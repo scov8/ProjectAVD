@@ -215,7 +215,7 @@ class BehaviorAgent(BasicAgent):
         obstacle_list = [w for w in obstacle_list if dist(w) < 10] # prendiamo quelli sotto i 10 mt
 
         # in base a quello ceh dbb fare valutaimo in modo diverso _vehicle_obstacle_detected()
-        if self._direction == RoadOption.CHANGELANELEFT:
+        if self._direction == RoadOption.CHANGELANELEFT: 
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=-1)
         elif self._direction == RoadOption.CHANGELANERIGHT:
@@ -270,6 +270,47 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         return control
+    
+    def overtake(self, vehicle_list):
+        # Check if the agent is currently changing lane
+        if self._local_planner.is_changing_lane():
+            return False
+
+        # Check if the agent is already in the rightmost lane
+        if not self._local_planner.can_change_lane(RoadOption.CHANGELANERIGHT):
+            return False
+
+        # Check if the agent is already overtaking
+        if self._local_planner.target_road_option == RoadOption.OVERTAKE:
+            return True
+
+        # Check if there is a vehicle ahead to overtake
+        if not self._local_planner._target_waypoint:
+            return False
+
+        # Check if the agent is too close to the vehicle ahead to initiate an overtake
+        if is_within_distance(self._vehicle, self._local_planner._target_waypoint.transform.location, 30):
+            return False
+
+        # Check if there is a vehicle on the right lane
+        right_lane_wp = self._local_planner._waypoint_buffer[1][-1]
+        right_lane_vehicles = [v for v in vehicle_list if v != self._vehicle and v.get_transform().location.distance(right_lane_wp.transform.location) < 30]
+        if len(right_lane_vehicles) > 0:
+            return False
+
+        # Check if there is enough distance to complete the overtake safely
+        front_vehicle = self._local_planner._target_waypoint
+        distance = compute_distance(self._vehicle, front_vehicle.transform.location)
+        speed = get_speed(self._vehicle)
+        time_to_overtake = distance / (speed + 1e-6)
+        if time_to_overtake < 4.0:
+            return False
+
+        # Initiate the overtake maneuver
+        self._local_planner.set_destination(front_vehicle.transform.location, RoadOption.OVERTAKE, clean=True)
+        return True
+
+
 
     def run_step(self, debug=False):
         """
@@ -312,7 +353,7 @@ class BehaviorAgent(BasicAgent):
         # 2.1.2: Obstacle avoidance behaviors
         obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine
 
-        if obstacle_state:
+        if obstacle_state: 
             distance = distance - max(
                 obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
                     self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
@@ -320,6 +361,8 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
+            else:
+                control = self.overtake(obstacle)
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine 
