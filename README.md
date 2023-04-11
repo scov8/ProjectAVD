@@ -1,2 +1,0 @@
-# ProjectAVD
- CARLA - AVD
