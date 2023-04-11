@@ -11,12 +11,14 @@ traffic signs, and has different possible configurations. """
 import random
 import numpy as np
 import carla
-import time, math
+import time
+import math
 from basic_agent import BasicAgent
 from local_planner import RoadOption
 from behavior_types import Cautious, Aggressive, Normal
 
 from misc import get_speed, positive, is_within_distance, compute_distance
+
 
 class BehaviorAgent(BasicAgent):
     """
@@ -83,11 +85,12 @@ class BehaviorAgent(BasicAgent):
 
     def traffic_light_manager(self):
         """
-        This method is in charge of behaviors for red lights.    
+        This method is in charge of behaviors for red lights.
         """
-        actor_list = self._world.get_actors() # prende dal mondo tuette le info dei sem
+        actor_list = self._world.get_actors()  # prende dal mondo tuette le info dei sem
         lights_list = actor_list.filter("*traffic_light*")
-        affected, _ = self._affected_by_traffic_light(lights_list) # valuta tra quale sem influenza la guida
+        affected, _ = self._affected_by_traffic_light(
+            lights_list)  # valuta tra quale sem influenza la guida
 
         return affected
 
@@ -122,7 +125,7 @@ class BehaviorAgent(BasicAgent):
                     end_waypoint = self._local_planner.target_waypoint
                     self._behavior.tailgate_counter = 200
                     self.set_destination(end_waypoint.transform.location,
-                                         right_wpt.transform.location) # lo posso vedere come modifica della traiettoria
+                                         right_wpt.transform.location)  # lo posso vedere come modifica della traiettoria
             elif left_turn == carla.LaneChange.Left and waypoint.lane_id * left_wpt.lane_id > 0 and left_wpt.lane_type == carla.LaneType.Driving:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
                     self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
@@ -145,9 +148,11 @@ class BehaviorAgent(BasicAgent):
             :return distance: distance to nearby vehicle
         """
 
-        vehicle_list = self._world.get_actors().filter("*vehicle*") # prendo i veicoli
-        def dist(v): return v.get_location().distance(waypoint.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] # prendo  quelli che mi servono
+        vehicle_list = self._world.get_actors().filter("*vehicle*")  # prendo i veicoli
+        def dist(v): return v.get_location().distance(
+            waypoint.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(
+            v) < 45 and v.id != self._vehicle.id]  # prendo  quelli che mi servono
 
         if self._direction == RoadOption.CHANGELANELEFT:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
@@ -166,7 +171,8 @@ class BehaviorAgent(BasicAgent):
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
                     and not waypoint.is_junction and self._speed > 10 \
                     and self._behavior.tailgate_counter == 0:
-                self._tailgating(waypoint, vehicle_list) # gestisce i veicoli ceh vengono da dietro, mi serve quando ad esempio esco dal percehggio
+                # gestisce i veicoli ceh vengono da dietro, mi serve quando ad esempio esco dal percehggio
+                self._tailgating(waypoint, vehicle_list)
 
         return vehicle_state, vehicle, distance
 
@@ -183,8 +189,11 @@ class BehaviorAgent(BasicAgent):
         """
 
         walker_list = self._world.get_actors().filter("*walker.pedestrian*")
-        def dist(w): return w.get_location().distance(waypoint.transform.location) # funzione distanza, valuta la distanza tra il pedone e dove mi trovo
-        walker_list = [w for w in walker_list if dist(w) < 10] # prendiamo quelli sotto i 10 mt
+        # funzione distanza, valuta la distanza tra il pedone e dove mi trovo
+        def dist(w): return w.get_location().distance(
+            waypoint.transform.location)
+        walker_list = [w for w in walker_list if dist(
+            w) < 10]  # prendiamo quelli sotto i 10 mt
 
         # in base a quello ceh dbb fare valutaimo in modo diverso _vehicle_obstacle_detected()
         if self._direction == RoadOption.CHANGELANELEFT:
@@ -195,10 +204,10 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1)
         else:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60) # se quesro sensore influenza la cosa
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)  # se quesro sensore influenza la cosa
 
         return walker_state, walker, distance
-    
+
     def obstacle_avoid_manager(self, waypoint):
         """
         This module is in charge of warning in case of a collision
@@ -212,11 +221,14 @@ class BehaviorAgent(BasicAgent):
         """
 
         obstacle_list = self._world.get_actors().filter("*static*")
-        def dist(w): return w.get_location().distance(waypoint.transform.location) # funzione distanza, valuta la distanza tra il pedone e dove mi trovo
-        obstacle_list = [w for w in obstacle_list if dist(w) < 10] # prendiamo quelli sotto i 10 mt
+        # funzione distanza, valuta la distanza tra il pedone e dove mi trovo
+        def dist(w): return w.get_location().distance(
+            waypoint.transform.location)
+        obstacle_list = [w for w in obstacle_list if dist(
+            w) < 10]  # prendiamo quelli sotto i 10 mt
 
         # in base a quello ceh dbb fare valutaimo in modo diverso _vehicle_obstacle_detected()
-        if self._direction == RoadOption.CHANGELANELEFT: 
+        if self._direction == RoadOption.CHANGELANELEFT:
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=-1)
         elif self._direction == RoadOption.CHANGELANERIGHT:
@@ -224,7 +236,7 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1)
         else:
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60) # se quesro sensore influenza la cosa
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)  # se quesro sensore influenza la cosa
 
         return obstacle_state, obstacle, distance
 
@@ -239,22 +251,26 @@ class BehaviorAgent(BasicAgent):
             :return control: carla.VehicleControl
         """
 
-        vehicle_speed = get_speed(vehicle) # prediamo la velocità del veicolo che ci sta davanti
+        # prediamo la velocità del veicolo che ci sta davanti
+        vehicle_speed = get_speed(vehicle)
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
-        ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision, tempo per arrivare a collisione
+        ttc = distance / delta_v if delta_v != 0 else distance / \
+            np.nextafter(
+                0., 1.)  # time to collision, tempo per arrivare a collisione
 
         # Under safety time distance, slow down.
-        if self._behavior.safety_time > ttc > 0.0: # se il tempo per arrivare a collisione è minore del tempo di sicurezza allora rallentiamo; voglio considerare il veicolo più tardi per evitare collisioni
+        if self._behavior.safety_time > ttc > 0.0:  # se il tempo per arrivare a collisione è minore del tempo di sicurezza allora rallentiamo; voglio considerare il veicolo più tardi per evitare collisioni
             target_speed = min([
                 positive(vehicle_speed - self._behavior.speed_decrease),
                 self._behavior.max_speed,
-                self._speed_limit - self._behavior.speed_lim_dist]) # se il veicolo che ci sta davanti è più lento di noi allora lo seguiamo
+                self._speed_limit - self._behavior.speed_lim_dist])  # se il veicolo che ci sta davanti è più lento di noi allora lo seguiamo
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
         # se al prossimo giro ancora sto in ttc di collisione rallento ancora
 
         # Actual safety distance area, try to follow the speed of the vehicle in front.
-        elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time: # siamo vicini, ma non tanto e proviamo a seguire la velocità del veicolo che ci sta davanti
+        # siamo vicini, ma non tanto e proviamo a seguire la velocità del veicolo che ci sta davanti
+        elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time:
             target_speed = min([
                 max(self._min_speed, vehicle_speed),
                 self._behavior.max_speed,
@@ -271,8 +287,11 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         return control
-    
-    def overtake(self, obstacle):
+
+    def overtake(self, obstacle, waypoint):
+        left_wpt = waypoint.get_left_lane()
+        right_wpt = waypoint.get_right_lane()
+
         OVERTAKE_OBSTACLE_THRESHOLD = 1.5
         target_lane = self._local_planner.get_right_lane()
         ego_location = self._vehicle.get_location()
@@ -287,16 +306,20 @@ class BehaviorAgent(BasicAgent):
         delta_yaw = math.fabs(ego_yaw - obstacle_yaw) * math.pi / 180.0
         delta_x = obstacle_extent / math.tan(delta_yaw)
         if target_lane == "right":
-            target_location = carla.Location(obstacle_location.x - delta_x, obstacle_location.y, obstacle_location.z)
+            target_location = carla.Location(
+                obstacle_location.x - delta_x, obstacle_location.y, obstacle_location.z)
         else:
-            target_location = carla.Location(obstacle_location.x + delta_x, obstacle_location.y, obstacle_location.z)
+            target_location = carla.Location(
+                obstacle_location.x + delta_x, obstacle_location.y, obstacle_location.z)
 
         # Check if the target location is free of obstacles
         # Wait until the obstacle clears the lane before starting the overtaking maneuver
         while True:
-            nearby_obstacles = self._world.get_actors().filter("*vehicle*") + self._world.get_actors().filter("*static*")
+            nearby_obstacles = self._world.get_actors().filter(
+                "*vehicle*") + self._world.get_actors().filter("*static*")
             if len(nearby_obstacles) > 0:
-                distance, _, _ = self._local_planner._vehicle.get_transform().distance(nearby_obstacles[0].get_transform())
+                distance, _, _ = self._local_planner._vehicle.get_transform().distance(
+                    nearby_obstacles[0].get_transform())
                 if distance < OVERTAKE_OBSTACLE_THRESHOLD:
                     time.sleep(0.1)
                 else:
@@ -311,13 +334,16 @@ class BehaviorAgent(BasicAgent):
         # Check if there are any obstacles on the target lane ahead of the vehicle
         # If yes, abort the overtaking maneuver and return to the original lane
         while True:
-            nearby_obstacles = self._world.get_actors().filter("*vehicle*") + self._world.get_actors().filter("*static*")
+            nearby_obstacles = self._world.get_actors().filter(
+                "*vehicle*") + self._world.get_actors().filter("*static*")
             if len(nearby_obstacles) > 0:
                 for nearby_obstacle in nearby_obstacles:
                     if nearby_obstacle.id != obstacle.id:
-                        _, _, distance_to_obstacle = self._local_planner._vehicle.get_transform().distance(nearby_obstacle.get_transform())
+                        _, _, distance_to_obstacle = self._local_planner._vehicle.get_transform(
+                        ).distance(nearby_obstacle.get_transform())
                         if distance_to_obstacle < OVERTAKE_OBSTACLE_THRESHOLD:
-                            self._local_planner.set_destination(ego_location, clean=True)
+                            self._local_planner.set_destination(
+                                ego_location, clean=True)
                             self._local_planner.change_lane("keep")
                             while self._local_planner.is_changing_lane():
                                 time.sleep(0.1)
@@ -347,13 +373,15 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
         # 1: Red lights and stops behavior
-        if self.traffic_light_manager(): # vede se esiste in un certo range un semaforo e vede se è rosso,si ferma e si salva che è rosso al semaforo. 
-            return self.emergency_stop() # se è rosso si ferma
+        # vede se esiste in un certo range un semaforo e vede se è rosso,si ferma e si salva che è rosso al semaforo.
+        if self.traffic_light_manager():
+            return self.emergency_stop()  # se è rosso si ferma
 
         # 2.1: Pedestrian avoidance behaviors
-        walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp) # lo considero fermandomi
+        walker_state, walker, w_distance = self.pedestrian_avoid_manager(
+            ego_vehicle_wp)  # lo considero fermandomi
 
-        #definisco se esiste un pednone che impatta con il veiolo
+        # definisco se esiste un pednone che impatta con il veiolo
         if walker_state:
             # Distance is computed from the center of the two cars,
             # we use bounding boxes to calculate the actual distance
@@ -366,9 +394,10 @@ class BehaviorAgent(BasicAgent):
                 return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
-        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine
+        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(
+            ego_vehicle_wp)  # se non ci sono pedoni che danno fastidio caco le macchine
 
-        if obstacle_state: 
+        if obstacle_state:
             distance = distance - max(
                 obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
                     self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
@@ -377,10 +406,11 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             else:
-                control = self.overtake(obstacle)
+                control = self.overtake(obstacle, ego_vehicle_wp)
 
         # 2.2: Car following behaviors
-        vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine 
+        vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(
+            ego_vehicle_wp)  # se non ci sono pedoni che danno fastidio caco le macchine
 
         if vehicle_state:
             # Distance is computed from the center of the two cars,
@@ -393,7 +423,8 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             else:
-                control = self.car_following_manager(vehicle, distance) # se il veicolo non è molto vicino posso pensare di seguirlo
+                # se il veicolo non è molto vicino posso pensare di seguirlo
+                control = self.car_following_manager(vehicle, distance)
 
         # 3: Intersection behavior
         # è una fregatura, ci dice se stiamo nellincrocio ma la gestione non è diversa da quella del behavior
@@ -410,10 +441,11 @@ class BehaviorAgent(BasicAgent):
             target_speed = min([
                 self._behavior.max_speed,
                 self._speed_limit - self._behavior.speed_lim_dist])
-            self._local_planner.set_speed(target_speed) # adattiamo il local planner a seguire la nostra velocità, dentro al local ci sono i controllori e cambia la vel
+            # adattiamo il local planner a seguire la nostra velocità, dentro al local ci sono i controllori e cambia la vel
+            self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
-        return control #una volta che abbiamo il controllo, lo ritornaimo 
+        return control  # una volta che abbiamo il controllo, lo ritornaimo
 
     def emergency_stop(self):
         """
