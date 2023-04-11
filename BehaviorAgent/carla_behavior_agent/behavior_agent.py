@@ -328,25 +328,6 @@ class BehaviorAgent(BasicAgent):
                 self.set_destination(right_wpt.transform.location,
                                      self.end_waypoint.transform.location, clean=True)
 
-        # Check if there are any obstacles on the target lane ahead of the vehicle
-        # If yes, abort the overtaking maneuver and return to the original lane
-        while True:
-            nearby_obstacles = self._world.get_actors().filter("vehicle*") + self._world.get_actors().filter("*static*")
-            if len(nearby_obstacles) > 0:
-                for nearby_obstacle in nearby_obstacles:
-                    if nearby_obstacle.id != obstacle.id:
-                        _, _, distance_to_obstacle = self._local_planner._vehicle.get_transform().distance(nearby_obstacle.get_transform())
-                        if distance_to_obstacle < OVERTAKE_OBSTACLE_THRESHOLD:
-                            self._local_planner.set_destination(ego_location, clean=True)
-                            self._local_planner.change_lane("keep")
-                            while self._local_planner.is_changing_lane():
-                                time.sleep(0.1)
-                            return False
-                time.sleep(0.1)
-            else:
-                break
-        return True
-
     def run_step(self, debug=False):
         """
         Execute one step of navigation.
