@@ -400,7 +400,8 @@ class BehaviorAgent(BasicAgent):
                 control = self.overtake(obstacle)
 
         # 2.2: Car following behaviors
-        vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine 
+        vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(
+            ego_vehicle_loc, ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine 
 
         if vehicle_state:
             # Distance is computed from the center of the two cars,
