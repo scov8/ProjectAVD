@@ -148,7 +148,7 @@ class BehaviorAgent(BasicAgent):
         vehicle_list = self._world.get_actors().filter("*vehicle*")
         def dist(v): return v.get_location().distance(waypoint.transform.location)
         # og dist threshold is 45
-        vehicle_list = [v for v in vehicle_list if dist(v) < 25 and v.id != self.vehicle.id]
+        vehicle_list = [v for v in vehicle_list if dist(v) < 25 and v.id != self._vehicle.id]
 
         if self.direction == RoadOption.CHANGELANELEFT:
             print('Change lane to left')
