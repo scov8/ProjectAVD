@@ -369,6 +369,38 @@ class BehaviorAgent(BasicAgent):
                 self.behavior.min_proximity_threshold, self.speed_limit / 3), up_angle_th=60)
 
         return walker_state, walker, distance
+<<<<<<< HEAD
+=======
+    
+    def obstacle_avoid_manager(self, waypoint):
+        """
+        This module is in charge of warning in case of a collision
+        with any pedestrian.
+
+            :param location: current location of the agent
+            :param waypoint: current waypoint of the agent
+            :return obstacle_state: True if there is a object nearby, False if not
+            :return obstacle: nearby obstacle
+            :return distance: distance to nearby obstacle
+        """
+
+        obstacle_list = self._world.get_actors().filter("*static*")
+        def dist(w): return w.get_location().distance(waypoint.transform.location) # funzione distanza, valuta la distanza tra il pedone e dove mi trovo
+        obstacle_list = [w for w in obstacle_list if dist(w) < 10] # prendiamo quelli sotto i 10 mt
+
+        # in base a quello ceh dbb fare valutaimo in modo diverso _vehicle_obstacle_detected()
+        if self._direction == RoadOption.CHANGELANELEFT:
+            obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=-1)
+        elif self._direction == RoadOption.CHANGELANERIGHT:
+            obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1)
+        else:
+            obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60) # se quesro sensore influenza la cosa
+
+        return obstacle_state, obstacle, distance
+>>>>>>> parent of 088635c (overtake)
 
     def car_following_manager(self, vehicle, distance, debug=False):
         """
@@ -435,7 +467,23 @@ class BehaviorAgent(BasicAgent):
             # we use bounding boxes to calculate the actual distance
             distance = w_distance - max(
                 walker.bounding_box.extent.y, walker.bounding_box.extent.x) - max(
+<<<<<<< HEAD
                     self.vehicle.bounding_box.extent.y, self.vehicle.bounding_box.extent.x)
+=======
+                    self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+
+            # Emergency brake if the car is very close al pedone.
+            if distance < self._behavior.braking_distance:
+                return self.emergency_stop()
+
+        # 2.1.2: Obstacle avoidance behaviors
+        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine
+
+        if obstacle_state:
+            distance = distance - max(
+                obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
+                    self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+>>>>>>> parent of 088635c (overtake)
 
             # Emergency brake if the car is very close.
             if distance < self.behavior.braking_distance:
