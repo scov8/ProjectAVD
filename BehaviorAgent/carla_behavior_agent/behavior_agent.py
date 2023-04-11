@@ -13,7 +13,7 @@ import numpy as np
 import carla
 import time, math
 from basic_agent import BasicAgent
-from local_planner import RoadOption, LocalPlanner, GlobalRoutePlanner
+from local_planner import RoadOption, LocalPlanner
 from behavior_types import Cautious, Aggressive, Normal
 
 from misc import get_speed, positive, is_within_distance, compute_distance
