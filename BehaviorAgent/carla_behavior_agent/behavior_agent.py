@@ -150,32 +150,32 @@ class BehaviorAgent(BasicAgent):
         # og dist threshold is 45
         vehicle_list = [v for v in vehicle_list if dist(v) < 25 and v.id != self._vehicle.id]
 
-        if self.direction == RoadOption.CHANGELANELEFT:
+        if self._direction == RoadOption.CHANGELANELEFT:
             print('Change lane to left')
             vehicle_state, vehicle, distance = self._bh_is_vehicle_hazard(
                 waypoint, location, vehicle_list, max(
-                    self.behavior.min_proximity_threshold, self.speed_limit / 2), up_angle_th=180, lane_offset=-1)
-        elif self.direction == RoadOption.CHANGELANERIGHT:
+                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+        elif self._direction == RoadOption.CHANGELANERIGHT:
             print('Change lane to right')
             vehicle_state, vehicle, distance = self._bh_is_vehicle_hazard(
                 waypoint, location, vehicle_list, max(
-                    self.behavior.min_proximity_threshold, self.speed_limit / 2), up_angle_th=180, lane_offset=1)
+                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
             vehicle_state, vehicle, distance = self._bh_is_vehicle_hazard(
                 waypoint, location, vehicle_list, max(                            # increase up_angle_th to account for goal waypoint appear after turn
-                    self.behavior.min_proximity_threshold, self.speed_limit / 3),up_angle_th=30) # up_angle_th=100) # og up th: 30)
+                    self._behavior.min_proximity_threshold, self._speed_limit / 3),up_angle_th=30) # up_angle_th=100) # og up th: 30)
 
             # Check for overtaking
-            if vehicle_state and self.direction == RoadOption.LANEFOLLOW and \
-                    not waypoint.is_junction and self.speed > 10 \
-                    and self.behavior.overtake_counter == 0 and self.speed > get_speed(vehicle):
+            if vehicle_state and self._direction == RoadOption.LANEFOLLOW and \
+                    not waypoint.is_junction and self._speed > 10 \
+                    and self._behavior.overtake_counter == 0 and self._speed > get_speed(vehicle):
                 print("!! start over taking !!")
                 self._overtake(location, waypoint, vehicle_list)
 
             # Check for tailgating
-            elif not vehicle_state and self.direction == RoadOption.LANEFOLLOW \
-                    and not waypoint.is_junction and self.speed > 10 \
-                    and self.behavior.tailgate_counter == 0:
+            elif not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
+                    and not waypoint.is_junction and self._speed > 10 \
+                    and self._behavior.tailgate_counter == 0:
                 self._tailgating(location, waypoint, vehicle_list)
 
         return vehicle_state, vehicle, distance
