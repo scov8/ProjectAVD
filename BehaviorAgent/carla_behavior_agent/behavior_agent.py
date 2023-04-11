@@ -18,8 +18,10 @@ import carla
 import time
 import math
 from basic_agent import BasicAgent
-from local_planner import RoadOption
+from local_planner import RoadOption, LocalPlanner
 from behavior_types import Cautious, Aggressive, Normal
+from global_route_planner import GlobalRoutePlanner
+from global_route_planner_dao import GlobalRoutePlannerDAO
 from misc import (get_speed, positive, is_within_distance,
                   get_trafficlight_trigger_location,
                   compute_distance)
@@ -73,11 +75,8 @@ class BehaviorAgent(BasicAgent):
         if behavior == 'cautious':
             self.behavior = Cautious()
 
-        elif behavior == 'normal_follow':
-            self.behavior = Normal_follow()
-
-        elif behavior == 'normal_overtake':
-            self.behavior = Normal_overtake()
+        elif behavior == 'normal':
+            self.behavior = Normal()
 
         elif behavior == 'aggressive':
             self.behavior = Aggressive()
