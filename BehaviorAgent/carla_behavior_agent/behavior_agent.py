@@ -11,6 +11,7 @@ traffic signs, and has different possible configurations. """
 import random
 import numpy as np
 import carla
+import time, math
 from basic_agent import BasicAgent
 from local_planner import RoadOption
 from behavior_types import Cautious, Aggressive, Normal
@@ -271,46 +272,60 @@ class BehaviorAgent(BasicAgent):
 
         return control
     
-    def overtake(self, vehicle_list):
-        # Check if the agent is currently changing lane
-        if self._local_planner.is_changing_lane():
-            return False
+    def overtake(self, obstacle):
+        OVERTAKE_OBSTACLE_THRESHOLD = 1.5
+        target_lane = self._local_planner.get_right_lane()
+        ego_location = self._vehicle.get_location()
+        ego_transform = self._vehicle.get_transform()
+        ego_yaw = ego_transform.rotation.yaw
 
-        # Check if the agent is already in the rightmost lane
-        if not self._local_planner.can_change_lane(RoadOption.CHANGELANERIGHT):
-            return False
+        # Calculate a position next to the obstacle, on the target lane
+        obstacle_location = obstacle.get_location()
+        obstacle_transform = obstacle.get_transform()
+        obstacle_extent = obstacle.bounding_box.extent.x
+        obstacle_yaw = obstacle_transform.rotation.yaw
+        delta_yaw = math.fabs(ego_yaw - obstacle_yaw) * math.pi / 180.0
+        delta_x = obstacle_extent / math.tan(delta_yaw)
+        if target_lane == "right":
+            target_location = carla.Location(obstacle_location.x - delta_x, obstacle_location.y, obstacle_location.z)
+        else:
+            target_location = carla.Location(obstacle_location.x + delta_x, obstacle_location.y, obstacle_location.z)
 
-        # Check if the agent is already overtaking
-        if self._local_planner.target_road_option == RoadOption.OVERTAKE:
-            return True
+        # Check if the target location is free of obstacles
+        # Wait until the obstacle clears the lane before starting the overtaking maneuver
+        while True:
+            nearby_obstacles = self._world.get_actors().filter("*vehicle*") + self._world.get_actors().filter("*static*")
+            if len(nearby_obstacles) > 0:
+                distance, _, _ = self._local_planner._vehicle.get_transform().distance(nearby_obstacles[0].get_transform())
+                if distance < OVERTAKE_OBSTACLE_THRESHOLD:
+                    time.sleep(0.1)
+                else:
+                    break
 
-        # Check if there is a vehicle ahead to overtake
-        if not self._local_planner._target_waypoint:
-            return False
+        self._local_planner.set_destination(target_location, clean=True)
+        self._local_planner.change_lane(target_lane)
 
-        # Check if the agent is too close to the vehicle ahead to initiate an overtake
-        if is_within_distance(self._vehicle, self._local_planner._target_waypoint.transform.location, 30):
-            return False
+        while self._local_planner.is_changing_lane():
+            time.sleep(0.1)
 
-        # Check if there is a vehicle on the right lane
-        right_lane_wp = self._local_planner._waypoint_buffer[1][-1]
-        right_lane_vehicles = [v for v in vehicle_list if v != self._vehicle and v.get_transform().location.distance(right_lane_wp.transform.location) < 30]
-        if len(right_lane_vehicles) > 0:
-            return False
-
-        # Check if there is enough distance to complete the overtake safely
-        front_vehicle = self._local_planner._target_waypoint
-        distance = compute_distance(self._vehicle, front_vehicle.transform.location)
-        speed = get_speed(self._vehicle)
-        time_to_overtake = distance / (speed + 1e-6)
-        if time_to_overtake < 4.0:
-            return False
-
-        # Initiate the overtake maneuver
-        self._local_planner.set_destination(front_vehicle.transform.location, RoadOption.OVERTAKE, clean=True)
+        # Check if there are any obstacles on the target lane ahead of the vehicle
+        # If yes, abort the overtaking maneuver and return to the original lane
+        while True:
+            nearby_obstacles = self._world.get_actors().filter("*vehicle*") + self._world.get_actors().filter("*static*")
+            if len(nearby_obstacles) > 0:
+                for nearby_obstacle in nearby_obstacles:
+                    if nearby_obstacle.id != obstacle.id:
+                        _, _, distance_to_obstacle = self._local_planner._vehicle.get_transform().distance(nearby_obstacle.get_transform())
+                        if distance_to_obstacle < OVERTAKE_OBSTACLE_THRESHOLD:
+                            self._local_planner.set_destination(ego_location, clean=True)
+                            self._local_planner.change_lane("keep")
+                            while self._local_planner.is_changing_lane():
+                                time.sleep(0.1)
+                            return False
+                time.sleep(0.1)
+            else:
+                break
         return True
-
-
 
     def run_step(self, debug=False):
         """
