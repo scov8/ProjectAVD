@@ -290,10 +290,10 @@ class BehaviorAgent(BasicAgent):
 
     def overtake(self, obstacle, waypoint):
         left_wpt = waypoint.get_left_lane()
-        right_wpt = waypoint.get_right_lane()
+        target_lane = waypoint.get_right_lane()
 
         OVERTAKE_OBSTACLE_THRESHOLD = 1.5
-        target_lane = self._local_planner.get_right_lane()
+
         ego_location = self._vehicle.get_location()
         ego_transform = self._vehicle.get_transform()
         ego_yaw = ego_transform.rotation.yaw
