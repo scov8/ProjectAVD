@@ -19,10 +19,8 @@ from leaderboard.autoagents.autonomous_agent import AutonomousAgent, Track
 import json
 from utils import Streamer
 
-
 def get_entry_point():
     return 'MyTeamAgent'
-
 
 class MyTeamAgent(AutonomousAgent):
 
@@ -40,13 +38,13 @@ class MyTeamAgent(AutonomousAgent):
         self.track = Track.SENSORS
 
         self._agent = None
-
+        
         with open(path_to_conf_file, "r") as f:
             self.configs = json.load(f)
             f.close()
-
+        
         self.__show = len(self.configs["Visualizer_IP"]) > 0
-
+        
         if self.__show:
             self.showServer = Streamer(self.configs["Visualizer_IP"])
 
@@ -71,10 +69,10 @@ class MyTeamAgent(AutonomousAgent):
 
     def run_step(self, input_data, timestamp):
         """
-        Execute one step of navigation.
+        Execute one step of navigation. 
         """
         if not self._agent:
-
+            
             # Search for the ego actor
             hero_actor = None
             for actor in CarlaDataProvider.get_world().get_actors():
@@ -83,8 +81,8 @@ class MyTeamAgent(AutonomousAgent):
 
             if not hero_actor:
                 return carla.VehicleControl()
-
-            self._agent = BehaviorAgent(hero_actor)
+            
+            self._agent = BehaviorAgent(hero_actor, opt_dict=self.configs)
 
             plan = []
             prev_wp = None
@@ -102,20 +100,20 @@ class MyTeamAgent(AutonomousAgent):
             controls = self._agent.run_step()
             if self.__show:
                 self.showServer.send_frame("RGB", input_data["Center"][1])
-                self.showServer.send_data("Controls", {
-                    "steer": controls.steer,
-                    "throttle": controls.throttle,
-                    "brake": controls.brake,
+                self.showServer.send_data("Controls",{ 
+                "steer":controls.steer, 
+                "throttle":controls.throttle, 
+                "brake": controls.brake,
                 })
             if len(self.configs["SaveSpeedData"]) > 0:
-                with open("team_code/"+self.configs["SaveSpeedData"], "a") as fp:
-                    fp.write(str(timestamp)+";"+str(input_data["Speed"][1]["speed"] * 3.6)+";"+str(
-                        self.configs["target_speed"])+"\n")
+                with open("team_code/"+self.configs["SaveSpeedData"],"a") as fp:
+                    fp.write(str(timestamp)+";"+str(input_data["Speed"][1]["speed"] * 3.6)+";"+str(self.configs["target_speed"])+"\n")
                     fp.close()
-
+                    
             return controls
 
     def destroy(self):
         print("DESTROY")
         if self._agent:
             self._agent.reset()
+            
