@@ -102,6 +102,20 @@ class BasicAgent(object):
         self._lights_list = self._world.get_actors().filter("*traffic_light*")
         self._lights_map = {}  # Dictionary mapping a traffic light to a wp corrspoing to its trigger volume location
 
+        bike_bp = self._world.get_blueprint_library().find('vehicle.tesla.cybertruck')
+        vehicle_list = self._world.get_actors().filter('vehicle.*')
+        car = vehicle_list[0]  # assumiamo che la prima macchina nella lista sia quella che ci interessa
+        car_orientation = car.get_transform().rotation
+        distance = 20  # metri
+        delta_x = distance * car_orientation.get_forward_vector().x
+        delta_y = distance * car_orientation.get_forward_vector().y
+        delta_z = 0  # assumiamo che la bicicletta sia a terra
+        bike_location = car.get_location() + carla.Location(delta_x, delta_y, delta_z)
+        bike_orientation = car_orientation
+        spawn_point = carla.Transform(bike_location, bike_orientation)
+        bike = self._world.spawn_actor(bike_bp, spawn_point)
+        bike.set_autopilot(True)
+
     def add_emergency_stop(self, control):
         """
         Overwrites the throttle a brake values of a control to perform an emergency stop.

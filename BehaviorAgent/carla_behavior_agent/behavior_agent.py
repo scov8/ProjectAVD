@@ -51,6 +51,9 @@ class BehaviorAgent(BasicAgent):
         self._behavior = None
         self._sampling_resolution = 4.5
 
+        self._overtake_threshold = 10
+        self._change_lane_threshold = 4
+
         # Parameters for agent behavior
         if behavior == 'cautious':
             self._behavior = Cautious()
@@ -131,7 +134,8 @@ class BehaviorAgent(BasicAgent):
                     self._behavior.tailgate_counter = 200
                     self.set_destination(end_waypoint.transform.location,
                                          left_wpt.transform.location)
-
+    '''
+    vecchia versione senza considerare i veicoli che vengono da dietro ed effettuando il cambio di corsia solo se la velocità è inferiore a quella del veicolo che ci sta dietro
     def collision_and_car_avoid_manager(self, waypoint):
         """
         This module is in charge of warning in case of a collision
@@ -168,6 +172,52 @@ class BehaviorAgent(BasicAgent):
                 self._tailgating(waypoint, vehicle_list) # gestisce i veicoli ceh vengono da dietro, mi serve quando ad esempio esco dal percehggio
 
         return vehicle_state, vehicle, distance
+    '''
+
+    def collision_and_car_avoid_manager(self, waypoint):
+        vehicle_list = self._world.get_actors().filter("*vehicle*") 
+        def dist(v): return v.get_location().distance(waypoint.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] 
+
+        if self._direction == RoadOption.CHANGELANELEFT: 
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
+                vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+            if vehicle_state:
+                right_vehicle_state, right_vehicle, right_distance = self._vehicle_obstacle_detected(
+                    vehicle_list, max(
+                        self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+                if not right_vehicle_state:
+                    print("Overtaking, moving to the right!")
+                    end_waypoint = self._local_planner.target_waypoint
+                    right_wpt = waypoint.get_right_lane()
+                    self.set_destination(end_waypoint.transform.location,
+                                        right_wpt.transform.location)
+        elif self._direction == RoadOption.CHANGELANERIGHT:
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
+                vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+            if vehicle_state:
+                left_vehicle_state, left_vehicle, left_distance = self._vehicle_obstacle_detected(
+                    vehicle_list, max(
+                        self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+                if not left_vehicle_state:
+                    print("Overtaking, moving to the left!")
+                    end_waypoint = self._local_planner.target_waypoint
+                    left_wpt = waypoint.get_left_lane()
+                    self.set_destination(end_waypoint.transform.location,
+                                        left_wpt.transform.location)
+        else:
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
+                vehicle_list, max(
+                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
+            # in questo caso teniamo conto del _tailgating()
+            # Check for tailgating
+            if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
+                    and not waypoint.is_junction and self._speed > 10 \
+                    and self._behavior.tailgate_counter == 0:
+                self._tailgating(waypoint, vehicle_list) # gestisce i veicoli ceh vengono da dietro, mi serve quando ad esempio esco dal percehggio
+
+        return vehicle_state, vehicle, distance
+
 
     def pedestrian_avoid_manager(self, waypoint):
         """
@@ -270,6 +320,44 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         return control
+    
+    def overtake_manager(self):
+        """
+        Manages the overtaking behavior of the vehicle.
+        """
+        ego_state = self._get_vehicle_state(self._ego_actor)
+
+        right_vehicle = None
+        left_vehicle = None
+
+        # Get the states of the vehicles to the right and left of the ego vehicle
+        for vehicle in self._world.get_actors().filter('vehicle.*'):
+            if vehicle.id != self._ego_actor.id:
+                vehicle_state = self._get_vehicle_state(vehicle)
+
+                if vehicle_state['lane_id'] == ego_state['lane_id']:
+                    if vehicle_state['lane_offset'] > ego_state['lane_offset']:
+                        if not right_vehicle or right_vehicle['lane_offset'] > vehicle_state['lane_offset']:
+                            right_vehicle = vehicle_state
+
+                    elif vehicle_state['lane_offset'] < ego_state['lane_offset']:
+                        if not left_vehicle or left_vehicle['lane_offset'] > vehicle_state['lane_offset']:
+                            left_vehicle = vehicle_state
+
+        # Check if there's a vehicle to overtake on the right
+        if right_vehicle and right_vehicle['lane_offset'] - ego_state['lane_offset'] <= self._overtake_threshold:
+            print("Overtaking, moving to the left!")
+            end_waypoint = self._local_planner.target_waypoint
+            left_wpt = end_waypoint.get_left_lane()
+            self.set_destination(end_waypoint.transform.location, left_wpt.transform.location)
+
+        # Check if we need to move back to the right lane
+        elif left_vehicle and ego_state['lane_offset'] - left_vehicle['lane_offset'] > self._change_lane_threshold:
+            print("Moving back to the right lane")
+            end_waypoint = self._local_planner.target_waypoint
+            right_wpt = end_waypoint.get_right_lane()
+            self.set_destination(end_waypoint.transform.location, right_wpt.transform.location)
+
 
     def run_step(self, debug=False):
         """
@@ -320,6 +408,8 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
+            else:
+                self.overtake_manager()
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine 
