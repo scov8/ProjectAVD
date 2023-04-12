@@ -179,7 +179,7 @@ class BehaviorAgent(BasicAgent):
         for vehicle in vehicle_list:
             if vehicle.id != self._vehicle.id and get_speed(vehicle) < 0.1 \
                     and vehicle.get_location().distance(ego_vehicle_location) < distance \
-                    and self._local_planner.target_waypoint.lane_id == self._map.get_waypoint(vehicle['position']).lane_id:
+                    and self._local_planner.target_waypoint.lane_id == self._map.get_waypoint(vehicle.get_location()).lane_id:
                 # Calculate a new destination for the ego vehicle to overtake the stopped vehicle
                 end_waypoint = self._local_planner.target_waypoint.next(2.0)[0]
                 right_wpt = end_waypoint.get_right_lane()
