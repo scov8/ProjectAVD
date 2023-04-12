@@ -106,7 +106,7 @@ class BasicAgent(object):
         vehicle_list = self._world.get_actors().filter('vehicle.*')
         car = vehicle_list[0]  # assumiamo che la prima macchina nella lista sia quella che ci interessa
         car_orientation = car.get_transform().rotation
-        distance = 20  # metri
+        distance = 10  # metri
         delta_x = distance * car_orientation.get_forward_vector().x
         delta_y = distance * car_orientation.get_forward_vector().y
         delta_z = 0  # assumiamo che la bicicletta sia a terra
