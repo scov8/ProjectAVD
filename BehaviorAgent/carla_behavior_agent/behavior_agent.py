@@ -168,8 +168,29 @@ class BehaviorAgent(BasicAgent):
                     and not waypoint.is_junction and self._speed > 10 \
                     and self._behavior.tailgate_counter == 0:
                 self._tailgating(waypoint, vehicle_list) # gestisce i veicoli ceh vengono da dietro, mi serve quando ad esempio esco dal percehggio
+                self.overtake_stopped_vehicle()
 
         return vehicle_state, vehicle, distance
+    
+    def overtake_stopped_vehicle(self, distance=20):
+        vehicle_list = self._world.get_actors().filter("*vehicle*")
+        ego_vehicle_location = self._vehicle.get_location()
+        # Search for a stopped vehicle ahead of the ego vehicle
+        for vehicle in vehicle_list:
+            if vehicle.id != self._vehicle.id and vehicle.get_speed() < 0.1 \
+                    and vehicle.get_location().distance(ego_vehicle_location) < distance \
+                    and self._local_planner.target_waypoint.lane_id == vehicle.get_location().lane_id:
+                # Calculate a new destination for the ego vehicle to overtake the stopped vehicle
+                end_waypoint = self._local_planner.target_waypoint.next(2.0)[0]
+                right_wpt = end_waypoint.get_right_lane()
+                # Check if there is a free lane to the right of the ego vehicle
+                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+                if not new_vehicle_state and right_wpt.lane_type == carla.LaneType.Driving:
+                    print("Overtaking stopped vehicle!")
+                    self.set_destination(end_waypoint.transform.location, right_wpt.transform.location)
+                    break
+
 
     def pedestrian_avoid_manager(self, waypoint):
         """
