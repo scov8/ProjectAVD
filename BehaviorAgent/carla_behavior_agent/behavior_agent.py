@@ -321,42 +321,49 @@ class BehaviorAgent(BasicAgent):
 
         return control
     
+    def _get_vehicle_state(self, vehicle_actor):
+        vehicle_state = {}
+        # Get actor state
+        vehicle_state['position'] = vehicle_actor.get_location()
+        vehicle_state['velocity'] = vehicle_actor.get_velocity()
+        vehicle_state['transform'] = vehicle_actor.get_transform()
+        vehicle_state['angular_velocity'] = vehicle_actor.get_angular_velocity()
+        vehicle_state['forward_vector'] = vehicle_state['transform'].get_forward_vector()
+        # Get lane id
+        waypoint = self._map.get_waypoint(vehicle_state['position'])
+        vehicle_state['lane_id'] = waypoint.lane_id
+
+        return vehicle_state
+
     def overtake_manager(self):
-        """
-        Manages the overtaking behavior of the vehicle.
-        """
-        ego_state = self._get_vehicle_state(self._ego_actor)
+        # Get the ego vehicle's state
+        ego_state = self._get_vehicle_state(self._vehicle)
 
-        right_vehicle = None
-        left_vehicle = None
+        # Check if the ego vehicle is on the right-most lane
+        if ego_state['lane_id'] == self._map.get_waypoint(self._vehicle.get_location()).lane_id:
+            # Get the state of the vehicle on the left
+            left_vehicle_state = self.collision_and_car_avoid_manager(left=True)
 
-        # Get the states of the vehicles to the right and left of the ego vehicle
-        for vehicle in self._world.get_actors().filter('vehicle.*'):
-            if vehicle.id != self._ego_actor.id:
-                vehicle_state = self._get_vehicle_state(vehicle)
+            # If there is a vehicle on the left and it is safe to overtake, move to the left lane
+            if left_vehicle_state and ego_state['distance_to_left'] > self._overtake_threshold and \
+                    ego_state['distance_to_left'] < self._change_lane_threshold:
+                print("Overtaking, moving to the left!")
+                end_waypoint = self._local_planner.target_waypoint
+                left_wpt = end_waypoint.get_left_lane()
+                self.set_destination(end_waypoint.transform.location, left_wpt.transform.location)
+        
+        # Check if the ego vehicle is on the left-most lane
+        elif ego_state['lane_id'] == self._map.get_waypoint(self._vehicle.get_location()).get_left_lane().lane_id:
+            # Get the state of the vehicle on the right
+            right_vehicle_state = self.collision_and_car_avoid_manager(right=True)
 
-                if vehicle_state['lane_id'] == ego_state['lane_id']:
-                    if vehicle_state['lane_offset'] > ego_state['lane_offset']:
-                        if not right_vehicle or right_vehicle['lane_offset'] > vehicle_state['lane_offset']:
-                            right_vehicle = vehicle_state
-
-                    elif vehicle_state['lane_offset'] < ego_state['lane_offset']:
-                        if not left_vehicle or left_vehicle['lane_offset'] > vehicle_state['lane_offset']:
-                            left_vehicle = vehicle_state
-
-        # Check if there's a vehicle to overtake on the right
-        if right_vehicle and right_vehicle['lane_offset'] - ego_state['lane_offset'] <= self._overtake_threshold:
-            print("Overtaking, moving to the left!")
-            end_waypoint = self._local_planner.target_waypoint
-            left_wpt = end_waypoint.get_left_lane()
-            self.set_destination(end_waypoint.transform.location, left_wpt.transform.location)
-
-        # Check if we need to move back to the right lane
-        elif left_vehicle and ego_state['lane_offset'] - left_vehicle['lane_offset'] > self._change_lane_threshold:
-            print("Moving back to the right lane")
-            end_waypoint = self._local_planner.target_waypoint
-            right_wpt = end_waypoint.get_right_lane()
-            self.set_destination(end_waypoint.transform.location, right_wpt.transform.location)
+            # If there is a vehicle on the right and it is safe to overtake, move to the right lane
+            if right_vehicle_state and ego_state['distance_to_right'] > self._overtake_threshold and \
+                    ego_state['distance_to_right'] < self._change_lane_threshold:
+                print("Overtaking, moving to the right!")
+                end_waypoint = self._local_planner.target_waypoint
+                right_wpt = end_waypoint.get_right_lane()
+                self.set_destination(end_waypoint.transform.location, right_wpt.transform.location)
 
 
     def run_step(self, debug=False):
