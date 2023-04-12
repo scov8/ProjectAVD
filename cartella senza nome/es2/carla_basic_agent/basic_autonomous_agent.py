@@ -101,9 +101,9 @@ class MyTeamAgent(AutonomousAgent):
             # questa seconda parte viene eseguita ad ogni step e contiene due ooperazioni importanti, cancella i veicoli che non sono il mio e invia i comandi di controllo
             # Release other vehicles 
             vehicle_list = CarlaDataProvider.get_world().get_actors().filter("*vehicle*")
-            #for actor in vehicle_list:  # nel for elimino tutti i veicoli che non sono il mio
-            #    if not('role_name' in actor.attributes and actor.attributes['role_name'] == 'hero'):
-            #        actor.destroy()
+            for actor in vehicle_list:  # nel for elimino tutti i veicoli che non sono il mio
+                if not('role_name' in actor.attributes and actor.attributes['role_name'] == 'hero'):
+                    actor.destroy()
             
             # questa seconda operazione: leggento tutti le informazioni del veicolo viene generato il controllo da attuare
             controls = self._agent.run_step() # controllo da attuare, che poi passa al server per poterlo attuare
