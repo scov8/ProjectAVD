@@ -270,7 +270,7 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
-        elif vehicle_speed == 0:
+        elif vehicle_speed < self._speed or vehicle_speed == 0.0:
             wpt = ego_vehicle_wp.get_left_lane()
             print(wpt)
             state, _, _ = self.collision_and_car_avoid_manager(wpt)
@@ -291,20 +291,6 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         return control
-    
-    def _get_vehicle_state(self, vehicle_actor):
-        vehicle_state = {}
-        # Get actor state
-        vehicle_state['position'] = vehicle_actor.get_location()
-        vehicle_state['velocity'] = vehicle_actor.get_velocity()
-        vehicle_state['transform'] = vehicle_actor.get_transform()
-        vehicle_state['angular_velocity'] = vehicle_actor.get_angular_velocity()
-        vehicle_state['forward_vector'] = vehicle_state['transform'].get_forward_vector()
-        # Get lane id
-        waypoint = self._map.get_waypoint(vehicle_state['position'])
-        vehicle_state['lane_id'] = waypoint.lane_id
-
-        return vehicle_state
 
     def run_step(self, debug=False):
         """
