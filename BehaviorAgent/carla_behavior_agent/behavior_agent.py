@@ -281,6 +281,7 @@ class BehaviorAgent(BasicAgent):
             else:
                 print("stop")
                 return self.emergency_stop()
+            control = self._local_planner.run_step(debug=debug)
 
         # Normal behavior.
         else:
