@@ -152,11 +152,11 @@ class BehaviorAgent(BasicAgent):
 
 
         file = open('scaler.txt', 'a') # Open a file in append mode
-        file.write(vehicle_list) # Write some text
+        file.write(str(vehicle_list)) # Write some text
         file.close() # Close the file   
         list = self._world.get_actors()
         file = open('scalerfff.txt', 'a') # Open a file in append mode
-        file.write(list) # Write some text
+        file.write(str(list)) # Write some text
         file.close() # Close the file   
              
         if self._direction == RoadOption.CHANGELANELEFT:
