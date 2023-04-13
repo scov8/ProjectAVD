@@ -146,7 +146,7 @@ class BehaviorAgent(BasicAgent):
             :return vehicle: nearby vehicle
             :return distance: distance to nearby vehicle
         """
-        vehicle_list = self._world.get_actors().filter("*vehicle*") # prendo i veicoli
+        vehicle_list = self._world.get_actors().filter("vehicle*") # prendo i veicoli
         def dist(v): return v.get_location().distance(waypoint.transform.location)
         vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] # prendo  quelli che mi servono
 
@@ -161,7 +161,7 @@ class BehaviorAgent(BasicAgent):
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
                 vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)
+                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=90)
             # in questo caso teniamo conto del _tailgating()
             # Check for tailgating
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
@@ -225,7 +225,9 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1)
         else:
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60) # se quesro sensore influenza la cosa
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=120, low_angle_th=30) # se quesro sensore influenza la cosa
+            
+            self._tailgating(waypoint, obstacle_list)
 
         return obstacle_state, obstacle, distance
 
