@@ -161,7 +161,7 @@ class BehaviorAgent(BasicAgent):
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
                 vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
+                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=180)
             # in questo caso teniamo conto del _tailgating()
             # Check for tailgating
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
@@ -243,8 +243,6 @@ class BehaviorAgent(BasicAgent):
         vehicle_speed = get_speed(vehicle) # prediamo la velocità del veicolo che ci sta davanti
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision, tempo per arrivare a collisione
-
-        print(vehicle_speed)
 
         # Under safety time distance, slow down.
         if self._behavior.safety_time > ttc > 0.0: # se il tempo per arrivare a collisione è minore del tempo di sicurezza allora rallentiamo; voglio considerare il veicolo più tardi per evitare collisioni
