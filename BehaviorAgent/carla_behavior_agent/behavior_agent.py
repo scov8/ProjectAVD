@@ -247,6 +247,7 @@ class BehaviorAgent(BasicAgent):
                 self._speed_limit - self._behavior.speed_lim_dist]) # se il veicolo che ci sta davanti è più lento di noi allora lo seguiamo
             #self._local_planner.set_speed(target_speed)
 
+            # in
             wpt = ego_vehicle_wp.get_left_lane()
             print(wpt)
             state, _, _ = self.collision_and_car_avoid_manager(wpt)
@@ -257,6 +258,7 @@ class BehaviorAgent(BasicAgent):
             else:
                 print("stop")
                 return self.emergency_stop()
+            # fin
             
             control = self._local_planner.run_step(debug=debug)
         # se al prossimo giro ancora sto in ttc di collisione rallento ancora
@@ -270,6 +272,7 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
+        # if mio
         elif vehicle_speed < self._speed or vehicle_speed == 0.0:
             wpt = ego_vehicle_wp.get_left_lane()
             print(wpt)
@@ -343,7 +346,10 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             else:
-                pass
+                self.lane_change("left")
+                self._local_planner.set_speed(30)
+                control = self._local_planner.run_step(debug=debug)
+                #pass
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine 
