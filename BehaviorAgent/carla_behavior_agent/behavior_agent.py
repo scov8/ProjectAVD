@@ -146,7 +146,7 @@ class BehaviorAgent(BasicAgent):
             :return vehicle: nearby vehicle
             :return distance: distance to nearby vehicle
         """
-        vehicle_list = self._world.get_actors()#.filter('vehicle.*') # prendo i veicoli
+        vehicle_list = self._world.get_actors().filter('*') # prendo i veicoli
         def dist(v): return v.get_location().distance(waypoint.transform.location)
         vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] # prendo  quelli che mi servono
         if self._direction == RoadOption.CHANGELANELEFT: # se sto cambiando corsia a sinistra
