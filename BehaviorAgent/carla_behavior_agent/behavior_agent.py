@@ -153,12 +153,8 @@ class BehaviorAgent(BasicAgent):
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
         elif self._direction == RoadOption.CHANGELANERIGHT: # se sto cambiando corsia a destra
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
-        elif self._direction == RoadOption.LEFT: # se sto andando a sinistra
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=359, low_angle_th=190) 
-        elif self._direction == RoadOption.RIGHT: # se sto andando a destra
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=100)
         else:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=15)
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
             # in questo caso teniamo conto del _tailgating()
             # Check for tailgating
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
@@ -240,6 +236,8 @@ class BehaviorAgent(BasicAgent):
         vehicle_speed = get_speed(vehicle) # prediamo la velocità del veicolo che ci sta davanti
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision, tempo per arrivare a collisione
+        ego_vehicle_loc = self._vehicle.get_location()
+        ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
         # Under safety time distance, slow down.
         if self._behavior.safety_time > ttc > 0.0: # se il tempo per arrivare a collisione è minore del tempo di sicurezza allora rallentiamo; voglio considerare il veicolo più tardi per evitare collisioni
@@ -247,7 +245,19 @@ class BehaviorAgent(BasicAgent):
                 positive(vehicle_speed - self._behavior.speed_decrease),
                 self._behavior.max_speed,
                 self._speed_limit - self._behavior.speed_lim_dist]) # se il veicolo che ci sta davanti è più lento di noi allora lo seguiamo
-            self._local_planner.set_speed(target_speed)
+            #self._local_planner.set_speed(target_speed)
+
+            wpt = ego_vehicle_wp.get_left_lane()
+            print(wpt)
+            state, _, _ = self.collision_and_car_avoid_manager(wpt)
+            if not state:
+                print("change lane")
+                self.lane_change("left")
+                self._local_planner.set_speed(target_speed)
+            else:
+                print("stop")
+                return self.emergency_stop()
+            
             control = self._local_planner.run_step(debug=debug)
         # se al prossimo giro ancora sto in ttc di collisione rallento ancora
 
@@ -257,6 +267,11 @@ class BehaviorAgent(BasicAgent):
                 max(self._min_speed, vehicle_speed),
                 self._behavior.max_speed,
                 self._speed_limit - self._behavior.speed_lim_dist])
+            self._local_planner.set_speed(target_speed)
+            control = self._local_planner.run_step(debug=debug)
+
+        elif vehicle_speed == 0:
+            target_speed = 0
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
