@@ -146,31 +146,19 @@ class BehaviorAgent(BasicAgent):
             :return vehicle: nearby vehicle
             :return distance: distance to nearby vehicle
         """
-        vehicle_list = self._world.get_actors().filter("*vehicle*") # prendo i veicoli
+        vehicle_list = self._world.get_actors().filter('vehicle.*') # prendo i veicoli
         def dist(v): return v.get_location().distance(waypoint.transform.location)
         vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] # prendo  quelli che mi servono
-
-
-        file = open('scaler.txt', 'a') # Open a file in append mode
-        file.write(str(vehicle_list)) # Write some text
-        file.close() # Close the file   
-        list = self._world.get_actors()
-        file = open('scalerfff.txt', 'a') # Open a file in append mode
-        file.write(str(list)) # Write some text
-        file.close() # Close the file   
-             
-        if self._direction == RoadOption.CHANGELANELEFT:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
-                vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
-        elif self._direction == RoadOption.CHANGELANERIGHT:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
-                vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+        if self._direction == RoadOption.CHANGELANELEFT: # se sto cambiando corsia a sinistra
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+        elif self._direction == RoadOption.CHANGELANERIGHT: # se sto cambiando corsia a destra
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+        elif self._direction == RoadOption.LEFT: # se sto andando a sinistra
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=359, low_angle_th=190) 
+        elif self._direction == RoadOption.RIGHT: # se sto andando a destra
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=100)
         else:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
-                vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=225, low_angle_th=135)
             # in questo caso teniamo conto del _tailgating()
             # Check for tailgating
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
@@ -234,7 +222,7 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1)
         else:
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60) # se quesro sensore influenza la cosa
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60) # se questo sensore influenza la cosa
 
         return obstacle_state, obstacle, distance
 
