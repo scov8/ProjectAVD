@@ -161,7 +161,7 @@ class BehaviorAgent(BasicAgent):
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(
                 vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=180)
+                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)
             # in questo caso teniamo conto del _tailgating()
             # Check for tailgating
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
