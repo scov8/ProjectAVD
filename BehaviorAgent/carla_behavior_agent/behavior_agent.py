@@ -168,31 +168,9 @@ class BehaviorAgent(BasicAgent):
                     and not waypoint.is_junction and self._speed > 10 \
                     and self._behavior.tailgate_counter == 0:
                 self._tailgating(waypoint, vehicle_list) # gestisce i veicoli ceh vengono da dietro, mi serve quando ad esempio esco dal percehggio
-                self.overtake_stopped_vehicle()
 
         return vehicle_state, vehicle, distance
     
-    def overtake_stopped_vehicle(self, distance=20):
-        vehicle_list = self._world.get_actors().filter("*vehicle*")
-        ego_vehicle_location = self._vehicle.get_location()
-        # Search for a stopped vehicle ahead of the ego vehicle
-        for vehicle in vehicle_list:
-            if vehicle.id != self._vehicle.id and get_speed(vehicle) < 15 \
-                    and vehicle.get_location().distance(ego_vehicle_location) < distance \
-                    and self._local_planner.target_waypoint.lane_id == self._map.get_waypoint(vehicle.get_location()).lane_id:
-                # Calculate a new destination for the ego vehicle to overtake the stopped vehicle
-                self.emergency_stop()
-                end_waypoint = self._local_planner.target_waypoint.next(2.0)[0]
-                right_wpt = end_waypoint.get_right_lane()
-                # Check if there is a free lane to the right of the ego vehicle
-                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
-                if not new_vehicle_state and right_wpt.lane_type == carla.LaneType.Driving:
-                    print("Overtaking stopped vehicle!")
-                    self.set_destination(end_waypoint.transform.location, right_wpt.transform.location)
-                    break
-
-
     def pedestrian_avoid_manager(self, waypoint):
         """
         This module is in charge of warning in case of a collision
@@ -265,6 +243,8 @@ class BehaviorAgent(BasicAgent):
         vehicle_speed = get_speed(vehicle) # prediamo la velocità del veicolo che ci sta davanti
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision, tempo per arrivare a collisione
+
+        print(vehicle_speed)
 
         # Under safety time distance, slow down.
         if self._behavior.safety_time > ttc > 0.0: # se il tempo per arrivare a collisione è minore del tempo di sicurezza allora rallentiamo; voglio considerare il veicolo più tardi per evitare collisioni
