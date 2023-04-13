@@ -13,6 +13,7 @@ class Cautious(object):
     min_proximity_threshold = 12
     braking_distance = 6
     tailgate_counter = 0
+    overtake_counter = 0
 
 
 class Normal(object):
@@ -24,6 +25,7 @@ class Normal(object):
     min_proximity_threshold = 10
     braking_distance = 5
     tailgate_counter = 0
+    overtake_counter = 0
 
 
 class Aggressive(object):
@@ -35,3 +37,4 @@ class Aggressive(object):
     min_proximity_threshold = 8
     braking_distance = 4
     tailgate_counter = -1
+    overtake_counter = 0

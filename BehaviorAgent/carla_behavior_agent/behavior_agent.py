@@ -134,6 +134,36 @@ class BehaviorAgent(BasicAgent):
                     self._behavior.tailgate_counter = 200
                     self.set_destination(end_waypoint.transform.location,
                                          left_wpt.transform.location)
+    
+    def _overtake(self, waypoint, vehicle_list):
+        left_turn = waypoint.left_lane_marking.lane_change
+        right_turn = waypoint.right_lane_marking.lane_change
+
+        left_wpt = waypoint.get_left_lane()
+        right_wpt = waypoint.get_right_lane()
+
+        # vedo se c è un veicolo davanti a me che mi sta rallentando
+        front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+            self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
+        
+        if front_vehicle_state and self._speed > get_speed(front_vehicle):
+            if (right_turn == carla.LaneChange.Right or right_turn ==
+                    carla.LaneChange.Both) and waypoint.lane_id * right_wpt.lane_id > 0 and right_wpt.lane_type == carla.LaneType.Driving:
+                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+                if not new_vehicle_state:
+                    # se non ci sono veicoli che ci ostacolano, cambia corsia, avvio la manovra di cambio corsia
+                    print("Tailgating, moving to the right!")
+                    end_waypoint = self._local_planner.target_waypoint
+                    self._behavior.overtake_counter = 200
+                    self.set_destination(end_waypoint.transform.location, right_wpt.transform.location) 
+
+            elif left_turn == carla.LaneChange.Left and waypoint.lane_id * left_wpt.lane_id > 0 and left_wpt.lane_type == carla.LaneType.Driving:
+                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+                if not new_vehicle_state:
+                    print("Tailgating, moving to the left!")
+                    end_waypoint = self._local_planner.target_waypoint
+                    self._behavior.overtake_counter = 200
+                    self.set_destination(end_waypoint.transform.location, left_wpt.transform.location)
 
     def collision_and_car_avoid_manager(self, waypoint):
         """
@@ -232,7 +262,7 @@ class BehaviorAgent(BasicAgent):
             :param debug: boolean for debugging
             :return control: carla.VehicleControl
         """
-
+        vehicle_list = self._world.get_actors().filter("vehicle")
         vehicle_speed = get_speed(vehicle) # prediamo la velocità del veicolo che ci sta davanti
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision, tempo per arrivare a collisione
@@ -253,7 +283,9 @@ class BehaviorAgent(BasicAgent):
             state, _, _ = self.collision_and_car_avoid_manager(wpt)
             if not state:
                 print("change lane")
-                self.lane_change("left")
+                if self._behavior.overtake_counter == 0:
+                    self._tailgating(wpt, vehicle_list)
+                #self.lane_change("left")
                 self._local_planner.set_speed(target_speed)
             else:
                 print("stop")
@@ -279,7 +311,9 @@ class BehaviorAgent(BasicAgent):
             state, _, _ = self.collision_and_car_avoid_manager(wpt)
             if not state:
                 print("change lane")
-                self.lane_change("left")
+                if self._behavior.overtake_counter == 0:
+                    self._tailgating(wpt, vehicle_list)
+                #self.lane_change("left")
                 self._local_planner.set_speed(30)
             else:
                 print("stop")
@@ -308,6 +342,9 @@ class BehaviorAgent(BasicAgent):
         self._update_information()
 
         control = None
+        if self._behavior.overtake_counter > 0:
+            self._behavior.overtake_counter -= 1
+
         if self._behavior.tailgate_counter > 0:
             self._behavior.tailgate_counter -= 1
 
@@ -346,10 +383,10 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             else:
-                self.lane_change("left")
-                self._local_planner.set_speed(30)
-                control = self._local_planner.run_step(debug=debug)
-                #pass
+                #self.lane_change("left")
+                #self._local_planner.set_speed(30)
+                #control = self._local_planner.run_step(debug=debug)
+                pass
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp) # se non ci sono pedoni che danno fastidio caco le macchine 
