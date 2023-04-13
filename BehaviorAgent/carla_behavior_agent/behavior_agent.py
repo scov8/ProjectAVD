@@ -222,7 +222,7 @@ class BehaviorAgent(BasicAgent):
 
         return obstacle_state, obstacle, distance
 
-    def car_following_manager(self, vehicle, distance, debug=False):
+    def car_following_manager(self, vehicle, distance, debug=True):
         """
         Module in charge of car-following behaviors when there's
         someone in front of us.
@@ -271,9 +271,16 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         elif vehicle_speed == 0:
-            target_speed = 0
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
+            wpt = ego_vehicle_wp.get_left_lane()
+            print(wpt)
+            state, _, _ = self.collision_and_car_avoid_manager(wpt)
+            if not state:
+                print("change lane")
+                self.lane_change("left")
+                self._local_planner.set_speed(30)
+            else:
+                print("stop")
+                return self.emergency_stop()
 
         # Normal behavior.
         else:
