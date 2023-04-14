@@ -176,19 +176,19 @@ class BehaviorAgent(BasicAgent):
             :return vehicle: nearby vehicle
             :return distance: distance to nearby vehicle
         """
-        vehicle_list = self._world.get_actors().filter("vehicle") # prendo i veicoli
+        vehicle_list = self._world.get_actors().filter("vehicle")
         def dist(v): return v.get_location().distance(waypoint.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] # prendo  quelli che mi servono
-        if self._direction == RoadOption.CHANGELANELEFT: # se sto cambiando corsia a sinistra
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] 
+        if self._direction == RoadOption.CHANGELANELEFT: 
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
-        elif self._direction == RoadOption.CHANGELANERIGHT: # se sto cambiando corsia a destra
+        elif self._direction == RoadOption.CHANGELANERIGHT:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
-            for i in range(2, 359):
-                vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=i, low_angle_th=i-2)
-                if vehicle_state:
-                    print(i)
-             
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30, low_angle_th=-30)
+            
+            print("dentro collision_and_car_avoid_manager")
+            print("vehicle_state: ", vehicle_state, " vehicle: ", vehicle, " distance: ", distance)
+
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
                     and not waypoint.is_junction and self._speed > 10 \
                     and self._behavior.tailgate_counter == 0:
