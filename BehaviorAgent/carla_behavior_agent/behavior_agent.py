@@ -275,43 +275,8 @@ class BehaviorAgent(BasicAgent):
         print(vehicle)
         print(distance)
 
-        # Under safety time distance, slow down.
-        if self._behavior.safety_time > ttc > 0.0: # se il tempo per arrivare a collisione è minore del tempo di sicurezza allora rallentiamo; voglio considerare il veicolo più tardi per evitare collisioni
-            target_speed = min([
-                positive(vehicle_speed - self._behavior.speed_decrease),
-                self._behavior.max_speed,
-                self._speed_limit - self._behavior.speed_lim_dist]) # se il veicolo che ci sta davanti è più lento di noi allora lo seguiamo
-            #self._local_planner.set_speed(target_speed)
-
-            # in
-            wpt = ego_vehicle_wp.get_left_lane()
-            print(wpt)
-            state, _, _ = self.collision_and_car_avoid_manager(wpt)
-            if not state:
-                print("change lane")
-                if self._behavior.overtake_counter == 0:
-                    self._overtake(wpt, vehicle_list)
-                #self.lane_change("left")
-                self._local_planner.set_speed(target_speed)
-            else:
-                print("stop")
-                return self.emergency_stop()
-            # fin
-            
-            control = self._local_planner.run_step(debug=debug)
-        # se al prossimo giro ancora sto in ttc di collisione rallento ancora
-
-        # Actual safety distance area, try to follow the speed of the vehicle in front.
-        elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time: # siamo vicini, ma non tanto e proviamo a seguire la velocità del veicolo che ci sta davanti
-            target_speed = min([
-                max(self._min_speed, vehicle_speed),
-                self._behavior.max_speed,
-                self._speed_limit - self._behavior.speed_lim_dist])
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
-
         # if mio
-        elif vehicle_speed < self._speed or vehicle_speed < 1.0:
+        if (vehicle_speed < self._speed or vehicle_speed < 15.0) and distance < 15.0:
             wpt = ego_vehicle_wp.get_left_lane()
             print(wpt)
             state, _, _ = self.collision_and_car_avoid_manager(wpt)
@@ -326,7 +291,24 @@ class BehaviorAgent(BasicAgent):
                 return self.emergency_stop()
             #control = self._local_planner.run_step(debug=debug)
 
-        # Normal behavior.
+        # Under safety time distance, slow down.
+        elif self._behavior.safety_time > ttc > 0.0:
+            target_speed = min([
+                positive(vehicle_speed - self._behavior.speed_decrease),
+                self._behavior.max_speed,
+                self._speed_limit - self._behavior.speed_lim_dist]) 
+            self._local_planner.set_speed(target_speed)
+            control = self._local_planner.run_step(debug=debug)
+
+        # Actual safety distance area, try to follow the speed of the vehicle in front.
+        elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time: # siamo vicini, ma non tanto e proviamo a seguire la velocità del veicolo che ci sta davanti
+            target_speed = min([
+                max(self._min_speed, vehicle_speed),
+                self._behavior.max_speed,
+                self._speed_limit - self._behavior.speed_lim_dist])
+            self._local_planner.set_speed(target_speed)
+            control = self._local_planner.run_step(debug=debug)
+        
         else:
             target_speed = min([
                 self._behavior.max_speed,
