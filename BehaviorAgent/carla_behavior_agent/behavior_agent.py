@@ -269,8 +269,7 @@ class BehaviorAgent(BasicAgent):
         # if mio
         if (vehicle_speed < (self._speed / 5) or vehicle_speed < 1.0) and distance < 10.0:
             wpt = ego_vehicle_wp.get_left_lane()    
-            if self._behavior.overtake_counter == 0:
-                self._overtake(vehicle_list)
+            self._overtake(vehicle_list)
             control = self._local_planner.run_step(debug=debug)       
 
         # Under safety time distance, slow down.
