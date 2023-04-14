@@ -123,8 +123,7 @@ class BehaviorAgent(BasicAgent):
                     print("Tailgating, moving to the right!")
                     end_waypoint = self._local_planner.target_waypoint
                     self._behavior.tailgate_counter = 200
-                    self.set_destination(end_waypoint.transform.location,
-                                         right_wpt.transform.location) # lo posso vedere come modifica della traiettoria
+                    self.set_destination(end_waypoint.transform.location, right_wpt.transform.location)
             elif left_turn == carla.LaneChange.Left and waypoint.lane_id * left_wpt.lane_id > 0 and left_wpt.lane_type == carla.LaneType.Driving:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
                     self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
@@ -146,7 +145,7 @@ class BehaviorAgent(BasicAgent):
         front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
             self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
         
-        if front_vehicle_state and (self._speed > get_speed(front_vehicle) or get_speed(front_vehicle) == 0):
+        if front_vehicle_state and (self._speed > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
             print("sto cazzzzoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             if (right_turn == carla.LaneChange.Right or right_turn ==
                     carla.LaneChange.Both) and waypoint.lane_id * right_wpt.lane_id > 0 and right_wpt.lane_type == carla.LaneType.Driving:
@@ -285,7 +284,7 @@ class BehaviorAgent(BasicAgent):
             if not state:
                 print("change lane")
                 if self._behavior.overtake_counter == 0:
-                    self._tailgating(wpt, vehicle_list)
+                    self._overtake(wpt, vehicle_list)
                 #self.lane_change("left")
                 self._local_planner.set_speed(target_speed)
             else:
@@ -306,20 +305,20 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         # if mio
-        elif vehicle_speed < self._speed or vehicle_speed == 0.0:
+        elif vehicle_speed < self._speed or vehicle_speed < 1.0:
             wpt = ego_vehicle_wp.get_left_lane()
             print(wpt)
             state, _, _ = self.collision_and_car_avoid_manager(wpt)
             if not state:
                 print("change lane")
                 if self._behavior.overtake_counter == 0:
-                    self._tailgating(wpt, vehicle_list)
+                    self._overtake(wpt, vehicle_list)
                 #self.lane_change("left")
                 self._local_planner.set_speed(30)
             else:
                 print("stop")
                 return self.emergency_stop()
-            control = self._local_planner.run_step(debug=debug)
+            #control = self._local_planner.run_step(debug=debug)
 
         # Normal behavior.
         else:
