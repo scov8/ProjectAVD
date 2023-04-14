@@ -144,7 +144,7 @@ class BehaviorAgent(BasicAgent):
                 if not new_vehicle_state and not new_vehicle_state2:
                     self._behavior.overtake_counter == 1
                     self.lane_change("left")
-            else:
+            elif self._behavior.overtake_counter == 1:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
                 if not new_vehicle_state:
                     self._behavior.overtake_counter == 0
@@ -309,9 +309,7 @@ class BehaviorAgent(BasicAgent):
         self._update_information()
 
         control = None
-        if self._behavior.overtake_counter > 0:
-            self._behavior.overtake_counter -= 1
-
+    
         if self._behavior.tailgate_counter > 0:
             self._behavior.tailgate_counter -= 1
 
