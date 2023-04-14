@@ -184,20 +184,11 @@ class BehaviorAgent(BasicAgent):
         elif self._direction == RoadOption.CHANGELANERIGHT: # se sto cambiando corsia a destra
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
-            # Check for tailgating
-            print("Dentro collision_and_car_avoid_manager") # togliere
-            print(vehicle_state) # togliere
-            print(vehicle) # togliere
-            print(distance)    # togliere
-
-            vehicle_state2, vehicle2, distance2 = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=359, low_angle_th=330)
-            # Check for tailgating
-            print("222222222222222222222222") # togliere
-            print(vehicle_state2) # togliere
-            print(vehicle2) # togliere
-            print(distance2)    # togliere
-
+            for i in range(2, 359):
+                vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=i, low_angle_th=i-2)
+                if vehicle_state:
+                    print(i)
+             
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
                     and not waypoint.is_junction and self._speed > 10 \
                     and self._behavior.tailgate_counter == 0:
