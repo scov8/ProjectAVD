@@ -279,16 +279,13 @@ class BehaviorAgent(BasicAgent):
         if (vehicle_speed < self._speed or vehicle_speed < 15.0) and distance < 15.0:
             wpt = ego_vehicle_wp.get_left_lane()
             print(wpt)
-            state, _, _ = self.collision_and_car_avoid_manager(wpt)
-            if not state:
-                print("change lane")
-                if self._behavior.overtake_counter == 0:
-                    self._overtake(wpt, vehicle_list)
-                #self.lane_change("left")
-                self._local_planner.set_speed(30)
-            else:
-                print("stop")
-                return self.emergency_stop()
+           
+            print("change lane")
+            if self._behavior.overtake_counter == 0:
+                self._overtake(wpt, vehicle_list)
+            #self.lane_change("left")
+            self._local_planner.set_speed(30)
+ 
             #control = self._local_planner.run_step(debug=debug)
 
         # Under safety time distance, slow down.
