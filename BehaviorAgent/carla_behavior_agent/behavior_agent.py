@@ -284,9 +284,9 @@ class BehaviorAgent(BasicAgent):
             if self._behavior.overtake_counter == 0:
                 self._overtake(wpt, vehicle_list)
             #self.lane_change("left")
-            self._local_planner.set_speed(30)
+            #self._local_planner.set_speed(30)
  
-            #control = self._local_planner.run_step(debug=debug)
+            control = self._local_planner.run_step(debug=debug)
 
         # Under safety time distance, slow down.
         elif self._behavior.safety_time > ttc > 0.0:
