@@ -184,7 +184,7 @@ class BehaviorAgent(BasicAgent):
         elif self._direction == RoadOption.CHANGELANERIGHT:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=359, low_angle_th=330)
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30, lane_offset=1)
             
             print("dentro collision_and_car_avoid_manager")
             print("vehicle_state: ", vehicle_state, " vehicle: ", vehicle, " distance: ", distance)
