@@ -137,7 +137,7 @@ class BehaviorAgent(BasicAgent):
     def _overtake(self, vehicle_list):
         front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
         
-        if front_vehicle_state and (self._speed > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
+        if front_vehicle_state and (self._speed / 5 > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
             if self._behavior.overtake_counter == 0:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
                 new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit * 2), up_angle_th=40, lane_offset=-1)
@@ -261,7 +261,7 @@ class BehaviorAgent(BasicAgent):
         print(distance)
 
         # if mio
-        if (vehicle_speed < (self._speed / 3) or vehicle_speed < 1.0) and distance < 15.0:
+        if (vehicle_speed < (self._speed / 5) or vehicle_speed < 1.0) and distance < 15.0:
             wpt = ego_vehicle_wp.get_left_lane()    
             if self._behavior.overtake_counter == 0:
                 self._overtake(vehicle_list)
