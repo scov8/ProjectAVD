@@ -3,6 +3,17 @@
 
 """ This module contains the different parameters sets for each behavior. """
 
+class Custom(object):
+    """Class for Custom agent."""
+    max_speed = 60
+    speed_lim_dist = 1
+    speed_decrease = 12
+    safety_time = 3
+    min_proximity_threshold = 10
+    braking_distance = 7
+    tailgate_counter = 0
+    overtake_counter = 0
+
 
 class Cautious(object):
     """Class for Cautious agent."""

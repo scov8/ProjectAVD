@@ -67,7 +67,7 @@ def is_within_distance(target_transform, reference_transform, max_distance, angl
     """
     Check if a location is both within a certain distance from a reference object.
     By using 'angle_interval', the angle between the location and reference transform
-    will also be tkaen into account, being 0 a location in front and 180, one behind.
+    will also be taken into account, being 0 a location in front and 180, one behind.
 
     :param target_transform: location of the target object
     :param reference_transform: location of the reference object
@@ -136,6 +136,19 @@ def distance_vehicle(waypoint, vehicle_transform):
 
     return math.sqrt(x * x + y * y)
 
+def distance_obstacle(waypoint, obstacle_transform):
+    """
+    Returns the 2D distance from a waypoint to an obstacle
+
+        :param waypoint: actual waypoint
+        :param obstacle_transform: transform of the target obstacle
+    """
+    loc = obstacle_transform.transform
+
+    x = waypoint.transform.location.x - loc.x
+    y = waypoint.transform.location.y - loc.y
+
+    return math.sqrt(x * x + y * y)
 
 def vector(location_1, location_2):
     """

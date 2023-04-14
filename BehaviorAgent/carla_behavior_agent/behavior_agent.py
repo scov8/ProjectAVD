@@ -13,7 +13,7 @@ import numpy as np
 import carla
 from basic_agent import BasicAgent
 from local_planner import RoadOption
-from behavior_types import Cautious, Aggressive, Normal
+from behavior_types import *
 
 from misc import get_speed, positive, is_within_distance, compute_distance
 
@@ -60,6 +60,9 @@ class BehaviorAgent(BasicAgent):
 
         elif behavior == 'normal':
             self._behavior = Normal()
+
+        elif behavior == 'custom':
+            self._behavior = Custom()
 
         elif behavior == 'aggressive':
             self._behavior = Aggressive()
@@ -134,22 +137,49 @@ class BehaviorAgent(BasicAgent):
                     self.set_destination(end_waypoint.transform.location,
                                          left_wpt.transform.location)
     
-    def _overtake(self, vehicle_list):
-        front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
-        if front_vehicle_state and (self._speed / 5 > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
-            if self._behavior.overtake_counter == 0:
-                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
-                new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=40, lane_offset=-1)
-                if not new_vehicle_state and not new_vehicle_state2:
-                    self._behavior.overtake_counter = 1
-                    self.lane_change("left")
-                    self._local_planner.set_speed(100)
-            elif self._behavior.overtake_counter == 1:
-                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
-                if not new_vehicle_state:
-                    self._behavior.overtake_counter = 0
-                    self.lane_change("right")
-                    self._local_planner.set_speed(30)
+    def _overtake(self, **kwargs):
+        if kwargs.items() is not None:
+            # front_vehicle_state = kwargs.get('front_vehicle_state')
+            # front_vehicle = kwargs.get('front_vehicle')
+            vehicle_list = kwargs.get('vehicle_list')
+            vehicle_speed = kwargs.get('vehicle_speed')
+        else:
+            return None
+
+        # if front_vehicle_state and (self._speed / 5 > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
+        if self._behavior.overtake_counter == 0:
+            new_vehicle_state_1, _, _ = self._vehicle_obstacle_detected(
+                vehicle_list, 
+                max(self._behavior.min_proximity_threshold, self._speed_limit / 2), 
+                up_angle_th=180,
+                low_angle_th=160,
+                lane_offset=-1
+                )
+            new_vehicle_state_2, _, _ = self._vehicle_obstacle_detected(
+                vehicle_list, 
+                max(self._behavior.min_proximity_threshold, self._speed_limit / 2), 
+                up_angle_th=40, 
+                lane_offset=-1
+                )
+            if not new_vehicle_state_1 and not new_vehicle_state_2:
+                self._behavior.overtake_counter = 1
+                self.lane_change("left")
+                speed = abs(self._speed - vehicle_speed) + self._speed * 1.5
+                self._local_planner.set_speed(speed if speed < 5 else 10) # 100 --> default value
+        elif self._behavior.overtake_counter == 1:
+            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(
+                vehicle_list, 
+                max(self._behavior.min_proximity_threshold, 
+                self._speed_limit / 2), 
+                up_angle_th=180,
+                lane_offset=1
+                )
+            if not new_vehicle_state:
+                self._behavior.overtake_counter = 0
+                self.lane_change("right")
+                self._local_planner.set_speed(30)
+        else:
+            return
 
     def collision_and_car_avoid_manager(self, waypoint):
         """
@@ -253,28 +283,31 @@ class BehaviorAgent(BasicAgent):
             :param debug: boolean for debugging
             :return control: carla.VehicleControl
         """
-        ego_vehicle_loc = self._vehicle.get_location()
-        ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
+        ego_vehicle_wp = self._map.get_waypoint(self._vehicle.get_location())
         vehicle_list = self._world.get_actors().filter("*vehicle*")
         def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] 
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
         
-        vehicle_speed = get_speed(vehicle) 
+        vehicle_speed = get_speed(vehicle)
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision, tempo per arrivare a collisione
-        ego_vehicle_loc = self._vehicle.get_location()
-        ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
+        ego_vehicle_wp = self._map.get_waypoint(self._vehicle.get_location())
 
         # if mio
         if (vehicle_speed < (self._speed / 5) or vehicle_speed < 1.0) and distance < 15.0:
-            wpt = ego_vehicle_wp.get_left_lane()    
-            if self._behavior.overtake_counter == 0:
-                self._overtake(vehicle_list)
-            #self.lane_change("left")
-            #self._local_planner.set_speed(30)
+            # wpt = ego_vehicle_wp.get_left_lane()
+            front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(
+                vehicle_list, 
+                max(self._behavior.min_proximity_threshold, self._speed_limit / 3), 
+                up_angle_th=40
+            )
+            # if self._behavior.overtake_counter == 0:
+            if front_vehicle_state and (self._speed / 5 > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
+                self._overtake(vehicle_list, vehicle_speed)
+            # self.lane_change("left")
+            # self._local_planner.set_speed(30)
             control = self._local_planner.run_step(debug=debug)       
-
 
         # Under safety time distance, slow down.
         elif self._behavior.safety_time > ttc > 0.0:
@@ -354,9 +387,17 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             else:
-                #self.lane_change("left")
-                #self._local_planner.set_speed(30)
-                #control = self._local_planner.run_step(debug=debug)
+                if self._behavior.overtake_counter < 1:
+                    self.lane_change('left')
+                    control = self.run_step()
+                    self.lane_change('right')
+                else: # self._behavior.overtake_counter == 1
+                    self.lane_change('rigth')
+
+                # self.lane_change("left")
+                # self._local_planner.set_speed(30)
+                # control = self._local_planner.run_step(debug=debug)
+                # self.lane_change("right")
                 pass
 
         # 2.2: Car following behaviors

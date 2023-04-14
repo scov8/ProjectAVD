@@ -82,7 +82,7 @@ class MyTeamAgent(AutonomousAgent):
             if not hero_actor:
                 return carla.VehicleControl()
             
-            self._agent = BehaviorAgent(hero_actor, opt_dict=self.configs)
+            self._agent = BehaviorAgent(hero_actor, behavior='custom', opt_dict=self.configs)
 
             plan = []
             prev_wp = None
