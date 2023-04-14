@@ -162,7 +162,7 @@ class BehaviorAgent(BasicAgent):
             :return vehicle: nearby vehicle
             :return distance: distance to nearby vehicle
         """
-        vehicle_list = self._world.get_actors().filter("vehicle")
+        vehicle_list = self._world.get_actors().filter("*vehicle*")
         def dist(v): return v.get_location().distance(waypoint.transform.location)
         vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id] 
         vehicle_list.sort(key=dist)
@@ -198,7 +198,8 @@ class BehaviorAgent(BasicAgent):
 
         walker_list = self._world.get_actors().filter("*walker.pedestrian*")
         def dist(w): return w.get_location().distance(waypoint.transform.location) 
-        walker_list = [w for w in walker_list if dist(w) < 10] 
+        walker_list = [w for w in walker_list if dist(w) < 10]
+        walker_list.sort(key=dist) 
 
         if self._direction == RoadOption.CHANGELANELEFT:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(
@@ -252,7 +253,7 @@ class BehaviorAgent(BasicAgent):
             :param debug: boolean for debugging
             :return control: carla.VehicleControl
         """
-        vehicle_list = self._world.get_actors().filter("vehicle")
+        vehicle_list = self._world.get_actors().filter("*vehicle*")
         vehicle_speed = get_speed(vehicle) 
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision, tempo per arrivare a collisione
