@@ -134,35 +134,20 @@ class BehaviorAgent(BasicAgent):
                     self.set_destination(end_waypoint.transform.location,
                                          left_wpt.transform.location)
     
-    def _overtake(self, waypoint, vehicle_list):
-        left_turn = waypoint.left_lane_marking.lane_change
-        right_turn = waypoint.right_lane_marking.lane_change
-
-        left_wpt = waypoint.get_left_lane()
-        right_wpt = waypoint.get_right_lane()
-
-        # vedo se c è un veicolo davanti a me che mi sta rallentando
-        front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
-            self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
+    def _overtake(self, vehicle_list):
+        front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
         
         if front_vehicle_state and (self._speed > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
-            print("sto cazzzzoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             if self._behavior.overtake_counter == 0:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
-                print("Massimooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
                 if not new_vehicle_state:
-                    print("Tailgating, moving to the left!")
-                    end_waypoint = self._local_planner.target_waypoint
-                    self._behavior.overtake_counter = 200
-                    self.set_destination(end_waypoint.transform.location, left_wpt.transform.location)
+                    self._behavior.overtake_counter == 1
+                    self.lane_change("left")
             else:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
-                print("Massimooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
                 if not new_vehicle_state:
-                    print("Tailgating, moving to the right!")
-                    end_waypoint = self._local_planner.target_waypoint
-                    self._behavior.overtake_counter = 200
-                    self.set_destination(end_waypoint.transform.location, right_wpt.transform.location)
+                    self._behavior.overtake_counter == 0
+                    self.lane_change("right")
 
     def collision_and_car_avoid_manager(self, waypoint):
         """
@@ -276,13 +261,13 @@ class BehaviorAgent(BasicAgent):
 
         # if mio
         if (vehicle_speed < self._speed or vehicle_speed < 1.0) and distance < 15.0:
-            wpt = ego_vehicle_wp.get_left_lane()           
+            wpt = ego_vehicle_wp.get_left_lane()    
+            control = self._local_planner.run_step(debug=debug)       
             if self._behavior.overtake_counter == 0:
-                self._overtake(wpt, vehicle_list)
+                control = self._overtake(vehicle_list)
             #self.lane_change("left")
             #self._local_planner.set_speed(30)
  
-            control = self._local_planner.run_step(debug=debug)
 
         # Under safety time distance, slow down.
         elif self._behavior.safety_time > ttc > 0.0:
