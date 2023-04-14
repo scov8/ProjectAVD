@@ -172,7 +172,7 @@ class BehaviorAgent(BasicAgent):
         elif self._direction == RoadOption.CHANGELANERIGHT:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=90)
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
             
             print("dentro collision_and_car_avoid_manager")
             print("vehicle_state: ", vehicle_state, " vehicle: ", vehicle, " distance: ", distance)
@@ -267,7 +267,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
         # if mio
-        if (vehicle_speed < (self._speed / 5) or vehicle_speed < 1.0) and distance < 15.0:
+        if (vehicle_speed < (self._speed / 5) or vehicle_speed < 1.0) and distance < 10.0:
             wpt = ego_vehicle_wp.get_left_lane()    
             if self._behavior.overtake_counter == 0:
                 self._overtake(vehicle_list)
