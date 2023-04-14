@@ -185,12 +185,11 @@ class BehaviorAgent(BasicAgent):
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
-            # in questo caso teniamo conto del _tailgating()
             # Check for tailgating
-            print("Dentro collision_and_car_avoid_manager")
-            print(vehicle_state)
-            print(vehicle)
-            print(distance)
+            print("Dentro collision_and_car_avoid_manager") # togliere
+            print(vehicle_state) # togliere
+            print(vehicle) # togliere
+            print(distance)    # togliere
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
                     and not waypoint.is_junction and self._speed > 10 \
                     and self._behavior.tailgate_counter == 0:
@@ -211,10 +210,9 @@ class BehaviorAgent(BasicAgent):
         """
 
         walker_list = self._world.get_actors().filter("*walker.pedestrian*")
-        def dist(w): return w.get_location().distance(waypoint.transform.location) # funzione distanza, valuta la distanza tra il pedone e dove mi trovo
-        walker_list = [w for w in walker_list if dist(w) < 10] # prendiamo quelli sotto i 10 mt
+        def dist(w): return w.get_location().distance(waypoint.transform.location) 
+        walker_list = [w for w in walker_list if dist(w) < 10] 
 
-        # in base a quello ceh dbb fare valutaimo in modo diverso _vehicle_obstacle_detected()
         if self._direction == RoadOption.CHANGELANELEFT:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=-1)
@@ -267,11 +265,16 @@ class BehaviorAgent(BasicAgent):
             :return control: carla.VehicleControl
         """
         vehicle_list = self._world.get_actors().filter("vehicle")
-        vehicle_speed = get_speed(vehicle) # prediamo la velocità del veicolo che ci sta davanti
+        vehicle_speed = get_speed(vehicle) 
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision, tempo per arrivare a collisione
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
+
+
+        print("dentro car_following_manager")  # togliere
+        print(vehicle)
+        print(distance)
 
         # Under safety time distance, slow down.
         if self._behavior.safety_time > ttc > 0.0: # se il tempo per arrivare a collisione è minore del tempo di sicurezza allora rallentiamo; voglio considerare il veicolo più tardi per evitare collisioni
