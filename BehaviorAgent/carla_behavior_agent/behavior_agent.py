@@ -150,6 +150,7 @@ class BehaviorAgent(BasicAgent):
             if (right_turn == carla.LaneChange.Right or right_turn ==
                     carla.LaneChange.Both) and waypoint.lane_id * right_wpt.lane_id > 0 and right_wpt.lane_type == carla.LaneType.Driving:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+                print("Massimooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
                 if not new_vehicle_state:
                     # se non ci sono veicoli che ci ostacolano, cambia corsia, avvio la manovra di cambio corsia
                     print("Tailgating, moving to the right!")
@@ -159,6 +160,7 @@ class BehaviorAgent(BasicAgent):
 
             elif left_turn == carla.LaneChange.Left and waypoint.lane_id * left_wpt.lane_id > 0 and left_wpt.lane_type == carla.LaneType.Driving:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+                print("Massimooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
                 if not new_vehicle_state:
                     print("Tailgating, moving to the left!")
                     end_waypoint = self._local_planner.target_waypoint
@@ -192,7 +194,7 @@ class BehaviorAgent(BasicAgent):
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
                     and not waypoint.is_junction and self._speed > 10 \
                     and self._behavior.tailgate_counter == 0:
-                self._tailgating(waypoint, vehicle_list) # gestisce i veicoli ceh vengono da dietro, mi serve quando ad esempio esco dal percehggio
+                self._tailgating(waypoint, vehicle_list) 
 
         return vehicle_state, vehicle, distance
     
@@ -276,11 +278,8 @@ class BehaviorAgent(BasicAgent):
         print(distance)
 
         # if mio
-        if (vehicle_speed < self._speed or vehicle_speed < 15.0) and distance < 15.0:
-            wpt = ego_vehicle_wp.get_left_lane()
-            print(wpt)
-           
-            print("change lane")
+        if (vehicle_speed < self._speed or vehicle_speed < 1.0) and distance < 15.0:
+            wpt = ego_vehicle_wp.get_left_lane()           
             if self._behavior.overtake_counter == 0:
                 self._overtake(wpt, vehicle_list)
             #self.lane_change("left")
