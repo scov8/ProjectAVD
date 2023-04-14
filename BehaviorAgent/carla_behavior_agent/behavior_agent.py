@@ -139,7 +139,7 @@ class BehaviorAgent(BasicAgent):
         if front_vehicle_state and (self._speed / 5 > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
             if self._behavior.overtake_counter == 0:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
-                new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=40, lane_offset=-1)
+                new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40, lane_offset=-1)
                 if not new_vehicle_state and not new_vehicle_state2:
                     self._behavior.overtake_counter = 1
                     self.lane_change("left")
@@ -172,7 +172,7 @@ class BehaviorAgent(BasicAgent):
         elif self._direction == RoadOption.CHANGELANERIGHT:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=90)
             
             print("dentro collision_and_car_avoid_manager")
             print("vehicle_state: ", vehicle_state, " vehicle: ", vehicle, " distance: ", distance)
@@ -271,10 +271,7 @@ class BehaviorAgent(BasicAgent):
             wpt = ego_vehicle_wp.get_left_lane()    
             if self._behavior.overtake_counter == 0:
                 self._overtake(vehicle_list)
-            #self.lane_change("left")
-            #self._local_planner.set_speed(30)
             control = self._local_planner.run_step(debug=debug)       
-
 
         # Under safety time distance, slow down.
         elif self._behavior.safety_time > ttc > 0.0:
@@ -286,7 +283,7 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         # Actual safety distance area, try to follow the speed of the vehicle in front.
-        elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time: # siamo vicini, ma non tanto e proviamo a seguire la velocità del veicolo che ci sta davanti
+        elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time: 
             target_speed = min([
                 max(self._min_speed, vehicle_speed),
                 self._behavior.max_speed,
