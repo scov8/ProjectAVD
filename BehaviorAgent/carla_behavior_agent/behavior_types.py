@@ -14,6 +14,7 @@ class Cautious(object):
     braking_distance = 6
     tailgate_counter = 0
     overtake_counter = 0
+    overtake_doing = 0
 
 
 class Normal(object):
@@ -26,6 +27,7 @@ class Normal(object):
     braking_distance = 5
     tailgate_counter = 0
     overtake_counter = 0
+    overtake_doing = 0
 
 
 class Aggressive(object):
@@ -38,3 +40,4 @@ class Aggressive(object):
     braking_distance = 4
     tailgate_counter = -1
     overtake_counter = 0
+    overtake_doing = 0
