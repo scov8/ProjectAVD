@@ -142,6 +142,7 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.overtake_doing = 1
                 self._behavior.overtake_counter = 100
                 self.lane_change("left")
+                self._local_planner.run_step()
                 self.lane_change("left")
                 self._local_planner.set_speed(70)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
