@@ -135,20 +135,24 @@ class BehaviorAgent(BasicAgent):
                                          left_wpt.transform.location)
     
     def _overtake(self, to_overtake, vehicle_list):
+        print("funzione overtake")
         if self._behavior.overtake_doing == 0:
+            print("posso valutare se fare il cambio di corsia per fare l'overtake")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
             new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max( self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40, lane_offset=-1)
             if not new_vehicle_state and not new_vehicle_state2:
-                print("cambio ovetake coounte")
+                print("posso fare il cambio di corsia e la attivo")
                 self._behavior.overtake_doing = 1
-                self._behavior.overtake_counter = 200
+                self._behavior.overtake_counter = 50
                 self.lane_change("left")
                 self._local_planner.set_speed(50)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
+            print("posso valutare se fare il rientro dall'overtake")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
             if not new_vehicle_state:
+                print("posso fare il cambio di corsia per rientrare e la attivo")
                 self._behavior.overtake_doing = 0
-                self._behavior.overtake_counter = 100
+                self._behavior.overtake_counter = 50
                 self.lane_change("right")
                 self._local_planner.set_speed(30)
 
@@ -174,6 +178,10 @@ class BehaviorAgent(BasicAgent):
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
+
+            print("funzione collision_and_car_avoid_manager")
+            print("vehicle_list: ", vehicle_list)
+            print("vehicle_state: ", vehicle_state, " vehicle: ", vehicle, " distance: ", distance, " speed: ", self._speed)
 
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW \
                     and not waypoint.is_junction and self._speed > 10 \
@@ -264,10 +272,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         
-        print("overttttttttt",self._behavior.overtake_doing)
-        print("if", (((vehicle_speed < (self._speed / 5)) or (vehicle_speed < 1.0)) and distance < 9.0) or self._behavior.overtake_doing == 1)
-        print("vehicle_speed",vehicle_speed)
-        print("self._speed",self._speed)
+        print("overtake_doing: ", self._behavior.overtake_doing, "overtake_counter: ", self._behavior.overtake_counter)
         # if mio
         if (((vehicle_speed < (self._speed / 5)) or (vehicle_speed < 1.0)) and distance < 9.0) or self._behavior.overtake_doing == 1:
             wpt = ego_vehicle_wp.get_left_lane()    
