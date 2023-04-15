@@ -269,7 +269,7 @@ class BehaviorAgent(BasicAgent):
         # if mio
         if (((vehicle_speed < (self._speed / 5)) or (vehicle_speed < 1.0)) and distance < 9.0) or self._behavior.overtake_counter == 1:
             wpt = ego_vehicle_wp.get_left_lane()    
-            self._overtake(vehicle_list,vehicle_list)
+            self._overtake(vehicle_list, vehicle_list)
             control = self._local_planner.run_step(debug=debug)       
 
         # Under safety time distance, slow down.
@@ -372,13 +372,14 @@ class BehaviorAgent(BasicAgent):
                     self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             if distance < self._behavior.braking_distance and self._speed <= 0.5:
-                self.obstacle_manager(obstacle, distance)
+                #self.obstacle_manager(obstacle, distance)
+                pass
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             else:
-                self.obstacle_manager(obstacle, distance)
-                #pass
+                #self.obstacle_manager(obstacle, distance)
+                pass
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
