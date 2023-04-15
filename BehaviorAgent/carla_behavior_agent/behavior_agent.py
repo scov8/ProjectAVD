@@ -269,7 +269,7 @@ class BehaviorAgent(BasicAgent):
         print("vehicle_speed",vehicle_speed)
         print("self._speed",self._speed)
         # if mio
-        if ((vehicle_speed < (self._speed / 5) or vehicle_speed < 1.0) and distance < 9.0) or self._behavior.overtake_counter == 1:
+        if (((vehicle_speed < (self._speed / 5)) or (vehicle_speed < 1.0)) and distance < 9.0) or self._behavior.overtake_counter == 1:
             wpt = ego_vehicle_wp.get_left_lane()    
             self._overtake(vehicle_list,vehicle_list)
             control = self._local_planner.run_step(debug=debug)       
