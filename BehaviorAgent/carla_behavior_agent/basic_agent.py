@@ -236,7 +236,7 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2):
+    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2, overtake_do = False):
         """
         Changes the path so that the vehicle performs a lane change.
         Use 'direction' to specify either a 'left' or 'right' lane change,
@@ -251,7 +251,8 @@ class BasicAgent(object):
             lane_change_time * speed,
             False,
             1,
-            self._sampling_resolution
+            self._sampling_resolution, 
+            overtake_do
         )
         if not path:
             print("WARNING: Ignoring the lane change as no path was found")
@@ -534,7 +535,7 @@ class BasicAgent(object):
 
     def _generate_lane_change_path(self, waypoint, direction='left', distance_same_lane=10,
                                 distance_other_lane=25, lane_change_distance=25,
-                                check=True, lane_changes=1, step_distance=2):
+                                check=True, lane_changes=1, step_distance=2, overtake_do=False):
         """
         This methods generates a path that results in a lane change.
         Use the different distances to fine-tune the maneuver.
@@ -599,7 +600,10 @@ class BasicAgent(object):
         # Other lane
         distance = 0
         while distance < distance_other_lane:
-            next_wps = plan[-1][0].next(step_distance)
+            if overtake_do:
+                next_wps = plan[-1][0].previous(step_distance)
+            else:
+                next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
                 return []
             next_wp = next_wps[0]
