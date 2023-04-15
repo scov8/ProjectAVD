@@ -297,7 +297,7 @@ class BehaviorAgent(BasicAgent):
 
         return control
     
-    def obstacle_manager(self, distance, debug=True):
+    def obstacle_manager(self, obstacle, distance, debug=True):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
@@ -370,12 +370,12 @@ class BehaviorAgent(BasicAgent):
                     self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             if distance < self._behavior.braking_distance and self._speed <= 0.5:
-                self.obstacle_manager(distance, obstacle)
+                self.obstacle_manager(obstacle, distance)
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             else:
-                self.obstacle_manager(distance,obstacle)
+                self.obstacle_manager(obstacle, distance)
                 #pass
 
         # 2.2: Car following behaviors
