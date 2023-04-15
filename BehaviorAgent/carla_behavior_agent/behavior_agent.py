@@ -143,9 +143,9 @@ class BehaviorAgent(BasicAgent):
             if not new_vehicle_state and not new_vehicle_state2:
                 print("posso fare il cambio di corsia e la attivo")
                 self._behavior.overtake_doing = 1
-                self._behavior.overtake_counter = 50
+                self._behavior.overtake_counter = 100
                 self.lane_change("left")
-                self._local_planner.set_speed(50)
+                self._local_planner.set_speed(70)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
             print("posso valutare se fare il rientro dall'overtake")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max( self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
@@ -177,7 +177,7 @@ class BehaviorAgent(BasicAgent):
         elif self._direction == RoadOption.CHANGELANERIGHT:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=90)
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=45)
 
             print("funzione collision_and_car_avoid_manager")
             print("vehicle_list: ", vehicle_list)
