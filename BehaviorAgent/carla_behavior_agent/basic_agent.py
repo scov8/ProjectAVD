@@ -471,7 +471,7 @@ class BasicAgent(object):
                     if target_wpt.road_id != next_wpt.road_id or target_wpt.lane_id != next_wpt.lane_id  + lane_offset:
                         continue
 
-                # valuto la posizone e direzione dle veicolo 
+                # valuto la posizone e direzione del veicolo 
                 target_forward_vector = target_transform.get_forward_vector()
                 target_extent = target_vehicle.bounding_box.extent.x
                 target_rear_transform = target_transform # prendo il punto posteriore del veicolo
@@ -481,11 +481,11 @@ class BasicAgent(object):
                 )
 
                 if is_within_distance(target_rear_transform, ego_front_transform, max_distance, [low_angle_th, up_angle_th]): # vedo la distanza tra la mia punta e il culo dell'altro veicolo
-                    return (True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)) # è una possivile colluisione con quel veiclo 
+                    return (True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)) # è una possibile colluisione con quel veiclo 
 
             # Waypoints aren't reliable, check the proximity of the vehicle to the route
             else:
-                # cotruisco un poligono sulla mia posizione
+                # costruisco un poligono sulla mia posizione
                 route_bb = [] # creo una lista vuota, dove ci saranno i miei punti estremi e poi creo il poligono
                 ego_location = ego_transform.location
                 extent_y = self._vehicle.bounding_box.extent.y

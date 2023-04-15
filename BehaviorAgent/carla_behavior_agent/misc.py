@@ -143,12 +143,13 @@ def distance_obstacle(waypoint, obstacle_transform):
         :param waypoint: actual waypoint
         :param obstacle_transform: transform of the target obstacle
     """
-    loc = obstacle_transform.transform
+    loc = obstacle_transform.location
 
     x = waypoint.transform.location.x - loc.x
     y = waypoint.transform.location.y - loc.y
 
     return math.sqrt(x * x + y * y)
+
 
 def vector(location_1, location_2):
     """

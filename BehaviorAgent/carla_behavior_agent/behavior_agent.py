@@ -15,7 +15,7 @@ from basic_agent import BasicAgent
 from local_planner import RoadOption
 from behavior_types import *
 
-from misc import get_speed, positive, is_within_distance, compute_distance
+from misc import get_speed, positive, distance_vehicle, is_within_distance, compute_distance
 
 class BehaviorAgent(BasicAgent):
     """
@@ -134,39 +134,95 @@ class BehaviorAgent(BasicAgent):
                     print("Tailgating, moving to the left!")
                     end_waypoint = self._local_planner.target_waypoint
                     self._behavior.tailgate_counter = 200
-                    self.set_destination(end_waypoint.transform.location,
-                                         left_wpt.transform.location)
+                    self.set_destination(end_waypoint.transform.location, left_wpt.transform.location)
     
-    def _overtake(self, **kwargs):
+    
+    def _overtaking(self, waypoint, **kwargs):
         if kwargs.items() is not None:
             # front_vehicle_state = kwargs.get('front_vehicle_state')
             # front_vehicle = kwargs.get('front_vehicle')
-            vehicle_list = kwargs.get('vehicle_list')
+            vehicle_list  = kwargs.get('vehicle_list')
             vehicle_speed = kwargs.get('vehicle_speed')
         else:
-            return None
+            return
+        
+        left_turn = waypoint.left_lane_marking.lane_change
+        right_turn = waypoint.right_lane_marking.lane_change
 
-        # if front_vehicle_state and (self._speed / 5 > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
-        if self._behavior.overtake_counter == 0:
-            new_vehicle_state_1, _, _ = self._vehicle_obstacle_detected(
-                vehicle_list, 
-                max(self._behavior.min_proximity_threshold, self._speed_limit / 2), 
-                up_angle_th=180,
-                low_angle_th=160,
-                lane_offset=-1
-                )
-            new_vehicle_state_2, _, _ = self._vehicle_obstacle_detected(
-                vehicle_list, 
-                max(self._behavior.min_proximity_threshold, self._speed_limit / 2), 
-                up_angle_th=40, 
-                lane_offset=-1
-                )
-            if not new_vehicle_state_1 and not new_vehicle_state_2:
-                self._behavior.overtake_counter = 1
+        left_wpt = waypoint.get_left_lane()
+        right_wpt = waypoint.get_right_lane()
+
+        def check_right_turn():
+            return (right_turn == carla.LaneChange.Right or right_turn ==
+                    carla.LaneChange.Both) and waypoint.lane_id * right_wpt.lane_id > 0 and right_wpt.lane_type == carla.LaneType.Driving
+        def check_left_turn():
+            return left_turn == carla.LaneChange.Left and waypoint.lane_id * left_wpt.lane_id > 0 and left_wpt.lane_type == carla.LaneType.Driving
+        def check_front_collision():
+            distance = distance_vehicle(waypoint, self._map.get_waypoint(front_vehicle.get_location()).transform)
+            check_distance = distance > 10
+            check_velocity = vehicle_speed < (self._speed / 1.45) or vehicle_speed < 1.0
+            delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
+            ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.)
+            
+            return front_vehicle_state and check_distance and self._behavior.safety_time > ttc > 0.0 and check_velocity
+
+        behind_vehicle_state, behind_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+            self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, low_angle_th=160)
+        if behind_vehicle_state and self._speed < get_speed(behind_vehicle):
+            if check_right_turn():
+                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+                # on other lane front vehicle
+                front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40, lane_offset=1)
+
+                if not front_vehicle_state and not new_vehicle_state or not new_vehicle_state and check_front_collision():
+                    print("Tailgating, moving to the right!")
+                    end_waypoint = self._local_planner.target_waypoint
+                    self._behavior.tailgate_counter, self._behavior.overtake_counter = 200
+                    self.set_destination(end_waypoint.transform.location, right_wpt.transform.location)
+                else:
+                    print('Unable to start right overtaking!')
+
+            elif check_left_turn():
+                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+                front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+                    self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40, lane_offset=-1)
+            
+                if not new_vehicle_state and not front_vehicle_state or not new_vehicle_state and check_front_collision():
+                    print("Tailgating, moving to the left!")
+                    end_waypoint = self._local_planner.target_waypoint
+                    self._behavior.tailgate_counter, self._behavior.overtake_counter = 200
+                    self.set_destination(end_waypoint.transform.location, left_wpt.transform.location)
+                else:
+                    print('Unable to start left overtaking!')
+
+
+    '''def _overtake(self, **kwargs):
+        if kwargs.items() is not None:
+            # front_vehicle_state = kwargs.get('front_vehicle_state')
+            # front_vehicle = kwargs.get('front_vehicle')
+            vehicle_list  = kwargs.get('vehicle_list')
+            vehicle_speed = kwargs.get('vehicle_speed')
+        else:
+            return
+
+        # if self._behavior.overtake_counter == 0:
+        # vehicle behind overtaking ego
+        new_vehicle_state_1, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+            self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, low_angle_th=160, lane_offset=-1)
+        
+        new_vehicle_state_2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+            self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=40, lane_offset=-1)
+            
+        if not new_vehicle_state_1 and not new_vehicle_state_2:
+                self._behavior.overtake_counter = 200
                 self.lane_change("left")
                 speed = abs(self._speed - vehicle_speed) + self._speed * 1.5
-                self._local_planner.set_speed(speed if speed < 5 else 10) # 100 --> default value
-        elif self._behavior.overtake_counter == 1:
+                self._local_planner.set_speed(speed if speed < 5 else 20) # 100 --> default value
+        
+        if self._behavior.overtake_counter == 1:
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(
                 vehicle_list, 
                 max(self._behavior.min_proximity_threshold, 
@@ -174,12 +230,12 @@ class BehaviorAgent(BasicAgent):
                 up_angle_th=180,
                 lane_offset=1
                 )
+            
             if not new_vehicle_state:
                 self._behavior.overtake_counter = 0
                 self.lane_change("right")
-                self._local_planner.set_speed(30)
-        else:
-            return
+                self._local_planner.set_speed(30)'''
+
 
     def collision_and_car_avoid_manager(self, waypoint):
         """
@@ -297,11 +353,9 @@ class BehaviorAgent(BasicAgent):
         # if mio
         if (vehicle_speed < (self._speed / 5) or vehicle_speed < 1.0) and distance < 15.0:
             # wpt = ego_vehicle_wp.get_left_lane()
-            front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(
-                vehicle_list, 
-                max(self._behavior.min_proximity_threshold, self._speed_limit / 3), 
-                up_angle_th=40
-            )
+            front_vehicle_state, front_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40)
+            
             # if self._behavior.overtake_counter == 0:
             if front_vehicle_state and (self._speed / 5 > get_speed(front_vehicle) or get_speed(front_vehicle) < 1):
                 self._overtake(vehicle_list, vehicle_speed)
