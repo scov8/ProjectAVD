@@ -312,7 +312,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        if distance > self._behavior.braking_distance :
+        if int(distance-3) > int(self._behavior.braking_distance) :
             target_speed = positive(self._speed - self._behavior.speed_decrease)
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
