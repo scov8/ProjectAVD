@@ -145,7 +145,7 @@ class BehaviorAgent(BasicAgent):
             if not new_vehicle_state and not new_vehicle_state2:
                 self._behavior.overtake_doing = 1
                 self._behavior.overtake_counter = 60
-                self.lane_change("left", other_lane_time=1, overtake_do=True)
+                self.lane_change("left", other_lane_time=2, overtake_do=True)
                 self._local_planner.set_speed(70)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(
