@@ -553,11 +553,9 @@ class BasicAgent(object):
         # Same lane
         distance = 0
         while distance < distance_same_lane:
-            if overtake_do:
-                next_wps = plan[-1][0].previous(step_distance)
-            else:
-                next_wps = plan[-1][0].next(step_distance)
+            next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
+                print("No next waypoint found AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                 return []
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
@@ -578,11 +576,9 @@ class BasicAgent(object):
         while lane_changes_done < lane_changes:
 
             # Move forward
-            if overtake_do:
-                next_wps = plan[-1][0].previous(lane_change_distance)
-            else:
-                next_wps = plan[-1][0].next(lane_change_distance)
+            next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
+                print("No next waypoint found BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
                 return []
             next_wp = next_wps[0]
 
@@ -597,6 +593,7 @@ class BasicAgent(object):
                 side_wp = next_wp.get_right_lane()
 
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
+                print("No side waypoint found CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
                 return []
 
             # Update the plan
@@ -611,6 +608,7 @@ class BasicAgent(object):
             else:
                 next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
+                print("No next way point found DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
                 return []
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
