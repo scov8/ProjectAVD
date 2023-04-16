@@ -144,7 +144,7 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40, lane_offset=-1)
             if not new_vehicle_state and not new_vehicle_state2:
                 self._behavior.overtake_doing = 1
-                self._behavior.overtake_counter = 100
+                self._behavior.overtake_counter = 60
                 self.lane_change("left", other_lane_time=2, overtake_do=True)
                 self._local_planner.set_speed(70)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
@@ -263,10 +263,8 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
-        def dist(v): return v.get_location().distance(
-            ego_vehicle_wp.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
 
         vehicle_speed = get_speed(vehicle)
@@ -348,6 +346,8 @@ class BehaviorAgent(BasicAgent):
         if self._behavior.overtake_counter > 0:
             self._behavior.overtake_counter -= 1
 
+        print("overtake counter: ", self._behavior.overtake_counter)
+
         # prende le info del veicolo
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
@@ -404,6 +404,16 @@ class BehaviorAgent(BasicAgent):
             else:
                 # se il veicolo non è molto vicino posso pensare di seguirlo
                 control = self.car_following_manager(vehicle, distance)
+        
+        elif self._behavior.overtake_doing == 1:
+            ego_vehicle_loc = self._vehicle.get_location()
+            ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
+            vehicle_list = self._world.get_actors().filter("*vehicle*")
+            def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
+            vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
+            vehicle_list.sort(key=dist)
+            self._overtake(vehicle_list, vehicle_list)
+            control = self._local_planner.run_step(debug=debug)
 
         # 3: Intersection behavior
         # è una fregatura, ci dice se stiamo nellincrocio ma la gestione non è diversa da quella del behavior
