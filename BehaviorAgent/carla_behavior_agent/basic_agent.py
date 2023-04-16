@@ -590,8 +590,12 @@ class BasicAgent(object):
                     return []
                 side_wp = next_wp.get_right_lane()
 
-            if not side_wp or (side_wp.lane_type != carla.LaneType.Driving and side_wp.lane_type != carla.LaneType.Shoulder):
-                return []
+            if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
+                print("No side waypoint found CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+                print("side_wp",side_wp)
+                print("side_wp.lane_type",side_wp.lane_type)
+                print("carla.LaneType.Driving",carla.LaneType.Driving)
+                #return []
 
             # Update the plan
             plan.append((side_wp, option))
