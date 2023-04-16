@@ -594,7 +594,9 @@ class BasicAgent(object):
 
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
                 print("No side waypoint found CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-                return []
+                print("side_wp",side_wp)
+                print("side_wp.lane_type",side_wp.lane_type)
+                #return []
 
             # Update the plan
             plan.append((side_wp, option))
