@@ -596,6 +596,7 @@ class BasicAgent(object):
                 print("No side waypoint found CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
                 print("side_wp",side_wp)
                 print("side_wp.lane_type",side_wp.lane_type)
+                print("carla.LaneType.Driving",carla.LaneType.Driving)
                 #return []
 
             # Update the plan
