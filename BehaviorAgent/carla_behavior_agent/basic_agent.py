@@ -553,7 +553,10 @@ class BasicAgent(object):
         # Same lane
         distance = 0
         while distance < distance_same_lane:
-            next_wps = plan[-1][0].next(step_distance)
+            if overtake_do:
+                next_wps = plan[-1][0].previous(step_distance)
+            else:
+                next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
                 return []
             next_wp = next_wps[0]
@@ -575,7 +578,10 @@ class BasicAgent(object):
         while lane_changes_done < lane_changes:
 
             # Move forward
-            next_wps = plan[-1][0].next(lane_change_distance)
+            if overtake_do:
+                next_wps = plan[-1][0].previous(lane_change_distance)
+            else:
+                next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
                 return []
             next_wp = next_wps[0]
