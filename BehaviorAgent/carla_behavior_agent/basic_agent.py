@@ -555,7 +555,6 @@ class BasicAgent(object):
         while distance < distance_same_lane:
             next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                print("No next waypoint found AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                 return []
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
@@ -578,7 +577,6 @@ class BasicAgent(object):
             # Move forward
             next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
-                print("No next waypoint found BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
                 return []
             next_wp = next_wps[0]
 
@@ -592,12 +590,8 @@ class BasicAgent(object):
                     return []
                 side_wp = next_wp.get_right_lane()
 
-            if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
-                print("No side waypoint found CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-                print("side_wp",side_wp)
-                print("side_wp.lane_type",side_wp.lane_type)
-                print("carla.LaneType.Driving",carla.LaneType.Driving)
-                #return []
+            if not side_wp or (side_wp.lane_type != carla.LaneType.Driving and side_wp.lane_type != carla.LaneType.Shoulder):
+                return []
 
             # Update the plan
             plan.append((side_wp, option))
@@ -611,7 +605,6 @@ class BasicAgent(object):
             else:
                 next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                print("No next way point found DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
                 return []
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
