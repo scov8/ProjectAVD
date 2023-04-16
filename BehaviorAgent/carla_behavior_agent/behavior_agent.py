@@ -153,7 +153,7 @@ class BehaviorAgent(BasicAgent):
             if not new_vehicle_state:
                 self._behavior.overtake_doing = 0
                 self._behavior.overtake_counter = 50
-                self.lane_change("right", other_lane_time=2, overtake_do=False)
+                #self.lane_change("right", other_lane_time=2, overtake_do=False)
                 self._local_planner.set_speed(30)
 
     def collision_and_car_avoid_manager(self, waypoint):

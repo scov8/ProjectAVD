@@ -257,7 +257,7 @@ class BasicAgent(object):
         if not path:
             print("WARNING: Ignoring the lane change as no path was found")
 
-        self.set_global_plan(path, clean_queue=False)
+        self.set_global_plan(path)
 
     def _affected_by_traffic_light(self, lights_list=None, max_distance=None):
         """
