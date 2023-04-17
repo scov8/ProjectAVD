@@ -535,7 +535,7 @@ class BasicAgent(object):
 
     def _generate_lane_change_path(self, waypoint, direction='left', distance_same_lane=10,
                                 distance_other_lane=25, lane_change_distance=25,
-                                check=False, lane_changes=1, step_distance=2, follow_direction=True): #check era true
+                                check=False, lane_changes=1, step_distance=2, follow_direction=None): #check era true
         """
         This methods generates a path that results in a lane change.
         Use the different distances to fine-tune the maneuver.
@@ -575,7 +575,10 @@ class BasicAgent(object):
         while lane_changes_done < lane_changes:
 
             # Move forward
-            next_wps = plan[-1][0].next(lane_change_distance)
+            if (not follow_direction) or (follow_direction is None):
+                next_wps = plan[-1][0].next(lane_change_distance)
+            else:
+                next_wps = plan[-1][0].previous(lane_change_distance)
             if not next_wps:
                 return plan #[]
             next_wp = next_wps[0]
