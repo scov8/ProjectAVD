@@ -137,17 +137,21 @@ class BehaviorAgent(BasicAgent):
 
     def _overtake(self, to_overtake, vehicle_list):
         if self._behavior.overtake_doing == 0:
+            print("vedo se posso fare il sorpasso")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
             new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40, lane_offset=-1)
             if not new_vehicle_state and not new_vehicle_state2:
+                print("avvio il sorpasso")
                 self._behavior.overtake_doing = 1
                 self._behavior.overtake_counter = 50
                 self.lane_change("left", other_lane_time=2.5, follow_direction=False)
-                self._local_planner.set_speed(80)
+                self._local_planner.set_speed(90)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
+            print("vedo se posso finire il sorpasso")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
             if not new_vehicle_state:
+                print("finisco il sorpasso")
                 self._behavior.overtake_doing = 0
                 self._behavior.overtake_counter = 50
                 self.lane_change("left", follow_direction=True)
@@ -271,6 +275,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
         if (((vehicle_speed < (self._speed / 5)) or (vehicle_speed < 1.0)) and distance < 9.0) or self._behavior.overtake_doing == 1:
+            print("potrei fare l'overtake")
             wpt = ego_vehicle_wp.get_left_lane()
             self._overtake(vehicle_list, vehicle_list)
             control = self._local_planner.run_step(debug=debug)
@@ -342,8 +347,6 @@ class BehaviorAgent(BasicAgent):
 
         if self._behavior.overtake_counter > 0:
             self._behavior.overtake_counter -= 1
-
-        print("overtake counter: ", self._behavior.overtake_counter)
 
         # prende le info del veicolo
         ego_vehicle_loc = self._vehicle.get_location()
