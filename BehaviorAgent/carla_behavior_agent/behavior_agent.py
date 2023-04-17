@@ -330,7 +330,10 @@ class BehaviorAgent(BasicAgent):
         control = self._local_planner.run_step(debug=debug)
 
         if distance <= self._behavior.braking_distance:
-            self._overtake(obstacle_list, vehicle_list)
+            ego_vehicle_loc = self._vehicle.get_location() #del
+            ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc) #del
+            wpt = ego_vehicle_wp.get_left_lane() #del
+            self._overtake(obstacle_list, vehicle_list, wpt)
             control = self._local_planner.run_step(debug=debug)
 
         return control
@@ -420,7 +423,10 @@ class BehaviorAgent(BasicAgent):
             def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
             vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
             vehicle_list.sort(key=dist)
-            self._overtake(vehicle_list, vehicle_list)
+            ego_vehicle_loc = self._vehicle.get_location()
+            ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
+            wpt = ego_vehicle_wp.get_left_lane()
+            self._overtake(vehicle_list, vehicle_list,wpt)
             control = self._local_planner.run_step(debug=debug)
 
         # 3: Intersection behavior
