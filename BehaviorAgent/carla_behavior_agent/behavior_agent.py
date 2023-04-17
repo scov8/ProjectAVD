@@ -384,8 +384,8 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance and self._speed != 0:
                 return self.emergency_stop()
             elif self._speed == 0:
-                #self.obstacle_manager(obstacle, distance)
-                pass
+                self.obstacle_manager(obstacle, distance)
+                #pass
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
