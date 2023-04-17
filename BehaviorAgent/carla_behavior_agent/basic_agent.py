@@ -578,6 +578,7 @@ class BasicAgent(object):
             if (not follow_direction) or (follow_direction is None):
                 next_wps = plan[-1][0].next(lane_change_distance)
             else:
+                print("Previoussssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
                 next_wps = plan[-1][0].previous(lane_change_distance)
 
             #next_wps = plan[-1][0].next(lane_change_distance)
