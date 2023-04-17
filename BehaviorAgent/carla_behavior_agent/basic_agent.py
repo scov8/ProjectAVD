@@ -236,7 +236,7 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2, follow_direction = True):
+    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2, follow_direction = None):
         """
         Changes the path so that the vehicle performs a lane change.
         Use 'direction' to specify either a 'left' or 'right' lane change,
@@ -579,6 +579,8 @@ class BasicAgent(object):
                 next_wps = plan[-1][0].next(lane_change_distance)
             else:
                 next_wps = plan[-1][0].previous(lane_change_distance)
+
+            #next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
                 return plan #[]
             next_wp = next_wps[0]
@@ -603,7 +605,7 @@ class BasicAgent(object):
         # Other lane
         distance = 0
         while distance < distance_other_lane:
-            if follow_direction:
+            if follow_direction or (follow_direction is None):
                 next_wps = plan[-1][0].next(step_distance)
             else:
                 next_wps = plan[-1][0].previous(step_distance)
