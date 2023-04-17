@@ -236,7 +236,7 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2, follow_direction = False):
+    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2, follow_direction = True):
         """
         Changes the path so that the vehicle performs a lane change.
         Use 'direction' to specify either a 'left' or 'right' lane change,
@@ -251,7 +251,7 @@ class BasicAgent(object):
             lane_change_time * speed,
             False,
             1,
-            1, # era self._sampling_resolution, 
+            self._sampling_resolution, # prova xon 1
             follow_direction
         )
         if not path:
@@ -269,13 +269,13 @@ class BasicAgent(object):
                 If None, the base threshold value is used
         """
         if self._ignore_traffic_lights:
-            return (False, None) # se nalla configurazione mettiamo che nn ce ne fotte dle sem non facciamo nnt 
+            return (False, None) 
 
         if not lights_list:
             lights_list = self._world.get_actors().filter("*traffic_light*")
 
         if not max_distance:
-            max_distance = self._base_tlight_threshold # prende al dist max di default
+            max_distance = self._base_tlight_threshold 
 
         if self._last_traffic_light:
             """se ci siamo già fermati al sem, o ci stiamo per fermare"""
@@ -535,7 +535,7 @@ class BasicAgent(object):
 
     def _generate_lane_change_path(self, waypoint, direction='left', distance_same_lane=10,
                                 distance_other_lane=25, lane_change_distance=25,
-                                check=False, lane_changes=1, step_distance=2, follow_direction=False): #check era true
+                                check=False, lane_changes=1, step_distance=2, follow_direction=True): #check era true
         """
         This methods generates a path that results in a lane change.
         Use the different distances to fine-tune the maneuver.
@@ -605,9 +605,9 @@ class BasicAgent(object):
         distance = 0
         while distance < distance_other_lane:
             if follow_direction:
-                next_wps = plan[-1][0].previous(step_distance)
-            else:
                 next_wps = plan[-1][0].next(step_distance)
+            else:
+                next_wps = plan[-1][0].previous(step_distance)
             if not next_wps:
                 return plan #[]
             next_wp = next_wps[0]
