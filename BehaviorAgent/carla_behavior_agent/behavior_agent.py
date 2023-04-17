@@ -141,16 +141,16 @@ class BehaviorAgent(BasicAgent):
             new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40, lane_offset=-1)
             if not new_vehicle_state and not new_vehicle_state2:
                 self._behavior.overtake_doing = 1
-                self._behavior.overtake_counter = 60
+                self._behavior.overtake_counter = 50
                 self.lane_change("left", other_lane_time=2, overtake_do=True)
-                self._local_planner.set_speed(70)
+                self._local_planner.set_speed(80)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
             if not new_vehicle_state:
                 self._behavior.overtake_doing = 0
                 self._behavior.overtake_counter = 50
-                self.lane_change("right", other_lane_time=1, overtake_do=False)
+                self.lane_change("right", other_lane_time=2, overtake_do=False)
                 self._local_planner.set_speed(30)
 
     def collision_and_car_avoid_manager(self, waypoint):
@@ -318,9 +318,9 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         control = self._local_planner.run_step(debug=debug)
 
-        #if distance <= self._behavior.braking_distance:
-        self._overtake(obstacle_list, vehicle_list)
-        control = self._local_planner.run_step(debug=debug)
+        if distance <= self._behavior.braking_distance:
+            self._overtake(obstacle_list, vehicle_list)
+            control = self._local_planner.run_step(debug=debug)
 
         return control
 
@@ -379,7 +379,7 @@ class BehaviorAgent(BasicAgent):
                     self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
-            if (distance - 5) < self._behavior.braking_distance and self._speed != 0:
+            if distance < self._behavior.braking_distance and self._speed != 0:
                 return self.emergency_stop()
             elif self._speed == 0:
                 self.obstacle_manager(obstacle, distance)
