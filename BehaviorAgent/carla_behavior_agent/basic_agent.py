@@ -236,7 +236,7 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2, overtake_do = False):
+    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2, follow_direction = False):
         """
         Changes the path so that the vehicle performs a lane change.
         Use 'direction' to specify either a 'left' or 'right' lane change,
@@ -251,8 +251,8 @@ class BasicAgent(object):
             lane_change_time * speed,
             False,
             1,
-            self._sampling_resolution, 
-            overtake_do
+            1, # era self._sampling_resolution, 
+            follow_direction
         )
         if not path:
             print("WARNING: Ignoring the lane change as no path was found")
@@ -535,7 +535,7 @@ class BasicAgent(object):
 
     def _generate_lane_change_path(self, waypoint, direction='left', distance_same_lane=10,
                                 distance_other_lane=25, lane_change_distance=25,
-                                check=True, lane_changes=1, step_distance=2, overtake_do=False):
+                                check=False, lane_changes=1, step_distance=2, follow_direction=False): #check era true
         """
         This methods generates a path that results in a lane change.
         Use the different distances to fine-tune the maneuver.
@@ -555,7 +555,7 @@ class BasicAgent(object):
         while distance < distance_same_lane:
             next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                return []
+                return plan #[]
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
@@ -577,25 +577,25 @@ class BasicAgent(object):
             # Move forward
             next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
-                return []
+                return plan #[]
             next_wp = next_wps[0]
 
             # Get the side lane
             if direction == 'left':
                 if check and str(next_wp.lane_change) not in ['Left', 'Both']:
-                    return []
+                    return plan #[]
                 side_wp = next_wp.get_left_lane()
             else:
                 if check and str(next_wp.lane_change) not in ['Right', 'Both']:
-                    return []
-                side_wp = next_wp.get_right_lane()
+                    return plan #[]
+                side_wp = next_wp #next_wp.get_right_lane()
 
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
                 print("No side waypoint found CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
                 print("side_wp",side_wp)
                 print("side_wp.lane_type",side_wp.lane_type)
                 print("carla.LaneType.Driving",carla.LaneType.Driving)
-                #return []
+                return plan #[]
 
             # Update the plan
             plan.append((side_wp, option))
@@ -604,12 +604,12 @@ class BasicAgent(object):
         # Other lane
         distance = 0
         while distance < distance_other_lane:
-            if overtake_do:
+            if follow_direction:
                 next_wps = plan[-1][0].previous(step_distance)
             else:
                 next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                return []
+                return plan #[]
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
