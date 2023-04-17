@@ -586,7 +586,7 @@ class BasicAgent(object):
             next_wp = next_wps[0]
 
             # Get the side lane
-            if direction == 'left' or follow_direction: #aggiutno il follow direction con l'or
+            if direction == 'left':
                 if check and str(next_wp.lane_change) not in ['Left', 'Both']:
                     return plan #[]
                 side_wp = next_wp.get_left_lane()
