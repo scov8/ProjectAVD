@@ -251,7 +251,7 @@ class BasicAgent(object):
             lane_change_time * speed,
             False,
             1,
-            1.5,#self._sampling_resolution, # prova xon 1.5
+            self._sampling_resolution, # prova xon 1.5
             follow_direction
         )
         if not path:
