@@ -560,11 +560,10 @@ class BasicAgent(object):
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
 
-        
-        if direction == 'right' or follow_direction:
-            option = RoadOption.CHANGELANERIGHT
-        elif direction == 'left':
+        if direction == 'left':
             option = RoadOption.CHANGELANELEFT
+        elif direction == 'right':
+            option = RoadOption.CHANGELANERIGHT
         else:
             # ERROR, input value for change must be 'left' or 'right'
             return []
