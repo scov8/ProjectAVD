@@ -144,7 +144,7 @@ class BehaviorAgent(BasicAgent):
                 print("avvio il sorpasso")
                 self._behavior.overtake_doing = 1
                 self._behavior.overtake_counter = 50
-                self.lane_change("left", other_lane_time=3, follow_direction=False)
+                self.lane_change("left", other_lane_time=2, follow_direction=False)
                 self._local_planner.set_speed(90)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
             print("vedo se posso finire il sorpasso")
@@ -389,9 +389,10 @@ class BehaviorAgent(BasicAgent):
                 pass
             else:
                 # faccio rallentare la macchina
-                target_speed = self._speed - self._behavior.speed_decrease
-                self._local_planner.set_speed(target_speed)
-                control = self._local_planner.run_step(debug=debug)
+                #target_speed = self._speed - self._behavior.speed_decrease
+                #self._local_planner.set_speed(target_speed)
+                #control = self._local_planner.run_step(debug=debug)
+                pass
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
