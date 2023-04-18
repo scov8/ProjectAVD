@@ -154,7 +154,7 @@ class BehaviorAgent(BasicAgent):
                 print("finisco il sorpasso")
                 self._behavior.overtake_doing = 0
                 self._behavior.overtake_counter = 50
-                self.lane_change("left", follow_direction=True)
+                self.lane_change("left", follow_direction=False)
                 self._local_planner.set_speed(30)
 
     def collision_and_car_avoid_manager(self, waypoint):
