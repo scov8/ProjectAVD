@@ -145,7 +145,7 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.overtake_doing = 1
                 self._behavior.overtake_counter = 55
                 self.lane_change("left", other_lane_time=3, follow_direction=False)
-                self._local_planner.set_speed(90)
+                self._local_planner.set_speed(80)
         elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
             print("vedo se posso finire il sorpasso")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(
