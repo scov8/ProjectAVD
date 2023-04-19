@@ -153,7 +153,7 @@ class BehaviorAgent(BasicAgent):
             if not new_vehicle_state:
                 print("finisco il sorpasso")
                 self._behavior.overtake_doing = 0
-                self._behavior.overtake_counter = 50
+                self._behavior.overtake_counter = 5
                 self.lane_change("left", follow_direction=True)
                 self._local_planner.set_speed(30)
 
@@ -274,7 +274,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        if (((vehicle_speed < (self._speed / 5)) or (vehicle_speed < 1.0)) and distance < 9.0) or self._behavior.overtake_doing == 1:
+        if (((vehicle_speed < (self._speed / 5)) or (vehicle_speed < 1.0)) and distance < 8.0) or self._behavior.overtake_doing == 1:
             print("potrei fare l'overtake")
             wpt = ego_vehicle_wp.get_left_lane()
             self._overtake(vehicle_list, vehicle_list)
