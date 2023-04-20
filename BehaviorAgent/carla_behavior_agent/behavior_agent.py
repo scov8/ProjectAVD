@@ -385,8 +385,8 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance and self._speed != 0:
                 return self.emergency_stop()
             elif self._speed == 0:
-                self.obstacle_manager(obstacle, distance)
-                #pass
+                #self.obstacle_manager(obstacle, distance)
+                pass
             else:
                 # faccio rallentare la macchina
                 target_speed = self._speed - (self._behavior.speed_decrease-3)
