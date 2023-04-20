@@ -555,7 +555,7 @@ class BasicAgent(object):
         while distance < distance_same_lane:
             next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                return plan #[]
+                return [] # posso far tiroanre plan
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
@@ -580,23 +580,23 @@ class BasicAgent(object):
             else:
                 next_wps = plan[-1][0].previous(lane_change_distance)
 
-            #next_wps = plan[-1][0].next(lane_change_distance)
+            #next_wps = plan[-1][0].next(lane_change_distance) # prima dell'if era così
             if not next_wps:
-                return plan #[]
+                return [] # posso far tiroanre plan
             next_wp = next_wps[0]
 
             # Get the side lane
             if direction == 'left':
                 if check and str(next_wp.lane_change) not in ['Left', 'Both']:
-                    return plan #[]
+                    return [] # posso far tiroanre plan
                 side_wp = next_wp.get_left_lane()
             else:
                 if check and str(next_wp.lane_change) not in ['Right', 'Both']:
-                    return plan #[]
+                    return [] # posso far tiroanre plan
                 side_wp = next_wp.get_right_lane() # provare anche con solo next_wp 
 
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
-                return plan #[]
+                return [] # posso far tiroanre plan
 
             # Update the plan
             plan.append((side_wp, option))
@@ -610,7 +610,7 @@ class BasicAgent(object):
             else:
                 next_wps = plan[-1][0].previous(step_distance)
             if not next_wps:
-                return plan #[]
+                return [] # posso far tiroanre plan
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
