@@ -143,17 +143,15 @@ class BehaviorAgent(BasicAgent):
             if not new_vehicle_state and not new_vehicle_state2:
                 print("avvio il sorpasso")
                 self._behavior.overtake_doing = 1
-                self._behavior.overtake_counter = 55
                 self.lane_change("left", other_lane_time=3, follow_direction=False)
                 self._local_planner.set_speed(80)
-        elif self._behavior.overtake_doing == 1 and self._behavior.overtake_counter == 0:
+        elif self._behavior.overtake_doing == 1:
             print("vedo se posso finire il sorpasso")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
             if not new_vehicle_state:
                 print("finisco il sorpasso")
                 self._behavior.overtake_doing = 0
-                self._behavior.overtake_counter = 5
                 self.lane_change("left", follow_direction=True)
                 self._local_planner.set_speed(30)
 
@@ -344,9 +342,6 @@ class BehaviorAgent(BasicAgent):
 
         if self._behavior.tailgate_counter > 0:
             self._behavior.tailgate_counter -= 1
-
-        if self._behavior.overtake_counter > 0:
-            self._behavior.overtake_counter -= 1
 
         # prende le info del veicolo
         ego_vehicle_loc = self._vehicle.get_location()
