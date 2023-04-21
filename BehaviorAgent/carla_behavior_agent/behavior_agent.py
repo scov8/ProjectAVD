@@ -404,7 +404,7 @@ class BehaviorAgent(BasicAgent):
                     self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance:
+            if distance < self._behavior.braking_distance and self._behavior.overtake_doing == 0:
                 return self.emergency_stop()
             else:
                 # se il veicolo non è molto vicino posso pensare di seguirlo
