@@ -143,7 +143,7 @@ class BehaviorAgent(BasicAgent):
             if not new_vehicle_state and not new_vehicle_state2:
                 print("avvio il sorpasso")
                 self._behavior.overtake_doing = 1
-                self.lane_change("left", other_lane_time=3, follow_direction=False)
+                self.lane_change("left", other_lane_time=10, follow_direction=False)
                 self._local_planner.set_speed(80)
         elif self._behavior.overtake_doing == 1:
             print("vedo se posso finire il sorpasso")
