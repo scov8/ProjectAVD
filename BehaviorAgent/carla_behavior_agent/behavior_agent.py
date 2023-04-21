@@ -290,9 +290,11 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
         elif (self._speed == 0) or (self._behavior.overtake_doing == 1):
-            print("potrei fare l'overtake")
+            print("potrei fare l'overtake, vedo la linea a sinistra")
             wpt = ego_vehicle_wp.get_left_lane()
-            self._overtake(vehicle_list, vehicle_list)
+            if wpt.lane_type == carla.LaneType.Driving:
+                print("la linea a sinistra è legale")
+                self._overtake(vehicle_list, vehicle_list)
             control = self._local_planner.run_step(debug=debug)
         else:
             target_speed = min([
