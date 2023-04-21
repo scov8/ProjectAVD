@@ -533,7 +533,7 @@ class BasicAgent(object):
 
         return (False, None, -1)
 
-    def _generate_lane_change_path(self, waypoint, direction='left', distance_same_lane=10,
+    def _generate_lane_change_path_o(self, waypoint, direction='left', distance_same_lane=10,
                                 distance_other_lane=25, lane_change_distance=25,
                                 check=False, lane_changes=1, step_distance=2, follow_direction=None): #check era true
         """
@@ -615,4 +615,147 @@ class BasicAgent(object):
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
 
+        return plan
+    
+    def _generate_lane_change_path(self, waypoint, direction='left', distance_same_lane=10,
+                                   distance_other_lane=25, lane_change_distance=25,
+                                   check=True, lane_changes=1, step_distance=2, follow_direction=False):
+        """
+        This methods generates a path that results in a lane change.
+        Use the different distances to fine-tune the maneuver.
+        If the lane change is impossible, the returned path will be empty.
+        """
+
+        # Calcola distanza da percorrere sulla corsia di partenza, sulla corsia di arrivo e la
+        # distanza per effettuare il passaggio.
+        distance_same_lane = max(distance_same_lane, 0.1)
+        distance_other_lane = max(distance_other_lane, 0.1)
+        lane_change_distance = max(lane_change_distance, 0.1)
+        print("\n\nDISTANCE SAME LANE:  ", distance_same_lane)
+        print("DISTANCE OTHER LANE: ", distance_other_lane)
+        print("DISTANCE LANE CHANGE:", lane_change_distance)
+
+        # Lista dei waypoint che tracciano il cambio di corsia.
+        plan = []
+        plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
+
+        # Prendi waypoint della prima parte del percorso: sulla corsia di partenza.
+        distance = 0
+        # Crea un nuovo waypoint a 'step_distance' dall'ultimo, continua ad andare avanti fino a
+        # quando la distanza accumulata non supera quella da percorrere sulla corsia di partenza.
+        while distance < distance_same_lane:
+            next_wps = plan[-1][0].next(step_distance)
+            if not next_wps:
+                print("\nLANE CHANGE ERROR 1\n")
+                return []
+            next_wp = next_wps[0]
+            if start_point is None:
+                start_point = next_wp
+            distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
+            plan.append((next_wp, RoadOption.LANEFOLLOW))
+
+        self._print_plan(plan, "CON SAME DISTANCE")
+
+        # In base al movimento che si vuole effettuare cambia la RoadOption.
+        if direction == "left":
+            option = RoadOption.CHANGELANELEFT
+        elif direction == "right":
+            option = RoadOption.CHANGELANERIGHT
+        else:
+            return []
+
+        # Trova il singolo waypoint che serve a cambiare corsia.
+        lane_changes_done = 0
+        lane_change_distance = lane_change_distance / lane_changes
+        while lane_changes_done < lane_changes:
+            # Dall'ultimo punto sulla corsia di partenza cerca questo next_wp un po' piú avanti.
+            next_wps = plan[-1][0].next(lane_change_distance)
+            if not next_wps:
+                print("\nLANE CHANGE ERROR 2\n")
+                return []
+            next_wp = next_wps[0]
+            # Traslo quel next_wp sull'altra corsia.
+            if direction == 'left':
+                if check and str(next_wp.lane_change) not in ['Left', 'Both']:
+                    print("\nLANE CHANGE ERROR 3\n")
+                    return []
+                side_wp = next_wp.get_left_lane()
+            else:
+                if check and str(next_wp.lane_change) not in ['Right', 'Both']:
+                    print("\nLANE CHANGE ERROR 4\n")
+                    return []
+                side_wp = next_wp.get_right_lane()
+            if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
+                print("\nLANE CHANGE ERROR 5\n")
+                return []
+            plan.append((side_wp, option))
+            lane_changes_done += 1
+
+        self._print_plan(plan, "CON LANE CHANGE A SINISTRA")
+
+        # Orientamento dei waypoint della corsia di partenza e dell'altra. I sensi di marcia
+        # corrispondono se questi sono uguali.
+        curr_orientation = next_wp.transform.rotation.yaw
+        side_orientation = side_wp.transform.rotation.yaw
+
+        # Percorri l'altra corsia.
+        distance = 0
+        while distance < distance_other_lane:
+            # Se i sensi di marcia delle due corsie sono diversi per andare avanti è come se dovessi
+            # andare indietro. (ESEMPIO: corsia iniziale di destra verso l'alto, corsia a sinistra
+            # va verso il basso; per andare avanti lungo la corsia di sinistra devo salire quindi
+            # percorrerla a ritroso)
+            if curr_orientation != side_orientation and direction == "left":
+                next_wps = plan[-1][0].previous(step_distance)
+            else:
+                next_wps = plan[-1][0].next(step_distance)
+            if not next_wps:
+                print("\nLANE CHANGE ERROR 6\n")
+                return []
+            next_wp = next_wps[0]
+            distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
+            plan.append((next_wp, RoadOption.LANEFOLLOW))
+
+        self._print_plan(plan, "CON SINISTRA")
+
+        if not follow_direction:
+            return plan
+
+        # Trova il singolo waypoint che permette di rientrare nella corsia iniziale.
+        # Dall'ultimo punto percorso sull'altra corsia cerca questo next_wp un po' piú avanti.
+        if curr_orientation != side_orientation and direction == "left":
+            next_wps = plan[-1][0].previous(lane_change_distance)
+        else:
+            next_wps = plan[-1][0].next(step_distance)
+        if not next_wps:
+            print("\nLANE CHANGE ERROR 7\n")
+            return []
+        next_wp = next_wps[0]
+        # Traslo il next_wp sulla corsia di partenza.
+        if direction == 'left':
+            if check and str(next_wp.lane_change) not in ['Left', 'Both']:
+                print("\nLANE CHANGE ERROR 3\n")
+                return []
+            side_wp = next_wp.get_left_lane()
+        else:
+            if check and str(next_wp.lane_change) not in ['Right', 'Both']:
+                print("\nLANE CHANGE ERROR 4\n")
+                return []
+            side_wp = next_wp.get_right_lane()
+        plan.append((side_wp, option))
+
+        self._print_plan(plan, "CON RIENTRO")
+
+        # Aggiungi alcuni waypoint sulla corsia iniziale per raddrizzare il veicolo quando rientra.
+        for _ in range(3):
+            next_wps = plan[-1][0].next(step_distance)
+            if not next_wps:
+                return []
+            next_wp = next_wps[0]
+            plan.append((next_wp, RoadOption.LANEFOLLOW))
+
+        self._print_plan(plan, "CON CONTINUAZIONE RIENTRO")
+
+        # route_trace = self._trace_route(self.start_waypoint, self.end_waypoint)
+        # self._local_planner.set_global_plan(route_trace, clean)
         return plan
