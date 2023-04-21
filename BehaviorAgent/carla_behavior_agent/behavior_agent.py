@@ -138,8 +138,8 @@ class BehaviorAgent(BasicAgent):
     def _overtake(self, to_overtake, vehicle_list):
         if self._behavior.overtake_doing == 0:
             print("vedo se posso fare il sorpasso")
-            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=180, lane_offset=-1)
-            new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit * 1.5), up_angle_th=40, lane_offset=-1)
+            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+            new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit ), up_angle_th=40, lane_offset=-1)
             if not new_vehicle_state and not new_vehicle_state2:
                 print("avvio il sorpasso")
                 self._behavior.overtake_doing = 1
