@@ -236,7 +236,7 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2, follow_direction = None):
+    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
         Changes the path so that the vehicle performs a lane change.
         Use 'direction' to specify either a 'left' or 'right' lane change,
@@ -251,8 +251,7 @@ class BasicAgent(object):
             lane_change_time * speed,
             False,
             1,
-            self._sampling_resolution, # prova xon 1.5
-            follow_direction
+            self._sampling_resolution # prova xon 1.5
         )
         if not path:
             print("WARNING: Ignoring the lane change as no path was found")
@@ -535,7 +534,7 @@ class BasicAgent(object):
 
     def _generate_lane_change_path(self, waypoint, direction='left', distance_same_lane=10,
                                 distance_other_lane=25, lane_change_distance=25,
-                                check=False, lane_changes=1, step_distance=2, follow_direction=None): #check era true
+                                check=False, lane_changes=1, step_distance=2): #check era true
         """
         This methods generates a path that results in a lane change.
         Use the different distances to fine-tune the maneuver.
@@ -555,7 +554,7 @@ class BasicAgent(object):
         while distance < distance_same_lane:
             next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                return plan #[]
+                return [] #plan
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
@@ -571,46 +570,53 @@ class BasicAgent(object):
         lane_changes_done = 0
         lane_change_distance = lane_change_distance / lane_changes
 
+        curr_orientation = next_wp.transform.rotation.yaw
+        side_orientation = side_wp.transform.rotation.yaw
+
         # Lane change
         while lane_changes_done < lane_changes:
 
             # Move forward
-            if (not follow_direction) or (follow_direction is None):
-                next_wps = plan[-1][0].next(lane_change_distance)
+            if curr_orientation != side_orientation and direction == "left":
+                next_wps = plan[-1][0].previous(step_distance)
             else:
-                next_wps = plan[-1][0].previous(lane_change_distance)
+                next_wps = plan[-1][0].next(step_distance)
 
             #next_wps = plan[-1][0].next(lane_change_distance) # prima dell'if era così
             if not next_wps:
-                return plan #[] 
+                return [] #plan
             next_wp = next_wps[0]
 
             # Get the side lane
             if direction == 'left':
                 if check and str(next_wp.lane_change) not in ['Left', 'Both']:
-                    return plan #[]
+                    return [] #plan
                 side_wp = next_wp.get_left_lane()
             else:
                 if check and str(next_wp.lane_change) not in ['Right', 'Both']:
-                    return plan #[]
+                    return [] #plan
                 side_wp = next_wp.get_right_lane() # provare anche con solo next_wp 
 
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
-                return plan #[]
+                return [] #plan
 
             # Update the plan
             plan.append((side_wp, option))
             lane_changes_done += 1
 
+        curr_orientation = next_wp.transform.rotation.yaw
+        side_orientation = side_wp.transform.rotation.yaw
+
         # Other lane
         distance = 0
         while distance < distance_other_lane:
-            if follow_direction or (follow_direction is None):
-                next_wps = plan[-1][0].next(step_distance)
-            else:
+            if curr_orientation != side_orientation and direction == "left":
                 next_wps = plan[-1][0].previous(step_distance)
+            else:
+                next_wps = plan[-1][0].next(step_distance)
+            
             if not next_wps:
-                return plan #[]
+                return [] #plan
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))

@@ -143,7 +143,7 @@ class BehaviorAgent(BasicAgent):
             if not new_vehicle_state and not new_vehicle_state2:
                 print("avvio il sorpasso")
                 self._behavior.overtake_doing = 1
-                self.lane_change("left", other_lane_time=10, follow_direction=False)
+                self.lane_change("left", other_lane_time=10)
                 self._local_planner.set_speed(80)
         elif self._behavior.overtake_doing == 1:
             print("vedo se posso finire il sorpasso")
@@ -152,7 +152,7 @@ class BehaviorAgent(BasicAgent):
             if not new_vehicle_state:
                 print("finisco il sorpasso")
                 self._behavior.overtake_doing = 0
-                self.lane_change("left", follow_direction=True)
+                self.lane_change("left")
                 self._local_planner.set_speed(30)
 
     def collision_and_car_avoid_manager(self, waypoint):
@@ -272,14 +272,8 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        if (((vehicle_speed < (self._speed / 5)) or (vehicle_speed < 1.0)) and distance < 9.0) or self._behavior.overtake_doing == 1:
-            print("potrei fare l'overtake")
-            wpt = ego_vehicle_wp.get_left_lane()
-            self._overtake(vehicle_list, vehicle_list)
-            control = self._local_planner.run_step(debug=debug)
-
         # Under safety time distance, slow down.
-        elif self._behavior.safety_time > ttc > 0.0:
+        if self._behavior.safety_time > ttc > 0.0:
             target_speed = min([
                 positive(vehicle_speed - self._behavior.speed_decrease),
                 self._behavior.max_speed,
@@ -295,7 +289,11 @@ class BehaviorAgent(BasicAgent):
                 self._speed_limit - self._behavior.speed_lim_dist])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
-
+        elif (self._speed == 0) or (self._behavior.overtake_doing == 1):
+            print("potrei fare l'overtake")
+            wpt = ego_vehicle_wp.get_left_lane()
+            self._overtake(vehicle_list, vehicle_list)
+            control = self._local_planner.run_step(debug=debug)
         else:
             target_speed = min([
                 self._behavior.max_speed,
