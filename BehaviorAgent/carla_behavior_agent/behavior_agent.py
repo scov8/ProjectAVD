@@ -13,7 +13,7 @@ import numpy as np
 import carla
 from basic_agent import BasicAgent
 from local_planner import RoadOption
-from behavior_types import Cautious, Aggressive, Normal
+from behavior_types import Cautious, Aggressive, Normal, Personal
 
 from misc import get_speed, positive, is_within_distance, compute_distance
 
@@ -31,7 +31,7 @@ class BehaviorAgent(BasicAgent):
     are encoded in the agent, from cautious to a more aggressive ones.
     """
 
-    def __init__(self, vehicle, behavior='normal', opt_dict={}, map_inst=None, grp_inst=None):
+    def __init__(self, vehicle, behavior='personal', opt_dict={}, map_inst=None, grp_inst=None):
         """
         Constructor method.
 
@@ -64,6 +64,10 @@ class BehaviorAgent(BasicAgent):
 
         elif behavior == 'aggressive':
             self._behavior = Aggressive()
+
+        elif behavior == 'personal':
+            self._behavior = Personal()
+            
 
     def _update_information(self):
         """
@@ -272,7 +276,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        if (self._speed == 0) or (self._behavior.overtake_doing == 1):
+        if (self._speed < 1.0) or (self._behavior.overtake_doing == 1):
             print("potrei fare l'overtake, vedo la linea a sinistra")
             wpt = ego_vehicle_wp.get_left_lane()
             if wpt.lane_type == carla.LaneType.Driving:
