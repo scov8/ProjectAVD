@@ -272,8 +272,16 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
+        if (self._speed == 0) or (self._behavior.overtake_doing == 1):
+            print("potrei fare l'overtake, vedo la linea a sinistra")
+            wpt = ego_vehicle_wp.get_left_lane()
+            if wpt.lane_type == carla.LaneType.Driving:
+                print("la linea a sinistra è legale")
+                self._overtake(vehicle_list, vehicle_list)
+            control = self._local_planner.run_step(debug=debug)
+
         # Under safety time distance, slow down.
-        if self._behavior.safety_time > ttc > 0.0:
+        elif self._behavior.safety_time > ttc > 0.0:
             target_speed = min([
                 positive(vehicle_speed - self._behavior.speed_decrease),
                 self._behavior.max_speed,
@@ -288,13 +296,6 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.max_speed,
                 self._speed_limit - self._behavior.speed_lim_dist])
             self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
-        elif (self._speed == 0) or (self._behavior.overtake_doing == 1):
-            print("potrei fare l'overtake, vedo la linea a sinistra")
-            wpt = ego_vehicle_wp.get_left_lane()
-            if wpt.lane_type == carla.LaneType.Driving:
-                print("la linea a sinistra è legale")
-                self._overtake(vehicle_list, vehicle_list)
             control = self._local_planner.run_step(debug=debug)
         else:
             target_speed = min([
