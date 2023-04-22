@@ -31,7 +31,7 @@ class BehaviorAgent(BasicAgent):
     are encoded in the agent, from cautious to a more aggressive ones.
     """
 
-    def __init__(self, vehicle, behavior='personal', opt_dict={}, map_inst=None, grp_inst=None):
+    def __init__(self, vehicle, behavior='normal', opt_dict={}, map_inst=None, grp_inst=None):
         """
         Constructor method.
 
