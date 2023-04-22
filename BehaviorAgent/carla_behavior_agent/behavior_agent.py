@@ -143,16 +143,15 @@ class BehaviorAgent(BasicAgent):
         if self._behavior.overtake_doing == 0:
             print("vedo se posso fare il sorpasso")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
-            new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit ), up_angle_th=40, lane_offset=-1)
+            new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=40, lane_offset=-1)
             if not new_vehicle_state and not new_vehicle_state2:
                 print("avvio il sorpasso")
                 self._behavior.overtake_doing = 1
-                self.lane_change("left", other_lane_time=10)
+                self.lane_change("left", other_lane_time=3)
                 self._local_planner.set_speed(80)
         elif self._behavior.overtake_doing == 1:
             print("vedo se posso finire il sorpasso")
-            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=180, lane_offset=1)
             if not new_vehicle_state:
                 print("finisco il sorpasso")
                 self._behavior.overtake_doing = 0

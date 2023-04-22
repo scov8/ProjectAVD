@@ -603,10 +603,7 @@ class BasicAgent(object):
 
         curr_orientation = next_wp.transform.rotation.yaw
         side_orientation = side_wp.transform.rotation.yaw
-
-        print("curr_orientation: ", curr_orientation)
-        print("side_orientation: ", side_orientation)
-
+        
         # Other lane
         distance = 0
         while distance < distance_other_lane:
