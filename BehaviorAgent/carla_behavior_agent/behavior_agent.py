@@ -276,7 +276,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        print("La linea a sinistra è:", ego_vehicle_wp.LaneChange)
+        print("La linea a sinistra è:", ego_vehicle_wp.lane_change)
 
         if (self._speed < 1.0) or (self._behavior.overtake_doing == 1):
             print("potrei fare l'overtake, vedo la linea a sinistra")
