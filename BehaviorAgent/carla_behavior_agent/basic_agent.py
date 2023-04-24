@@ -570,6 +570,9 @@ class BasicAgent(object):
         lane_changes_done = 0
         lane_change_distance = lane_change_distance / lane_changes
 
+        curr_orientation = next_wp.transform.rotation.yaw
+        side_orientation = next_wp.get_left_lane().transform.rotation.yaw
+
         # Lane change
         while lane_changes_done < lane_changes:
 
@@ -600,9 +603,6 @@ class BasicAgent(object):
             # Update the plan
             plan.append((side_wp, option))
             lane_changes_done += 1
-
-        curr_orientation = next_wp.transform.rotation.yaw
-        side_orientation = side_wp.transform.rotation.yaw
         
         # Other lane
         distance = 0
