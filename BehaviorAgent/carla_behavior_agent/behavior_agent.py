@@ -209,6 +209,9 @@ class BehaviorAgent(BasicAgent):
         walker_list = [w for w in walker_list if dist(w) < 10]
         walker_list.sort(key=dist)
 
+        if walker_list == []:
+            return False, None, None
+
         if self._direction == RoadOption.CHANGELANELEFT:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=-1)
