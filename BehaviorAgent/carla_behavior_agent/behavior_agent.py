@@ -88,6 +88,16 @@ class BehaviorAgent(BasicAgent):
         if self._incoming_direction is None:
             self._incoming_direction = RoadOption.LANEFOLLOW
 
+    def stop_signs_manager(self):
+        actor_list = self._world.get_actors()
+        stops_list = actor_list.filter("*traffic.traffic_sign.stop*")
+        print('###############################################')
+        print(stops_list)
+        print('###############################################')
+        affected, _ = self._affected_by_stop_sign(stops_list)
+
+        return affected
+
     def traffic_light_manager(self):
         """
         This method is in charge of behaviors for red lights.
@@ -331,7 +341,7 @@ class BehaviorAgent(BasicAgent):
 
         return control
 
-    def run_step(self, debug=True):  # il debug era false
+    def run_step(self, debug=False):  # il debug era false
         """
         Execute one step of navigation.
 
@@ -356,6 +366,9 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()  # se è rosso si ferma
 
+        if self.stop_signs_manager():
+            return self.add_emergency_stop()
+        
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(
             ego_vehicle_wp)  # lo considero fermandomi

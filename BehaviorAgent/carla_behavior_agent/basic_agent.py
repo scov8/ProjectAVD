@@ -48,6 +48,8 @@ class BasicAgent(object):
                 self._map = self._world.get_map()
         else:
             self._map = self._world.get_map()
+        
+        self._last_stop_sign = None
         self._last_traffic_light = None
 
         # Base parameters
@@ -101,6 +103,9 @@ class BasicAgent(object):
         # Get the static elements of the scene
         self._lights_list = self._world.get_actors().filter("*traffic_light*")
         self._lights_map = {}  # Dictionary mapping a traffic light to a wp corrspoing to its trigger volume location
+
+        self._stops_list = self._world.get_actors().filter("*traffic.traffic_sign.stop*")
+        self._stops_map = {} # Dictionary mapping a stop sing to a wp corrspoing to its trigger volume location
 
     def add_emergency_stop(self, control):
         """
@@ -257,6 +262,54 @@ class BasicAgent(object):
             print("WARNING: Ignoring the lane change as no path was found")
 
         self.set_global_plan(path)
+
+    def _affected_by_stop_sign(self, stops_list=None, max_distance=None):
+        if self._ignore_stop_signs:
+            return (False, None)
+        
+        if not stops_list:
+            stops_list = self._world.get_actors().filter("*traffic.traffic_sign.stop**")
+
+        if not max_distance:
+            max_distance = self._base_tlight_threshold 
+
+        if self._last_stop_sign:
+            if 1 == 1: # se la via è libera (il true è temporaneo, da togliere)
+                self._last_stop_sign = None
+            else:
+                return (True, self._last_stop_sign)
+        
+        ego_vehicle_location = self._vehicle.get_location()
+        ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
+
+        for stop_sign in stops_list:
+            if stop_sign.id in self._stops_map:
+                trigger_wp = self._stops_map[stop_sign.id]
+            else:
+                trigger_location = get_trafficlight_trigger_location(stop_sign)
+                trigger_wp = self._map.get_waypoint(trigger_location)
+                self._lights_map[stop_sign.id] = trigger_wp
+            
+            if trigger_wp.transform.location.distance(ego_vehicle_location) > max_distance:
+                continue
+            
+            if trigger_wp.road_id != ego_vehicle_waypoint.road_id: # se si trova nel raggio d'azione 
+                continue
+
+            ve_dir = ego_vehicle_waypoint.transform.get_forward_vector()
+            wp_dir = trigger_wp.transform.get_forward_vector() # valuriamo anceh l'orientamento del veicolo per non cacare i sem che stanno dietro
+            dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z # dove dbb andare 
+
+            if dot_ve_wp < 0: # sta dietro
+                continue
+
+            if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]): # valutazione sulla distanza
+                self._last_stop_sign = stop_sign
+                return (True, stop_sign)
+
+        return (False, None)
+        
+
 
     def _affected_by_traffic_light(self, lights_list=None, max_distance=None):
         """
