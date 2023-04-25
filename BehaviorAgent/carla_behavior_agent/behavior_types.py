@@ -14,8 +14,6 @@ class Cautious(object):
     braking_distance = 6
     tailgate_counter = 0
     overtake_counter = 0
-    overtake_doing = 0
-
 
 class Normal(object):
     """Class for Normal agent."""
@@ -27,8 +25,6 @@ class Normal(object):
     braking_distance = 5
     tailgate_counter = 0
     overtake_counter = 0
-    overtake_doing = 0
-
 
 class Aggressive(object):
     """Class for Aggressive agent."""
@@ -40,7 +36,6 @@ class Aggressive(object):
     braking_distance = 4
     tailgate_counter = -1
     overtake_counter = 0
-    overtake_doing = 0
 
 class Personal(object):
     """Class for Normal agent."""
@@ -52,4 +47,3 @@ class Personal(object):
     braking_distance = 5
     tailgate_counter = 0
     overtake_counter = 0
-    overtake_doing = 0

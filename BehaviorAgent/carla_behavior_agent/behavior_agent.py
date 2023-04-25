@@ -51,6 +51,7 @@ class BehaviorAgent(BasicAgent):
         self._min_speed = 5
         self._behavior = None
         self._sampling_resolution = 4.5
+        self._overtaking = False
 
         self._overtake_threshold = 10
         self._change_lane_threshold = 4
@@ -140,25 +141,22 @@ class BehaviorAgent(BasicAgent):
                         end_waypoint.transform.location, left_wpt.transform.location)
 
     def _overtake(self, to_overtake, vehicle_list):
-        if self._behavior.overtake_doing == 0:
+        if self._overtaking :
             print("vedo se posso fare il sorpasso")
-            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
-            new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit * 2), up_angle_th=40, lane_offset=-1)
+            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+            new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit * 2), up_angle_th=40, lane_offset=-1)
             if not new_vehicle_state and not new_vehicle_state2:
                 print("avvio il sorpasso")
-                self._behavior.overtake_doing = 1
                 self.lane_change("left", other_lane_time=15)
+                self._overtaking = True
                 self._local_planner.set_speed(80)
-        elif self._behavior.overtake_doing == 1:
+        elif self._overtaking:
             print("vedo se posso finire il sorpasso")
-            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=180, lane_offset=1)
+            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=180, lane_offset=1)
             if not new_vehicle_state:
                 print("finisco il sorpasso")
-                self._behavior.overtake_doing = 0
                 self.lane_change("right")
+                self._overtaking = False
                 self._local_planner.set_speed(self._behavior.max_speed)
 
     def collision_and_car_avoid_manager(self, waypoint):
@@ -241,10 +239,8 @@ class BehaviorAgent(BasicAgent):
 
         obstacle_list = self._world.get_actors().filter("*static*")
         # funzione distanza, valuta la distanza tra il pedone e dove mi trovo
-        def dist(w): return w.get_location().distance(
-            waypoint.transform.location)
-        obstacle_list = [w for w in obstacle_list if dist(
-            w) < 45]  # prendiamo quelli sotto i 10 mt
+        def dist(w): return w.get_location().distance(waypoint.transform.location)
+        obstacle_list = [w for w in obstacle_list if dist(w) < 45]  # prendiamo quelli sotto i 10 mt
         obstacle_list.sort(key=dist)
 
         if obstacle_list == []:
@@ -291,9 +287,8 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        print("distance: ", distance, "Velocità ego: ", self._speed,
-              "Velocità veicolo davanti: ", vehicle_speed)
-        if ((distance - 1) < self._behavior.braking_distance) and (vehicle_speed < 0.1) or (self._behavior.overtake_doing == 1):
+        print("distance: ", distance, "Velocità ego: ", self._speed,"Velocità veicolo davanti: ", vehicle_speed)
+        if ((distance - 1) < self._behavior.braking_distance) and (vehicle_speed < 0.1) or self._overtaking:
             print("potrei fare l'overtake, vedo la linea a sinistra")
             wpt = ego_vehicle_wp.get_left_lane()
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
@@ -343,7 +338,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         control = self._local_planner.run_step(debug=debug)
 
-        if distance <= self._behavior.braking_distance and self._speed < 0.01:
+        if distance <= self._behavior.braking_distance and self._speed < 0.01 or self._overtaking == True:
             self._overtake(obstacle_list, vehicle_list)
             control = self._local_planner.run_step(debug=debug)
 
@@ -390,8 +385,7 @@ class BehaviorAgent(BasicAgent):
                 return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
-        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(
-            ego_vehicle_wp)
+        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
 
         if obstacle_state:
             distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
@@ -400,15 +394,15 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
 
             print("self._speed:", self._speed)
-            if distance < self._behavior.braking_distance and self._speed > 0.01:
+            if self._speed < 0.01 or self._overtaking == True:
+                self.obstacle_manager(obstacle, distance)
+                #pass
+            elif distance < self._behavior.braking_distance and self._speed > 0.01:
                 return self.emergency_stop()
             elif distance < 30 and self._speed > 0.01:
                 return self.no_throttle()
             elif distance < 15 and self._speed > 0.01:
                 return self.soft_stop()
-            elif self._speed < 0.01:
-                self.obstacle_manager(obstacle, distance)
-                #pass
             else:
                 # faccio rallentare la macchina
                 target_speed = self._speed - (self._behavior.speed_decrease-3)
@@ -416,15 +410,12 @@ class BehaviorAgent(BasicAgent):
                 control = self._local_planner.run_step(debug=debug)
 
         # 2.2: Car following behaviors
-        vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(
-            ego_vehicle_wp)
+        vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
 
         if vehicle_state:
             # Distance is computed from the center of the two cars,
             # we use bounding boxes to calculate the actual distance
-            distance = distance - max(
-                vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(
-                    self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+            distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
@@ -433,14 +424,12 @@ class BehaviorAgent(BasicAgent):
                 # se il veicolo non è molto vicino posso pensare di seguirlo
                 control = self.car_following_manager(vehicle, distance)
 
-        elif self._behavior.overtake_doing == 1:
+        elif self._overtaking:
             ego_vehicle_loc = self._vehicle.get_location()
             ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
             vehicle_list = self._world.get_actors().filter("*vehicle*")
-            def dist(v): return v.get_location().distance(
-                ego_vehicle_wp.transform.location)
-            vehicle_list = [v for v in vehicle_list if dist(
-                v) < 45 and v.id != self._vehicle.id]
+            def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
+            vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
             vehicle_list.sort(key=dist)
             self._overtake(vehicle_list, vehicle_list)
             control = self._local_planner.run_step(debug=debug)
