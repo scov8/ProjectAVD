@@ -700,7 +700,7 @@ class BasicAgent(object):
             else:
                 if check and str(next_wp.lane_change) not in ['Right', 'Both']:
                     return []
-                side_wp = next_wp.get_right_lane() # provare anche con solo next_wp 
+                side_wp = next_wp.get_right_lane()
 
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
                 return plan #[]
