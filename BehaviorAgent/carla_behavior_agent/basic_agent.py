@@ -712,7 +712,10 @@ class BasicAgent(object):
         # Other lane
         distance = 0
         while distance < distance_other_lane:
-            next_wps = plan[-1][0].next(step_distance)
+            if curr_orientation != side_orientation and direction == "left":
+                next_wps = plan[-1][0].previous(step_distance)
+            else:
+                next_wps = plan[-1][0].next(step_distance)
             
             if not next_wps:
                 return plan #[]
