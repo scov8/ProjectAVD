@@ -173,10 +173,8 @@ class BehaviorAgent(BasicAgent):
             :return distance: distance to nearby vehicle
         """
         vehicle_list = self._world.get_actors().filter("*vehicle*")
-        def dist(v): return v.get_location().distance(
-            waypoint.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        def dist(v): return v.get_location().distance(waypoint.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
 
         if self._direction == RoadOption.CHANGELANELEFT:
@@ -209,8 +207,7 @@ class BehaviorAgent(BasicAgent):
         """
 
         walker_list = self._world.get_actors().filter("*walker.pedestrian*")
-        def dist(w): return w.get_location().distance(
-            waypoint.transform.location)
+        def dist(w): return w.get_location().distance(waypoint.transform.location)
         walker_list = [w for w in walker_list if dist(w) < 10]
         walker_list.sort(key=dist)
 
@@ -243,10 +240,8 @@ class BehaviorAgent(BasicAgent):
 
         obstacle_list = self._world.get_actors().filter("*static*")
         # funzione distanza, valuta la distanza tra il pedone e dove mi trovo
-        def dist(w): return w.get_location().distance(
-            waypoint.transform.location)
-        obstacle_list = [w for w in obstacle_list if dist(
-            w) < 45]  # prendiamo quelli sotto i 10 mt
+        def dist(w): return w.get_location().distance(waypoint.transform.location)
+        obstacle_list = [w for w in obstacle_list if dist(w) < 45]  # prendiamo quelli sotto i 10 mt
         obstacle_list.sort(key=dist)
 
         # in base a quello ceh dbb fare valutaimo in modo diverso _vehicle_obstacle_detected()
@@ -290,7 +285,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        if (self._speed < 0.3) or (self._behavior.overtake_doing == 1):
+        if (self._speed < 0.1) or (self._behavior.overtake_doing == 1):
             print("potrei fare l'overtake, vedo la linea a sinistra")
             wpt = ego_vehicle_wp.get_left_lane()
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
