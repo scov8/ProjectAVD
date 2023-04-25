@@ -182,7 +182,7 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=30)
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40)
 
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
                 self._tailgating(waypoint, vehicle_list)
@@ -244,16 +244,15 @@ class BehaviorAgent(BasicAgent):
 
         # in base a quello ceh dbb fare valutaimo in modo diverso _vehicle_obstacle_detected()
         if self._direction == RoadOption.CHANGELANELEFT:
-            obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
+            obstacle_state, obstacle, distance = self._object_obstacle_detected(obstacle_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=-1)
         elif self._direction == RoadOption.CHANGELANERIGHT:
-            obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
+            obstacle_state, obstacle, distance = self._object_obstacle_detected(obstacle_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1)
         else:
-            obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
+            obstacle_state, obstacle, distance = self._object_obstacle_detected(obstacle_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)  # se questo sensore influenza la cosa
 
-        print("obstacle_state: ", obstacle_state,"obstacle: ", obstacle, "distance: ", distance)
         return obstacle_state, obstacle, distance
 
     def car_following_manager(self, vehicle, distance, debug=True):
