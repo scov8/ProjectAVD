@@ -274,12 +274,12 @@ class BehaviorAgent(BasicAgent):
 
         vehicle_speed = get_speed(vehicle)
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
-        ttc = distance / delta_v if delta_v != 0 else distance / \
-            np.nextafter(0., 1.)
+        ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.)
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        if (self._speed < 0.1) or (self._behavior.overtake_doing == 1):
+        print("distance: ", distance, "Velocità ego: ", self._speed, "Velocità veicolo davanti: ", vehicle_speed)
+        if ((distance - 1)  < self._behavior.braking_distance) and (vehicle_speed < 0.1) or (self._behavior.overtake_doing == 1):
             print("potrei fare l'overtake, vedo la linea a sinistra")
             wpt = ego_vehicle_wp.get_left_lane()
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
