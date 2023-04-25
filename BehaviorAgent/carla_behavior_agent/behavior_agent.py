@@ -116,13 +116,11 @@ class BehaviorAgent(BasicAgent):
         left_wpt = waypoint.get_left_lane()
         right_wpt = waypoint.get_right_lane()
 
-        behind_vehicle_state, behind_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
-            self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, low_angle_th=160)
+        behind_vehicle_state, behind_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, low_angle_th=160)
         if behind_vehicle_state and self._speed < get_speed(behind_vehicle):
             if (right_turn == carla.LaneChange.Right or right_turn ==
                     carla.LaneChange.Both) and waypoint.lane_id * right_wpt.lane_id > 0 and right_wpt.lane_type == carla.LaneType.Driving:
-                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
                 if not new_vehicle_state:
                     # se non ci sono veicoli che ci ostacolano, cambia corsia, avvio la manovra di cambio corsia
                     print("Tailgating, moving to the right!")
@@ -131,8 +129,7 @@ class BehaviorAgent(BasicAgent):
                     self.set_destination(
                         end_waypoint.transform.location, right_wpt.transform.location)
             elif left_turn == carla.LaneChange.Left and waypoint.lane_id * left_wpt.lane_id > 0 and left_wpt.lane_type == carla.LaneType.Driving:
-                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(
-                    self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+                new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
                 if not new_vehicle_state:
                     print("Tailgating, moving to the left!")
                     end_waypoint = self._local_planner.target_waypoint
@@ -171,10 +168,8 @@ class BehaviorAgent(BasicAgent):
             :return distance: distance to nearby vehicle
         """
         vehicle_list = self._world.get_actors().filter("*vehicle*")
-        def dist(v): return v.get_location().distance(
-            waypoint.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        def dist(v): return v.get_location().distance(waypoint.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
 
         if self._direction == RoadOption.CHANGELANELEFT:
@@ -338,9 +333,8 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         control = self._local_planner.run_step(debug=debug)
 
-        if distance <= self._behavior.braking_distance and self._speed < 0.01 or self._overtaking == True:
-            self._overtake(obstacle_list, vehicle_list)
-            control = self._local_planner.run_step(debug=debug)
+        self._overtake(obstacle_list, vehicle_list)
+        control = self._local_planner.run_step(debug=debug)
 
         return control
 
@@ -394,7 +388,7 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
 
             print("self._speed:", self._speed)
-            if self._speed < 0.01 or self._overtaking == True:
+            if self._speed < 0.01 or self._overtaking:
                 self.obstacle_manager(obstacle, distance)
                 #pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01:
