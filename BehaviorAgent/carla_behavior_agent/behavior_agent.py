@@ -400,7 +400,7 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
 
             print("self._speed:", self._speed)
-            if distance < self._behavior.braking_distance > 0.01:
+            if distance < self._behavior.braking_distance and self._speed > 0.01:
                 return self.emergency_stop()
             elif distance < 30 and self._speed > 0.01:
                 return self.no_throttle()
