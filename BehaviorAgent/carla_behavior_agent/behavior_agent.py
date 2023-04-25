@@ -153,9 +153,9 @@ class BehaviorAgent(BasicAgent):
             print("vedo se posso finire il sorpasso")
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=180, lane_offset=1)
             if not new_vehicle_state:
-                #print("finisco il sorpasso")
-                #self._behavior.overtake_doing = 0
-                #self.lane_change("right")
+                print("finisco il sorpasso")
+                self._behavior.overtake_doing = 0
+                self.lane_change("right")
                 self._local_planner.set_speed(self._behavior.max_speed)
 
     def collision_and_car_avoid_manager(self, waypoint):
