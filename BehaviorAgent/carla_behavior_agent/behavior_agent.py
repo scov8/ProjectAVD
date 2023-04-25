@@ -397,11 +397,6 @@ class BehaviorAgent(BasicAgent):
                 return self.no_throttle()
             elif distance < 15 and self._speed > 0.01:
                 return self.soft_stop()
-            else:
-                # faccio rallentare la macchina
-                target_speed = self._speed - (self._behavior.speed_decrease-3)
-                self._local_planner.set_speed(target_speed)
-                control = self._local_planner.run_step(debug=debug)
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
