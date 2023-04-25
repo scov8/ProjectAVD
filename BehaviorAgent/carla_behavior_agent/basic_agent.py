@@ -584,7 +584,7 @@ class BasicAgent(object):
 
             next_wps = plan[-1][0].next(lane_change_distance) # prima dell'if era così
             if not next_wps:
-                return [] #plan
+                return plan #[]
             next_wp = next_wps[0]
 
             # Get the side lane
