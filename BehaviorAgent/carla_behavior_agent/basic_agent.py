@@ -251,7 +251,7 @@ class BasicAgent(object):
             lane_change_time * speed,
             False,
             1,
-            self._sampling_resolution # prova xon 1.5
+            1,#self._sampling_resolution # prova con 1
         )
         if not path:
             print("WARNING: Ignoring the lane change as no path was found")
