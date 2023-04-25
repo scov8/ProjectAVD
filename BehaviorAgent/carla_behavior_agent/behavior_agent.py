@@ -185,6 +185,7 @@ class BehaviorAgent(BasicAgent):
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
                 self._tailgating(waypoint, vehicle_list)
 
+        print("vehicle_state: ", vehicle_state, "vehicle: ", vehicle, "distance: ", distance)
         return vehicle_state, vehicle, distance
 
     def pedestrian_avoid_manager(self, waypoint):
@@ -217,7 +218,8 @@ class BehaviorAgent(BasicAgent):
         else:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)  # se quesro sensore influenza la cosa
-
+            
+        print("walker_state: ", walker_state, "walker: ", walker, "distance: ", distance)
         return walker_state, walker, distance
 
     def obstacle_avoid_manager(self, waypoint):
@@ -252,8 +254,7 @@ class BehaviorAgent(BasicAgent):
             obstacle_state, obstacle, distance = self._object_obstacle_detected(obstacle_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)  # se questo sensore influenza la cosa
 
-        print("obstacle_state", obstacle_state,
-              "obstacle", obstacle, "distance", distance)
+        print("obstacle_state", obstacle_state,"obstacle", obstacle, "distance", distance)
         return obstacle_state, obstacle, distance
 
     def car_following_manager(self, vehicle, distance, debug=True):
@@ -269,10 +270,8 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
-        def dist(v): return v.get_location().distance(
-            ego_vehicle_wp.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
 
         vehicle_speed = get_speed(vehicle)
@@ -456,7 +455,6 @@ class BehaviorAgent(BasicAgent):
 
             :param speed (carl.VehicleControl): control to be modified
         """
-        print("FRENOOOOOO")
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = self._max_brake
@@ -470,7 +468,6 @@ class BehaviorAgent(BasicAgent):
 
             :param speed (carl.VehicleControl): control to be modified
         """
-        print("soft FRENOOOOOO")
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = 0.2
@@ -484,7 +481,6 @@ class BehaviorAgent(BasicAgent):
 
             :param speed (carl.VehicleControl): control to be modified
         """
-        print("TOLGO ACCELERATORE")
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = 0.0
