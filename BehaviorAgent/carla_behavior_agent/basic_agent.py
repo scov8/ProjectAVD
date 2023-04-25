@@ -703,7 +703,7 @@ class BasicAgent(object):
                 side_wp = next_wp.get_right_lane() # provare anche con solo next_wp 
 
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
-                return []
+                return plan #[]
 
             # Update the plan
             plan.append((side_wp, option))
