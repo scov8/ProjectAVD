@@ -332,21 +332,18 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
 
-        def dist(v): return v.get_location().distance(
-            ego_vehicle_wp.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
         obstacle_list = self._world.get_actors().filter("*static*")
-        obstacle_list = [v for v in obstacle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        obstacle_list = [v for v in obstacle_list if dist(v) < 45 and v.id != self._vehicle.id]
         obstacle_list.sort(key=dist)
 
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         control = self._local_planner.run_step(debug=debug)
 
-        if distance <= self._behavior.braking_distance:
+        if distance <= self._behavior.braking_distance and self._speed < 0.01:
             self._overtake(obstacle_list, vehicle_list)
             control = self._local_planner.run_step(debug=debug)
 
@@ -403,15 +400,15 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
 
             print("self._speed:", self._speed)
-            if distance < self._behavior.braking_distance and self._speed != 0:
+            if distance < self._behavior.braking_distance > 0.01:
                 return self.emergency_stop()
-            elif distance < 30 and self._speed != 0:
+            elif distance < 30 and self._speed > 0.01:
                 return self.no_throttle()
-            elif distance < 15 and self._speed != 0:
+            elif distance < 15 and self._speed > 0.01:
                 return self.soft_stop()
             elif self._speed == 0:
-                #self.obstacle_manager(obstacle, distance)
-                pass
+                self.obstacle_manager(obstacle, distance)
+                #pass
             else:
                 # faccio rallentare la macchina
                 target_speed = self._speed - (self._behavior.speed_decrease-3)
