@@ -401,8 +401,13 @@ class BehaviorAgent(BasicAgent):
                 self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
-            if distance < 3*self._behavior.braking_distance and self._speed != 0:
+
+            if distance < 2*self._behavior.braking_distance and self._speed != 0:
                 return self.emergency_stop()
+            if distance < 30 and self._speed != 0:
+                return self.soft_stop()
+            if distance < 50 and self._speed != 0:
+                return self.no_throttle()
             elif self._speed == 0:
                 #self.obstacle_manager(obstacle, distance)
                 pass
@@ -474,5 +479,33 @@ class BehaviorAgent(BasicAgent):
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = self._max_brake
+        control.hand_brake = False
+        return control
+
+    def soft_stop(self):
+        """
+        Overwrites the throttle a brake values of a control to perform an emergency stop.
+        The steering is kept the same to avoid going out of the lane when stopping during turns
+
+            :param speed (carl.VehicleControl): control to be modified
+        """
+        print("soft FRENOOOOOO")
+        control = carla.VehicleControl()
+        control.throttle = 0.0
+        control.brake = 0.2
+        control.hand_brake = False
+        return control
+
+    def no_throttle(self):
+        """
+        Overwrites the throttle a brake values of a control to perform an emergency stop.
+        The steering is kept the same to avoid going out of the lane when stopping during turns
+
+            :param speed (carl.VehicleControl): control to be modified
+        """
+        print("TOLGO ACCELERATORE")
+        control = carla.VehicleControl()
+        control.throttle = 0.0
+        control.brake = 0.0
         control.hand_brake = False
         return control
