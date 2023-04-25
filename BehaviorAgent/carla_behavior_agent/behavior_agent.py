@@ -244,6 +244,9 @@ class BehaviorAgent(BasicAgent):
         obstacle_list = [w for w in obstacle_list if dist(w) < 45]  # prendiamo quelli sotto i 10 mt
         obstacle_list.sort(key=dist)
 
+        if obstacle_list == []:
+            return False, None, None
+
         # in base a quello ceh dbb fare valutaimo in modo diverso _vehicle_obstacle_detected()
         if self._direction == RoadOption.CHANGELANELEFT:
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
@@ -255,8 +258,7 @@ class BehaviorAgent(BasicAgent):
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)  # se questo sensore influenza la cosa
 
-        print("obstacle_state: ", obstacle_state,
-              "obstacle: ", obstacle, "distance: ", distance)
+        print("obstacle_state: ", obstacle_state,"obstacle: ", obstacle, "distance: ", distance)
         return obstacle_state, obstacle, distance
 
     def car_following_manager(self, vehicle, distance, debug=True):
@@ -324,14 +326,11 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
 
-        def dist(v): return v.get_location().distance(
-            ego_vehicle_wp.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
         obstacle_list = self._world.get_actors().filter("*static*")
-        obstacle_list = [v for v in obstacle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        obstacle_list = [v for v in obstacle_list if dist(v) < 45 and v.id != self._vehicle.id]
         obstacle_list.sort(key=dist)
 
         ego_vehicle_loc = self._vehicle.get_location()
@@ -370,29 +369,23 @@ class BehaviorAgent(BasicAgent):
             return self.emergency_stop()  # se è rosso si ferma
 
         # 2.1: Pedestrian avoidance behaviors
-        walker_state, walker, w_distance = self.pedestrian_avoid_manager(
-            ego_vehicle_wp)  # lo considero fermandomi
+        walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
 
         # definisco se esiste un pednone che impatta con il veiolo
         if walker_state:
             # Distance is computed from the center of the two cars,
             # we use bounding boxes to calculate the actual distance
-            distance = w_distance - max(
-                walker.bounding_box.extent.y, walker.bounding_box.extent.x) - max(
-                    self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+            distance = w_distance - max(walker.bounding_box.extent.y, walker.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close al pedone.
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
-        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(
-            ego_vehicle_wp)
+        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
 
         if obstacle_state:
-            distance = distance - max(
-                obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
-                    self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+            distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance and self._speed != 0:
