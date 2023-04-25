@@ -406,7 +406,7 @@ class BehaviorAgent(BasicAgent):
                 return self.no_throttle()
             elif distance < 15 and self._speed > 0.01:
                 return self.soft_stop()
-            elif self._speed == 0:
+            elif self._speed < 0.01:
                 self.obstacle_manager(obstacle, distance)
                 #pass
             else:
