@@ -247,7 +247,7 @@ class BasicAgent(object):
             self._map.get_waypoint(self._vehicle.get_location()),
             direction,
             same_lane_time * speed,
-            other_lane_time,# * speed,
+            other_lane_time * speed,
             lane_change_time * speed,
             False,
             1,
