@@ -268,10 +268,8 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
-        def dist(v): return v.get_location().distance(
-            ego_vehicle_wp.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(
-            v) < 45 and v.id != self._vehicle.id]
+        def dist(v): return v.get_location().distance(ego_vehicle_wp.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
 
         vehicle_speed = get_speed(vehicle)
@@ -281,7 +279,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
-        if (self._speed == 0) or (self._behavior.overtake_doing == 1):
+        if (self._speed < 0.1) or (self._behavior.overtake_doing == 1):
             print("potrei fare l'overtake, vedo la linea a sinistra")
             wpt = ego_vehicle_wp.get_left_lane()
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
