@@ -708,12 +708,6 @@ class BasicAgent(object):
             # Update the plan
             plan.append((side_wp, option))
             lane_changes_done += 1
-
-        if curr_orientation != side_orientation and direction == "left":
-            next_wps = plan[-1][0].previous(step_distance)
-        else:
-            next_wps = plan[-1][0].next(step_distance)
-        plan.append((next_wp, RoadOption.LANEFOLLOW))
         
         # Other lane
         distance = 0
