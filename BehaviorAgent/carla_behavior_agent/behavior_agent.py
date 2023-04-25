@@ -330,9 +330,10 @@ class BehaviorAgent(BasicAgent):
 
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-        control = self._local_planner.run_step(debug=debug)
 
-        self._overtake(obstacle_list, vehicle_list)
+        if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
+            print("la linea a sinistra è legale")
+            self._overtake(obstacle_list, vehicle_list)
         control = self._local_planner.run_step(debug=debug)
 
         return control
