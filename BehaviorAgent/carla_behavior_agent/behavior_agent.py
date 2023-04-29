@@ -108,8 +108,8 @@ class BehaviorAgent(BasicAgent):
             return False
 
         else:
-            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(  vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90,  check_rear=True)
-            vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane( vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)
+            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90,  check_rear=True)
+            vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)
 
             if vehicle_state_ahead and vehicle_state_behind:
                 return dist(vehicle_ahead, vehicle_behind) <= self._vehicle.bounding_box.extent.x * 2 + 5
@@ -171,6 +171,20 @@ class BehaviorAgent(BasicAgent):
                     end_waypoint = self._local_planner.target_waypoint
                     self._behavior.tailgate_counter = 200
                     self.set_destination(end_waypoint.transform.location, left_wpt.transform.location)
+    
+    def _lane_invasion(self, ego_vehicle, other_vehicle, ego_loc):
+        ego_wp = self._map.get_waypoint(ego_loc, project_to_road=False)
+        other_loc = other_vehicle.get_location()
+        other_lane_wp = self._map.get_waypoint(other_loc)
+
+        other_offset = other_lane_wp.transform.location.distance(other_vehicle.get_location())
+        other_extent = other_vehicle.bounding_box.extent.y
+        lane_width = other_lane_wp.lane_width
+        free_space_on_one_side = lane_width / 2 - other_extent
+
+        if other_offset > free_space_on_one_side:
+            return True, other_offset - free_space_on_one_side
+        return False, 0
 
     def _overtake(self, debug=True):
         ego_vehicle_loc = self._vehicle.get_location()
@@ -432,6 +446,27 @@ class BehaviorAgent(BasicAgent):
                 return self.soft_stop()
             elif distance < 30 and self._speed > 0.01:
                 return self.no_throttle()
+            
+        # 2.3: Lane Invasion (degli altri)
+        vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(ego_vehicle_loc, distance=70)
+        if vehicle_state_invasion:
+            invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
+            if invasion_state:
+                self._print_info('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
+                # TODO: spostati a destra di offset_invasion per farlo passare
+                self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
+
+                target_speed = min([self._behavior.max_speed, self._speed_limit])
+                self._local_planner.set_speed(target_speed)
+                control = self._local_planner.run_step(debug=debug)
+                return control
+                # ego_vehicle_loc_to_right = ego_vehicle_loc + carla.Location(y=offset_invasion)
+                # self._map.get_waypoint(ego_vehicle_loc_to_right, project_to_road=False)
+                # route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
+                # self._local_planner.set_global_plan(route_trace, True)
+                # return self.emergency_stop()
+        else:
+            self._print_info('LANE INVASION: FALSE')
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
