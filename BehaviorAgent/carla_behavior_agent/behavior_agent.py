@@ -462,15 +462,16 @@ class BehaviorAgent(BasicAgent):
             # we use bounding boxes to calculate the actual distance
             distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
-            if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
-                if self._is_slow(vehicle):
-                    if not self._other_lane_occupied(ego_vehicle_loc, distance=60) and not self._overtaking:
-                        if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
-                            self._overtaking = True
-                            target_speed = min([self._behavior.max_speed, self._speed_limit])
-                            self._local_planner.set_speed(target_speed)
-                            control = self._local_planner.run_step(debug=debug)
-                            return control
+            if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
+                if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
+                    if self._is_slow(vehicle):
+                        if not self._other_lane_occupied(ego_vehicle_loc, distance=60) and not self._overtaking:
+                            if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                                self._overtaking = True
+                                target_speed = min([self._behavior.max_speed, self._speed_limit])
+                                self._local_planner.set_speed(target_speed)
+                                control = self._local_planner.run_step(debug=debug)
+                                return control
                 return control
 
             # Emergency brake if the car is very close.
