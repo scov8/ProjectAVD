@@ -51,6 +51,7 @@ class BehaviorAgent(BasicAgent):
         self._min_speed = 5
         self._behavior = None
         self._sampling_resolution = 4.5
+        self._prev_direction = RoadOption.LANEFOLLOW
         self._overtaking = False
         self._ending_overtake = False
         self._destination_waypoint = None
@@ -74,6 +75,7 @@ class BehaviorAgent(BasicAgent):
         self._speed_limit = self._vehicle.get_speed_limit()
         self._local_planner.set_speed(self._speed_limit)
         self._vehicle_heading = self._vehicle.get_transform().rotation.yaw
+        self._prev_direction = self._direction
         self._direction = self._local_planner.target_road_option
         if self._direction is None:
             self._direction = RoadOption.LANEFOLLOW
