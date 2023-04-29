@@ -468,7 +468,7 @@ class BehaviorAgent(BasicAgent):
                         if not self._other_lane_occupied(ego_vehicle_loc, distance=60) and not self._overtaking:
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 self._overtaking = True
-                                target_speed = min([self._behavior.max_speed, self._speed_limit])
+                                target_speed = max([self._behavior.max_speed, self._speed_limit])
                                 self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
                                 return control
