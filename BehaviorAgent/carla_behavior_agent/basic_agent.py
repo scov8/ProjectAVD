@@ -236,7 +236,7 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2):
+    def lane_change(self, direction, heading, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
         Changes the path so that the vehicle performs a lane change.
         Use 'direction' to specify either a 'left' or 'right' lane change,
@@ -246,6 +246,7 @@ class BasicAgent(object):
         path = self._generate_lane_change_path(
             self._map.get_waypoint(self._vehicle.get_location()),
             direction,
+            heading,
             same_lane_time * speed,
             other_lane_time * speed,
             lane_change_time * speed,
@@ -637,7 +638,7 @@ class BasicAgent(object):
 
         return (False, None, -1)
 
-    def _generate_lane_change_path(self, waypoint, direction='left', distance_same_lane=10,
+    def _generate_lane_change_path(self, waypoint, direction='left', heading=0, distance_same_lane=10,
                                 distance_other_lane=25, lane_change_distance=25,
                                 check=False, lane_changes=1, step_distance=2): #check era true
         """
@@ -654,15 +655,24 @@ class BasicAgent(object):
 
         option = RoadOption.LANEFOLLOW
 
+        curr_orientation = next_wp.transform.rotation.yaw
+        side_orientation = next_wp.get_left_lane().transform.rotation.yaw
+
         # Same lane
         distance = 0
         while distance < distance_same_lane:
-            next_wps = plan[-1][0].next(step_distance)
+            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
+                next_wps = plan[-1][0].previous(step_distance)
+            else:
+                next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
                 return plan #[]
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
+
+        if lane_change_distance == 0:
+            return plan
 
         if direction == 'left':
             option = RoadOption.CHANGELANELEFT
@@ -675,19 +685,12 @@ class BasicAgent(object):
         lane_changes_done = 0
         lane_change_distance = lane_change_distance / lane_changes
 
-        curr_orientation = next_wp.transform.rotation.yaw
-        side_orientation = next_wp.get_left_lane().transform.rotation.yaw
-
         # Lane change
         while lane_changes_done < lane_changes:
-
-            # Move forward
-            #if curr_orientation != side_orientation and direction == "left":
-            #    next_wps = plan[-1][0].previous(step_distance)
-            #else:
-            #    next_wps = plan[-1][0].next(step_distance)
-
-            next_wps = plan[-1][0].next(lane_change_distance) # prima dell'if era così
+            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
+                next_wps = plan[-1][0].previous(lane_change_distance)
+            else:
+                next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
                 return plan #[]
             next_wp = next_wps[0]
@@ -712,7 +715,7 @@ class BasicAgent(object):
         # Other lane
         distance = 0
         while distance < distance_other_lane:
-            if curr_orientation != side_orientation and direction == "left":
+            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
                 next_wps = plan[-1][0].previous(step_distance)
             else:
                 next_wps = plan[-1][0].next(step_distance)
