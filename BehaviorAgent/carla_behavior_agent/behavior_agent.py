@@ -472,7 +472,6 @@ class BehaviorAgent(BasicAgent):
                                 self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
                                 return control
-                return control
 
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
