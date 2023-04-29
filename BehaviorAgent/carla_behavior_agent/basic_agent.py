@@ -251,7 +251,7 @@ class BasicAgent(object):
             lane_change_time * speed,
             False,
             1,
-            1,#self._sampling_resolution # prova con 1
+            self._sampling_resolution # prova con 1
         )
         if not path:
             print("WARNING: Ignoring the lane change as no path was found")
@@ -681,12 +681,6 @@ class BasicAgent(object):
         # Lane change
         while lane_changes_done < lane_changes:
 
-            # Move forward
-            #if curr_orientation != side_orientation and direction == "left":
-            #    next_wps = plan[-1][0].previous(step_distance)
-            #else:
-            #    next_wps = plan[-1][0].next(step_distance)
-
             next_wps = plan[-1][0].next(lane_change_distance) # prima dell'if era così
             if not next_wps:
                 return plan #[]
@@ -718,7 +712,7 @@ class BasicAgent(object):
                 next_wps = plan[-1][0].next(step_distance)
             
             if not next_wps:
-                return plan #[]
+                return [] #plan
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))

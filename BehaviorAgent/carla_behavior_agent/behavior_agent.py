@@ -393,10 +393,10 @@ class BehaviorAgent(BasicAgent):
                 #pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01:
                 return self.emergency_stop()
-            elif distance < 30 and self._speed > 0.01:
-                return self.no_throttle()
             elif distance < 15 and self._speed > 0.01:
                 return self.soft_stop()
+            elif distance < 30 and self._speed > 0.01:
+                return self.no_throttle()
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
