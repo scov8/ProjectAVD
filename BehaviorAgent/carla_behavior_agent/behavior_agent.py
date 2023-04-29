@@ -92,7 +92,7 @@ class BehaviorAgent(BasicAgent):
     def _is_slow(self, vehicle):
         vel = vehicle.get_velocity().length()
         acc = vehicle.get_acceleration().length()
-        return acc <= 1.0 and vel < 5
+        return acc <= 1.0 and vel < 1
 
     def traffic_light_manager(self):
         """
@@ -289,7 +289,7 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
         print("distance: ", distance, "Velocità ego: ", self._speed,"Velocità veicolo davanti: ", vehicle_speed)
-        if (distance < 10) and (vehicle_speed < 0.1) or self._overtaking:
+        if self._is_slow(vehicle) or self._overtaking:
             print("potrei fare l'overtake, vedo la linea a sinistra")
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 print("la linea a sinistra è legale")
