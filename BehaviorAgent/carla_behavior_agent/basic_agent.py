@@ -62,6 +62,7 @@ class BasicAgent(object):
         self._speed_ratio = 1
         self._max_brake = 0.5
         self._offset = 0
+        self._near_vehicle_list = []
 
         # Change parameters according to the dictionary
         if 'target_speed' in opt_dict:
@@ -424,6 +425,83 @@ class BasicAgent(object):
 
         return (False, None, -1)
     
+    def _vehicle_detected_other_lane(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, check_rear=False):
+        """
+        Controlla se ci sono veicoli nella corsia adiacente.
+
+        - vehicle_list: lista di veicoli nel mondo abbastanza vicini ad ego
+        - max_distance: distanza a cui guardare
+        - up_angle, low_angle: range di angoli in cui guardare
+        - check_rear: calcolare distanza tra fronte di ego e retro di altro veicolo
+                    se True, altrimenti distanza fronte ego e fronte veicolo.
+                    Sarà True quando devo rientrare in corsia a fine sorpasso
+                    e devo capire se c'è lo spazio per rientrare.
+                    Sarà False quando devo iniziare sorpasso e controllo non ci
+                    siano veicoli che mi vengono contro.
+        """
+        self._near_vehicle_list = []
+
+        if self._ignore_vehicles:
+            return (False, None, -1)
+
+        if vehicle_list is None:
+            vehicle_list = self._world.get_actors().filter("*vehicle*")
+
+        if len(vehicle_list) == 0:
+            return (False, None, -1)
+
+        if not max_distance:
+            max_distance = self._base_vehicle_threshold
+
+        # La mia posizione.
+        ego_transform = self._vehicle.get_transform()
+        ego_wpt = self._map.get_waypoint(self._vehicle.get_location())
+
+        # ID della corsia da controllare. é sempre quella opposta alla mia.
+        lane_id = -ego_wpt.lane_id
+
+        # Calcolo location che identifica il fronte del mio ego vehicle.
+        ego_forward_vector = ego_transform.get_forward_vector()
+        ego_extent = self._vehicle.bounding_box.extent.x
+        ego_front_transform = ego_transform
+        ego_front_transform.location += carla.Location(
+            x=ego_extent * ego_forward_vector.x,
+            y=ego_extent * ego_forward_vector.y,
+        )
+
+        for target_vehicle in vehicle_list:
+            target_transform = target_vehicle.get_transform()
+            target_wpt = self._map.get_waypoint(target_transform.location, lane_type=carla.LaneType.Any)
+            if not ego_wpt.is_junction or not target_wpt.is_junction:
+                if target_wpt.road_id != ego_wpt.road_id or target_wpt.lane_id != lane_id:
+                    next_wpt = self._local_planner.get_incoming_waypoint_and_direction(steps=3)[0]
+                    if not next_wpt:
+                        continue
+                    if target_wpt.road_id != next_wpt.road_id or target_wpt.lane_id != lane_id:
+                        continue
+
+                # Prendo location del centro del veicolo target.
+                target_forward_vector = target_transform.get_forward_vector()
+                target_extent = target_vehicle.bounding_box.extent.x
+                target_end_transform = target_transform
+                # Se devo calcolare la distanza tra fronte ego e rear target allora sottraggo
+                # la extent della BB alla location che identifica il centro del veicolo target
+                if check_rear:
+                    target_end_transform.location -= carla.Location(x=target_extent * target_forward_vector.x, y=target_extent * target_forward_vector.y)
+                # Se devo calcolare la distanza tra fronte ego e fronte target allora aggiungo
+                # la extent della BB alla location che identifica il centro del veicolo target
+                else:
+                    target_end_transform.location += carla.Location(x=target_extent * target_forward_vector.x, y=target_extent * target_forward_vector.y)
+                # se il punto posteriore si trova ad una certa distanza dal punto anteriore del nostro veicolo
+                if is_within_distance(target_end_transform, ego_front_transform, max_distance, [low_angle_th, up_angle_th]):
+                    self._near_vehicle_list.append((True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)))
+
+        # Ordino la lista per ritornare il piú vicino
+        if len(self._near_vehicle_list) > 0:
+            self._near_vehicle_list = sorted(self._near_vehicle_list,key=lambda t: t[2])
+            return self._near_vehicle_list[0]
+        return (False, None, -1)
+
     def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
         """
         Method to check if there is a vehicle in front of the agent blocking its path.
