@@ -16,7 +16,6 @@ from local_planner import RoadOption
 from behavior_types import Cautious, Aggressive, Normal
 
 from misc import get_speed, positive, is_within_distance, compute_distance
-from misc import printdir
 
 
 class BehaviorAgent(BasicAgent):
