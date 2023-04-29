@@ -655,8 +655,8 @@ class BasicAgent(object):
 
         option = RoadOption.LANEFOLLOW
 
-        curr_orientation = next_wp.transform.rotation.yaw
-        side_orientation = next_wp.get_left_lane().transform.rotation.yaw
+        #curr_orientation = next_wp.transform.rotation.yaw
+        #side_orientation = next_wp.get_left_lane().transform.rotation.yaw
 
         # Same lane
         distance = 0
