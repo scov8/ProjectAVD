@@ -89,6 +89,11 @@ class BehaviorAgent(BasicAgent):
         if self._incoming_direction is None:
             self._incoming_direction = RoadOption.LANEFOLLOW
 
+    def _is_slow(self, vehicle):
+        vel = vehicle.get_velocity().length()
+        acc = vehicle.get_acceleration().length()
+        return acc <= 1.0 and vel < 5
+
     def traffic_light_manager(self):
         """
         This method is in charge of behaviors for red lights.
@@ -156,6 +161,7 @@ class BehaviorAgent(BasicAgent):
                 self.lane_change("left", self._vehicle_heading, other_lane_time=3)
                 self._overtaking = False
                 self._local_planner.set_speed(self._behavior.max_speed)
+
 
     def collision_and_car_avoid_manager(self, waypoint):
         """
@@ -283,9 +289,8 @@ class BehaviorAgent(BasicAgent):
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
         print("distance: ", distance, "Velocità ego: ", self._speed,"Velocità veicolo davanti: ", vehicle_speed)
-        if ((distance - 1) < self._behavior.braking_distance) and (vehicle_speed < 0.1) or self._overtaking:
+        if (distance < 10) and (vehicle_speed < 0.1) or self._overtaking:
             print("potrei fare l'overtake, vedo la linea a sinistra")
-            wpt = ego_vehicle_wp.get_left_lane()
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 print("la linea a sinistra è legale")
                 self._overtake(vehicle_list, vehicle_list)
