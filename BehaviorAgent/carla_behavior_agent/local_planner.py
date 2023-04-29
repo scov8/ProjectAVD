@@ -272,6 +272,12 @@ class LocalPlanner(object):
 
         return control
 
+    def has_incoming_waypoint(self):
+        """
+        Returns whether the list of waypoints has more than 1 element.
+        """
+        return len(self._waypoints_queue) > 1
+
     def get_incoming_waypoint_and_direction(self, steps=3):
         """
         Returns direction and waypoint at a distance ahead defined by the user.
