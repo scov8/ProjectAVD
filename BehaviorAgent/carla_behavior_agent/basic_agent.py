@@ -48,6 +48,7 @@ class BasicAgent(object):
                 self._map = self._world.get_map()
         else:
             self._map = self._world.get_map()
+
         self._last_traffic_light = None
 
         # Base parameters
@@ -87,7 +88,7 @@ class BasicAgent(object):
             self._max_brake = opt_dict['max_brake']
         if 'offset' in opt_dict:
             self._offset = opt_dict['offset']
-        
+
         # Initialize the planners
         self._local_planner = LocalPlanner(self._vehicle, opt_dict=opt_dict, map_inst=self._map)
         if grp_inst:
@@ -110,9 +111,9 @@ class BasicAgent(object):
 
             :param speed (carl.VehicleControl): control to be modified
         """
-        control.throttle = 0.0
-        control.brake = self._max_brake
-        control.hand_brake = False
+        control.throttle = 0.0 # accelerazione a 0
+        control.brake = self._max_brake # frenata massima possibile
+        control.hand_brake = False # freno a mano
         return control
 
     def set_target_speed(self, speed):
@@ -185,6 +186,7 @@ class BasicAgent(object):
         """
         start_location = start_waypoint.transform.location
         end_location = end_waypoint.transform.location
+        # restituisce la route calcolata dal global planner
         return self._global_planner.trace_route(start_location, end_location)
 
     def run_step(self):
@@ -196,18 +198,18 @@ class BasicAgent(object):
         #####
         # Basic Agent :
         vehicle_list = self._world.get_actors().filter("*vehicle*")
-        ### 
+        ###
 
         vehicle_speed = get_speed(self._vehicle) / 3.6
 
-        # Check for possible vehicle obstacles
         max_vehicle_distance = self._base_vehicle_threshold + self._speed_ratio * vehicle_speed
+
         affected_by_vehicle, _, _ = self._vehicle_obstacle_detected(vehicle_list, max_vehicle_distance)
         if affected_by_vehicle:
             hazard_detected = True
 
-        # Check if the vehicle is affected by a red traffic light
         max_tlight_distance = self._base_tlight_threshold + self._speed_ratio * vehicle_speed
+
         affected_by_tlight, _ = self._affected_by_traffic_light(self._lights_list, max_tlight_distance)
         if affected_by_tlight:
             hazard_detected = True
@@ -217,7 +219,7 @@ class BasicAgent(object):
             control = self.add_emergency_stop(control)
 
         return control
-    
+
     def reset(self):
         pass
 
@@ -237,6 +239,26 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
+    def stay_on_the_right(self, waypoint, offset, on_the_right_time=1, step_distance=1):
+        speed = self._vehicle.get_velocity().length()
+        on_the_right_distance = on_the_right_time * speed
+
+        plan = []
+        plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
+
+        distance = 0
+        while distance < on_the_right_distance:
+            next_wps = plan[-1][0].next(step_distance)
+            next_wp = self._map.get_waypoint(next_wps[0].transform.location + carla.Location(y=offset), project_to_road=False)
+
+            if not next_wp:
+                print("\nSTAY ON THE RIGHT ERROR 1\n")
+                return []
+            distance += next_wps[0].transform.location.distance(plan[-1][0].transform.location)
+            plan.append((next_wp, RoadOption.RIGHT))
+
+        self.set_global_plan(plan, clean_queue=True)
+
     def lane_change(self, direction, heading, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
         Changes the path so that the vehicle performs a lane change.
@@ -253,12 +275,15 @@ class BasicAgent(object):
             lane_change_time * speed,
             False,
             1,
-            self._sampling_resolution # prova con 1
+            self._sampling_resolution
         )
+
         if not path:
             print("WARNING: Ignoring the lane change as no path was found")
+            return False
+        self.set_global_plan(path, clean_queue=True)
+        return True
 
-        self.set_global_plan(path)
 
     def _affected_by_traffic_light(self, lights_list=None, max_distance=None):
         """
@@ -269,17 +294,19 @@ class BasicAgent(object):
             :param max_distance (float): max distance for traffic lights to be considered relevant.
                 If None, the base threshold value is used
         """
+        # se si vogliono ignorare i semafori si andrà sempre avanti
         if self._ignore_traffic_lights:
-            return (False, None) 
+            return (False, None)
 
+        # se non sono stati passati i semafori
         if not lights_list:
             lights_list = self._world.get_actors().filter("*traffic_light*")
 
+        # distanza di default massima
         if not max_distance:
-            max_distance = self._base_tlight_threshold 
+            max_distance = self._base_tlight_threshold
 
         if self._last_traffic_light:
-            """se ci siamo già fermati al sem, o ci stiamo per fermare"""
             if self._last_traffic_light.state != carla.TrafficLightState.Red:
                 self._last_traffic_light = None
             else:
@@ -288,7 +315,6 @@ class BasicAgent(object):
         ego_vehicle_location = self._vehicle.get_location()
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
-        # valuto tutti gli altri semafori
         for traffic_light in lights_list:
             if traffic_light.id in self._lights_map:
                 trigger_wp = self._lights_map[traffic_light.id]
@@ -300,20 +326,20 @@ class BasicAgent(object):
             if trigger_wp.transform.location.distance(ego_vehicle_location) > max_distance:
                 continue
 
-            if trigger_wp.road_id != ego_vehicle_waypoint.road_id: # se si trova nel raggio d'azione 
+            if trigger_wp.road_id != ego_vehicle_waypoint.road_id:
                 continue
 
             ve_dir = ego_vehicle_waypoint.transform.get_forward_vector()
-            wp_dir = trigger_wp.transform.get_forward_vector() # valuriamo anceh l'orientamento del veicolo per non cacare i sem che stanno dietro
-            dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z # dove dbb andare 
+            wp_dir = trigger_wp.transform.get_forward_vector()
+            dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z
 
-            if dot_ve_wp < 0: # sta dietro
-                continue 
+            if dot_ve_wp < 0:
+                continue
 
             if traffic_light.state != carla.TrafficLightState.Red:
                 continue
 
-            if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]): # vaòutazione sulla distaxan
+            if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]):
                 self._last_traffic_light = traffic_light
                 return (True, traffic_light)
 
@@ -424,7 +450,7 @@ class BasicAgent(object):
                     return (True, target_vehicle, compute_distance(target_transform.location, ego_transform.location))
 
         return (False, None, -1)
-    
+
     def _vehicle_detected_other_lane(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, check_rear=False):
         """
         Controlla se ci sono veicoli nella corsia adiacente.
@@ -484,43 +510,18 @@ class BasicAgent(object):
                 target_forward_vector = target_transform.get_forward_vector()
                 target_extent = target_vehicle.bounding_box.extent.x
                 target_end_transform = target_transform
-                # Se devo calcolare la distanza tra fronte ego e rear target allora sottraggo
-                # la extent della BB alla location che identifica il centro del veicolo target
                 if check_rear:
                     target_end_transform.location -= carla.Location(x=target_extent * target_forward_vector.x, y=target_extent * target_forward_vector.y)
-                # Se devo calcolare la distanza tra fronte ego e fronte target allora aggiungo
-                # la extent della BB alla location che identifica il centro del veicolo target
                 else:
                     target_end_transform.location += carla.Location(x=target_extent * target_forward_vector.x, y=target_extent * target_forward_vector.y)
-                # se il punto posteriore si trova ad una certa distanza dal punto anteriore del nostro veicolo
                 if is_within_distance(target_end_transform, ego_front_transform, max_distance, [low_angle_th, up_angle_th]):
                     self._near_vehicle_list.append((True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)))
 
-        # Ordino la lista per ritornare il piú vicino
         if len(self._near_vehicle_list) > 0:
             self._near_vehicle_list = sorted(self._near_vehicle_list,key=lambda t: t[2])
             return self._near_vehicle_list[0]
         return (False, None, -1)
-    
-    def stay_on_the_right(self, waypoint, offset, on_the_right_time=1, step_distance=1):
-        speed = self._vehicle.get_velocity().length()
-        on_the_right_distance = on_the_right_time * speed
 
-        plan = []
-        plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
-
-        distance = 0
-        while distance < on_the_right_distance:
-            next_wps = plan[-1][0].next(step_distance)
-            next_wp = self._map.get_waypoint(next_wps[0].transform.location + carla.Location(y=offset), project_to_road=False)
-
-            if not next_wp:
-                print("\nSTAY ON THE RIGHT ERROR 1\n")
-                return []
-            distance += next_wps[0].transform.location.distance(plan[-1][0].transform.location)
-            plan.append((next_wp, RoadOption.RIGHT))
-
-        self.set_global_plan(plan, clean_queue=True)
 
     def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
         """
@@ -531,147 +532,39 @@ class BasicAgent(object):
             :param max_distance: max freespace to check for obstacles.
                 If None, the base threshold value is used
         """
+        self._near_vehicle_list = []
+
         if self._ignore_vehicles:
             return (False, None, -1)
 
-        if not vehicle_list:
+        if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
 
-        if not max_distance:
-            max_distance = self._base_vehicle_threshold
-
-        ego_transform = self._vehicle.get_transform()
-        ego_wpt = self._map.get_waypoint(self._vehicle.get_location())
-
-        # Get the right offset
-        if ego_wpt.lane_id < 0 and lane_offset != 0:
-            lane_offset *= -1
-
-        # Get the transform of the front of the ego
-        ego_forward_vector = ego_transform.get_forward_vector()
-        ego_extent = self._vehicle.bounding_box.extent.x
-        ego_front_transform = ego_transform
-        ego_front_transform.location += carla.Location(
-            x=ego_extent * ego_forward_vector.x,
-            y=ego_extent * ego_forward_vector.y,
-        ) # informazioni sul mio veicolo
-
-        for target_vehicle in vehicle_list: # per ogni veicolo della lista 
-            target_transform = target_vehicle.get_transform()
-            target_wpt = self._map.get_waypoint(target_transform.location, lane_type=carla.LaneType.Any) # vedo dove si trova quel veicolo
-
-            # Simplified version for outside junctions
-            if not ego_wpt.is_junction or not target_wpt.is_junction: # se non siamo in un incrocio fa delle cose 
-
-                if target_wpt.road_id != ego_wpt.road_id or target_wpt.lane_id != ego_wpt.lane_id  + lane_offset:
-                    next_wpt = self._local_planner.get_incoming_waypoint_and_direction(steps=3)[0] # valuto il veicolo un po' più avanti perchè quello subito prima è troppo vicino 
-                    if not next_wpt:
-                        continue
-                    if target_wpt.road_id != next_wpt.road_id or target_wpt.lane_id != next_wpt.lane_id  + lane_offset:
-                        continue
-
-                # valuto la posizone e direzione dle veicolo 
-                target_forward_vector = target_transform.get_forward_vector()
-                target_extent = target_vehicle.bounding_box.extent.x
-                target_rear_transform = target_transform # prendo il punto posteriore del veicolo
-                target_rear_transform.location -= carla.Location(
-                    x=target_extent * target_forward_vector.x,
-                    y=target_extent * target_forward_vector.y,
-                )
-
-                if is_within_distance(target_rear_transform, ego_front_transform, max_distance, [low_angle_th, up_angle_th]): # vedo la distanza tra la mia punta e il culo dell'altro veicolo
-                    return (True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)) # è una possivile colluisione con quel veiclo 
-
-            # Waypoints aren't reliable, check the proximity of the vehicle to the route
-            else:
-                # cotruisco un poligono sulla mia posizione
-                route_bb = [] # creo una lista vuota, dove ci saranno i miei punti estremi e poi creo il poligono
-                ego_location = ego_transform.location
-                extent_y = self._vehicle.bounding_box.extent.y
-                r_vec = ego_transform.get_right_vector()
-                p1 = ego_location + carla.Location(extent_y * r_vec.x, extent_y * r_vec.y)
-                p2 = ego_location + carla.Location(-extent_y * r_vec.x, -extent_y * r_vec.y)
-                route_bb.append([p1.x, p1.y, p1.z])
-                route_bb.append([p2.x, p2.y, p2.z])
-
-                for wp, _ in self._local_planner.get_plan():
-                    if ego_location.distance(wp.transform.location) > max_distance:
-                        break
-
-                    r_vec = wp.transform.get_right_vector()
-                    p1 = wp.transform.location + carla.Location(extent_y * r_vec.x, extent_y * r_vec.y)
-                    p2 = wp.transform.location + carla.Location(-extent_y * r_vec.x, -extent_y * r_vec.y)
-                    route_bb.append([p1.x, p1.y, p1.z])
-                    route_bb.append([p2.x, p2.y, p2.z])
-
-                if len(route_bb) < 3:
-                    # 2 points don't create a polygon, nothing to check
-                    return (False, None, -1)
-                ego_polygon = Polygon(route_bb)
-
-                # Compare the two polygons
-                # una volta preso il poligono faccio:
-                for target_vehicle in vehicle_list:
-                    target_extent = target_vehicle.bounding_box.extent.x
-                    if target_vehicle.id == self._vehicle.id: # se sono io stesso non mi interessa
-                        continue
-                    if ego_location.distance(target_vehicle.get_location()) > max_distance: # se sono troppo lontani non mi interessa
-                        continue 
-
-                    # se mi crea collisione con un altro veicolo allora mi interessa
-                    target_bb = target_vehicle.bounding_box
-                    target_vertices = target_bb.get_world_vertices(target_vehicle.get_transform())
-                    target_list = [[v.x, v.y, v.z] for v in target_vertices]
-                    target_polygon = Polygon(target_list)
-
-                    if ego_polygon.intersects(target_polygon): # se si intersecano allora è una possibile collisione e mi da fastidio
-                        return (True, target_vehicle, compute_distance(target_vehicle.get_location(), ego_location)) # dato che impatta voglio sapere le info del veicolo che mi ha impattato
-
-                return (False, None, -1)
-
-        return (False, None, -1)
-    
-    def _object_obstacle_detected(self, object_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
-        """
-        Method to check if there is a vehicle in front of the agent blocking its path.
-
-            :param vehicle_list (list of carla.Vehicle): list contatining vehicle objects.
-                If None, all vehicle in the scene are used
-            :param max_distance: max freespace to check for obstacles.
-                If None, the base threshold value is used
-        """
-        if self._ignore_vehicles:
+        if len(vehicle_list) == 0:
             return (False, None, -1)
 
-        if not object_list:
-            object_list = self._world.get_actors().filter("*static*")
-
         if not max_distance:
             max_distance = self._base_vehicle_threshold
 
+        # La mia posizione.
         ego_transform = self._vehicle.get_transform()
         ego_wpt = self._map.get_waypoint(self._vehicle.get_location())
 
-        # Get the right offset
         if ego_wpt.lane_id < 0 and lane_offset != 0:
             lane_offset *= -1
 
-        # Get the transform of the front of the ego
         ego_forward_vector = ego_transform.get_forward_vector()
         ego_extent = self._vehicle.bounding_box.extent.x
         ego_front_transform = ego_transform
         ego_front_transform.location += carla.Location(
             x=ego_extent * ego_forward_vector.x,
             y=ego_extent * ego_forward_vector.y,
-        ) # informazioni sul mio veicolo
+        )
 
-        for target_object in object_list: # per ogni veicolo della lista 
-            target_transform = target_object.get_transform()
+        for target_vehicle in vehicle_list:
+            target_transform = target_vehicle.get_transform()
             target_wpt = self._map.get_waypoint(target_transform.location, lane_type=carla.LaneType.Any)
-
-            # Simplified version for outside junctions
             if not ego_wpt.is_junction or not target_wpt.is_junction:
-
                 if target_wpt.road_id != ego_wpt.road_id or target_wpt.lane_id != ego_wpt.lane_id  + lane_offset:
                     next_wpt = self._local_planner.get_incoming_waypoint_and_direction(steps=3)[0]
                     if not next_wpt:
@@ -680,17 +573,15 @@ class BasicAgent(object):
                         continue
 
                 target_forward_vector = target_transform.get_forward_vector()
-                target_extent = target_object.bounding_box.extent.x
+                target_extent = target_vehicle.bounding_box.extent.x
                 target_rear_transform = target_transform
                 target_rear_transform.location -= carla.Location(
                     x=target_extent * target_forward_vector.x,
                     y=target_extent * target_forward_vector.y,
                 )
-
                 if is_within_distance(target_rear_transform, ego_front_transform, max_distance, [low_angle_th, up_angle_th]):
-                    return (True, target_object, compute_distance(target_transform.location, ego_transform.location))
+                    self._near_vehicle_list.append((True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)))
 
-            # Waypoints aren't reliable, check the proximity of the vehicle to the route
             else:
                 route_bb = []
                 ego_location = ego_transform.location
@@ -717,46 +608,44 @@ class BasicAgent(object):
                 ego_polygon = Polygon(route_bb)
 
                 # Compare the two polygons
-                for target_object in object_list:
-                    target_extent = target_object.bounding_box.extent.x
-                    if target_object.id == self._vehicle.id:
+                for target_vehicle in vehicle_list:
+                    target_extent = target_vehicle.bounding_box.extent.x
+                    if target_vehicle.id == self._vehicle.id:
                         continue
-                    if ego_location.distance(target_object.get_location()) > max_distance:
-                        continue 
-
-                    target_bb = target_object.bounding_box
-                    target_vertices = target_bb.get_world_vertices(target_object.get_transform())
+                    # se il veicolo è troppo distante si ignora
+                    if ego_location.distance(target_vehicle.get_location()) > max_distance:
+                        continue
+                    target_bb = target_vehicle.bounding_box
+                    target_vertices = target_bb.get_world_vertices(target_vehicle.get_transform())
                     target_list = [[v.x, v.y, v.z] for v in target_vertices]
                     target_polygon = Polygon(target_list)
 
                     if ego_polygon.intersects(target_polygon):
-                        return (True, target_object, compute_distance(target_object.get_location(), ego_location))
+                        self._near_vehicle_list.append((True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)))
 
-                return (False, None, -1)
+        if len(self._near_vehicle_list) > 0:
+            self._near_vehicle_list = sorted(self._near_vehicle_list,key=lambda t: t[2])
+            return self._near_vehicle_list[0]
 
         return (False, None, -1)
 
-    def _generate_lane_change_path(self, waypoint, direction='left', heading=0, distance_same_lane=10,
-                                distance_other_lane=25, lane_change_distance=25,
-                                check=False, lane_changes=1, step_distance=2): #check era true
+    def _generate_lane_change_path(self, waypoint, direction, heading, distance_same_lane=10,
+                                   distance_other_lane=25, lane_change_distance=25,
+                                   check=True, lane_changes=1, step_distance=1):
         """
         This methods generates a path that results in a lane change.
         Use the different distances to fine-tune the maneuver.
         If the lane change is impossible, the returned path will be empty.
         """
-        distance_same_lane = max(distance_same_lane, 0.1)
-        distance_other_lane = max(distance_other_lane, 0.1)
-        lane_change_distance = max(lane_change_distance, 0.1)
 
+        print("DISTANCE SAME LANE:  ", distance_same_lane)
+        print("DISTANCE OTHER LANE: ", distance_other_lane)
+        print("DISTANCE LANE CHANGE:", lane_change_distance)
+
+        # Lista dei waypoint che tracciano il cambio di corsia.
         plan = []
         plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
 
-        option = RoadOption.LANEFOLLOW
-
-        #curr_orientation = next_wp.transform.rotation.yaw
-        #side_orientation = next_wp.get_left_lane().transform.rotation.yaw
-
-        # Same lane
         distance = 0
         while distance < distance_same_lane:
             if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
@@ -764,7 +653,8 @@ class BasicAgent(object):
             else:
                 next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                return plan #[]
+                print("\nLANE CHANGE ERROR 1\n")
+                return []
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
@@ -772,54 +662,51 @@ class BasicAgent(object):
         if lane_change_distance == 0:
             return plan
 
-        if direction == 'left':
+        if direction == "left":
             option = RoadOption.CHANGELANELEFT
-        elif direction == 'right':
+        elif direction == "right":
             option = RoadOption.CHANGELANERIGHT
         else:
-            # ERROR, input value for change must be 'left' or 'right'
             return []
 
         lane_changes_done = 0
         lane_change_distance = lane_change_distance / lane_changes
-
-        # Lane change
         while lane_changes_done < lane_changes:
             if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
                 next_wps = plan[-1][0].previous(lane_change_distance)
             else:
                 next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
-                return plan #[]
+                print("\nLANE CHANGE ERROR 2\n")
+                return []
             next_wp = next_wps[0]
-
-            # Get the side lane
+            # Traslo quel next_wp sull'altra corsia.
             if direction == 'left':
                 if check and str(next_wp.lane_change) not in ['Left', 'Both']:
+                    print("\nLANE CHANGE ERROR 3\n")
                     return []
                 side_wp = next_wp.get_left_lane()
             else:
                 if check and str(next_wp.lane_change) not in ['Right', 'Both']:
+                    print("\nLANE CHANGE ERROR 4\n")
                     return []
                 side_wp = next_wp.get_right_lane()
-
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
-                return plan #[]
-
-            # Update the plan
+                print("\nLANE CHANGE ERROR 5\n")
+                return []
             plan.append((side_wp, option))
             lane_changes_done += 1
-        
-        # Other lane
+
+        # Percorri l'altra corsia.
         distance = 0
         while distance < distance_other_lane:
             if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
                 next_wps = plan[-1][0].previous(step_distance)
             else:
                 next_wps = plan[-1][0].next(step_distance)
-            
             if not next_wps:
-                return [] #plan
+                print("\nLANE CHANGE ERROR 6\n")
+                return []
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.LANEFOLLOW))
