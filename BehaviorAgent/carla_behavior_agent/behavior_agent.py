@@ -425,40 +425,7 @@ class BehaviorAgent(BasicAgent):
         # vede se esiste in un certo range un semaforo e vede se è rosso,si ferma e si salva che è rosso al semaforo.
         if self.traffic_light_manager():
             return self.emergency_stop()  # se è rosso si ferma
-
-        # 2.1: Pedestrian avoidance behaviors
-        walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
-
-        # definisco se esiste un pednone che impatta con il veiolo
-        if walker_state:
-            # Distance is computed from the center of the two cars,
-            # we use bounding boxes to calculate the actual distance
-            distance = w_distance - max(walker.bounding_box.extent.y, walker.bounding_box.extent.x) - max(
-                self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
-
-            # Emergency brake if the car is very close al pedone.
-            if distance < self._behavior.braking_distance:
-                return self.emergency_stop()
-
-        # 2.1.2: Obstacle avoidance behaviors
-        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
-
-        if obstacle_state:
-            distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
-                self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
-
-            # Emergency brake if the car is very close.
-
-            if self._speed < 0.01 or self._overtaking:
-                self.obstacle_manager(obstacle, distance)
-                #pass
-            elif distance < self._behavior.braking_distance and self._speed > 0.01:
-                return self.emergency_stop()
-            elif distance < 15 and self._speed > 0.01:
-                return self.soft_stop()
-            elif distance < 30 and self._speed > 0.01:
-                return self.no_throttle()
-            
+        
         # 2.3: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(ego_vehicle_loc, distance=70)
         if vehicle_state_invasion:
@@ -474,6 +441,67 @@ class BehaviorAgent(BasicAgent):
         else:
             print('LANE INVASION: FALSE')
 
+        # 2.1: Pedestrian avoidance behaviors
+        walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
+
+        # definisco se esiste un pednone che impatta con il veiolo
+        if walker_state:
+            # Distance is computed from the center of the two cars,
+            # we use bounding boxes to calculate the actual distance
+            distance = w_distance - max(walker.bounding_box.extent.y, walker.bounding_box.extent.x) - max(
+                self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+
+            # Emergency brake if the car is very close al pedone.
+            if distance < self._behavior.braking_distance:
+                return self.emergency_stop()
+            
+        # 2.1.2: Obstacle avoidance behaviors
+        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
+
+        if obstacle_state:
+            distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
+                self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+
+            # Emergency brake if the car is very close.
+
+            if self._speed < 0.01 or self._overtaking:
+                #self.obstacle_manager(obstacle, distance)
+                pass
+            elif distance < self._behavior.braking_distance and self._speed > 0.01:
+                return self.emergency_stop()
+            elif distance < 15 and self._speed > 0.01:
+                return self.soft_stop()
+            elif distance < 30 and self._speed > 0.01:
+                return self.no_throttle()
+
+        # 2.2.1: overtake behavior
+        if self._ending_overtake:
+            print("sto terminando sorpasso")
+            if not self._local_planner.has_incoming_waypoint():
+                self._ending_overtake = False
+                self._overtaking = False
+                route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
+                self._local_planner.set_global_plan(route_trace, True)
+                print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
+            target_speed = min([self._behavior.max_speed, self._speed_limit])
+            self._local_planner.set_speed(target_speed)
+            control = self._local_planner.run_step(debug=debug)
+            return control
+        elif self._overtaking:
+            print("sorpasso in corso...")
+            if not self._local_planner.has_incoming_waypoint():
+                if not self._other_lane_occupied(ego_vehicle_loc, 30, check_behind=True):
+                    print("RIENTRO")
+                    if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                        self._ending_overtake = True
+                else:
+                    self.lane_change("left", self._vehicle_heading, 1, 0, 0)
+
+            target_speed = min([self._behavior.max_speed, self._speed_limit])
+            self._local_planner.set_speed(target_speed)
+            control = self._local_planner.run_step(debug=debug)
+            return control
+
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
 
@@ -483,7 +511,15 @@ class BehaviorAgent(BasicAgent):
             distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
-                control = self._overtake(vehicle)
+                if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
+                    if self._is_slow(vehicle):
+                        if not self._other_lane_occupied(ego_vehicle_loc, distance=60) and not self._overtaking:
+                            if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                                self._overtaking = True
+                                target_speed = min([self._behavior.max_speed, self._speed_limit])
+                                self._local_planner.set_speed(target_speed)
+                                control = self._local_planner.run_step(debug=debug)
+                                return control
                 return control
 
             # Emergency brake if the car is very close.
