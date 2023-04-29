@@ -424,8 +424,7 @@ class BehaviorAgent(BasicAgent):
             return self.emergency_stop()  # se è rosso si ferma
 
         # 2.1: Pedestrian avoidance behaviors
-        walker_state, walker, w_distance = self.pedestrian_avoid_manager(
-            ego_vehicle_wp)  # lo considero fermandomi
+        walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
 
         # definisco se esiste un pednone che impatta con il veiolo
         if walker_state:
@@ -462,21 +461,15 @@ class BehaviorAgent(BasicAgent):
         if vehicle_state_invasion:
             invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
             if invasion_state:
-                self._print_info('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                # TODO: spostati a destra di offset_invasion per farlo passare
+                print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
                 self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
 
                 target_speed = min([self._behavior.max_speed, self._speed_limit])
                 self._local_planner.set_speed(target_speed)
                 control = self._local_planner.run_step(debug=debug)
                 return control
-                # ego_vehicle_loc_to_right = ego_vehicle_loc + carla.Location(y=offset_invasion)
-                # self._map.get_waypoint(ego_vehicle_loc_to_right, project_to_road=False)
-                # route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
-                # self._local_planner.set_global_plan(route_trace, True)
-                # return self.emergency_stop()
         else:
-            self._print_info('LANE INVASION: FALSE')
+            print('LANE INVASION: FALSE')
 
         # 2.2: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
@@ -486,7 +479,9 @@ class BehaviorAgent(BasicAgent):
             # we use bounding boxes to calculate the actual distance
             distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
-            control = self._overtake()
+            if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
+                print("la linea a sinistra è legale")
+                control = self._overtake()
 
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
