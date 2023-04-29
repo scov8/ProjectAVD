@@ -681,6 +681,12 @@ class BasicAgent(object):
         # Lane change
         while lane_changes_done < lane_changes:
 
+            # Move forward
+            #if curr_orientation != side_orientation and direction == "left":
+            #    next_wps = plan[-1][0].previous(step_distance)
+            #else:
+            #    next_wps = plan[-1][0].next(step_distance)
+
             next_wps = plan[-1][0].next(lane_change_distance) # prima dell'if era così
             if not next_wps:
                 return plan #[]
