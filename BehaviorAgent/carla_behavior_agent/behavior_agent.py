@@ -199,14 +199,7 @@ class BehaviorAgent(BasicAgent):
     def _overtake(self, debug=True):
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-        if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:   
-            if not self._other_lane_occupied(ego_vehicle_loc, distance=60) and not self._overtaking:
-                if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
-                    self._overtaking = True
-                    target_speed = min([self._behavior.max_speed, self._speed_limit])
-                    self._local_planner.set_speed(target_speed)
-                    control = self._local_planner.run_step(debug=debug)
-                    return control
+        
         if self._ending_overtake:
             print("sto terminando sorpasso")
             if not self._local_planner.has_incoming_waypoint():
@@ -233,6 +226,15 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
             return control
+        
+        if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:   
+            if not self._other_lane_occupied(ego_vehicle_loc, distance=60) and not self._overtaking:
+                if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                    self._overtaking = True
+                    target_speed = min([self._behavior.max_speed, self._speed_limit])
+                    self._local_planner.set_speed(target_speed)
+                    control = self._local_planner.run_step(debug=debug)
+                    return control
 
 
     def collision_and_car_avoid_manager(self, waypoint):
