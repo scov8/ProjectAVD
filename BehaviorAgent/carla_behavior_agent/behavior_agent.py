@@ -480,8 +480,8 @@ class BehaviorAgent(BasicAgent):
             distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
-                print("la linea a sinistra è legale")
                 control = self._overtake()
+                return control
 
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
