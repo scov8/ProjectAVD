@@ -119,6 +119,16 @@ class BehaviorAgent(BasicAgent):
             elif vehicle_state_behind:
                 return distance_behind < self._vehicle.bounding_box.extent.x * 2.5
             return False
+    
+    def _other_lane_occupied_bis(self, ego_loc, distance):
+        vehicle_list = self._world.get_actors().filter("*vehicle*")
+        def dist(v, w):return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
+        vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < distance and v.id != self._vehicle.id]
+
+        vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(vehicle_list,distance,up_angle_th=90)
+        if vehicle_state:
+            return True, vehicle
+        return False, None
 
     def _is_slow(self, vehicle):
         vel = vehicle.get_velocity().length()
