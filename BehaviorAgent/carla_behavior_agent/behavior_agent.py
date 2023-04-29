@@ -150,7 +150,7 @@ class BehaviorAgent(BasicAgent):
             new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit * 2), up_angle_th=40, lane_offset=-1)
             if not new_vehicle_state and not new_vehicle_state2:
                 print("avvio il sorpasso")
-                self.lane_change("left", self._vehicle_heading, other_lane_time=3)
+                self.lane_change("left", self._vehicle_heading, other_lane_time=100)
                 self._overtaking = True
                 self._local_planner.set_speed(80)
         elif not self._overtaking:
@@ -158,7 +158,7 @@ class BehaviorAgent(BasicAgent):
             new_vehicle_state, _, _ = self._vehicle_obstacle_detected(to_overtake, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=180, lane_offset=1)
             if not new_vehicle_state:
                 print("finisco il sorpasso")
-                self.lane_change("left", self._vehicle_heading, other_lane_time=3)
+                self.lane_change("left", self._vehicle_heading, other_lane_time=100)
                 self._overtaking = False
                 self._local_planner.set_speed(self._behavior.max_speed)
 
