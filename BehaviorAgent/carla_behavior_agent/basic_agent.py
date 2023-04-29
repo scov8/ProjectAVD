@@ -501,6 +501,26 @@ class BasicAgent(object):
             self._near_vehicle_list = sorted(self._near_vehicle_list,key=lambda t: t[2])
             return self._near_vehicle_list[0]
         return (False, None, -1)
+    
+    def stay_on_the_right(self, waypoint, offset, on_the_right_time=1, step_distance=1):
+        speed = self._vehicle.get_velocity().length()
+        on_the_right_distance = on_the_right_time * speed
+
+        plan = []
+        plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
+
+        distance = 0
+        while distance < on_the_right_distance:
+            next_wps = plan[-1][0].next(step_distance)
+            next_wp = self._map.get_waypoint(next_wps[0].transform.location + carla.Location(y=offset), project_to_road=False)
+
+            if not next_wp:
+                print("\nSTAY ON THE RIGHT ERROR 1\n")
+                return []
+            distance += next_wps[0].transform.location.distance(plan[-1][0].transform.location)
+            plan.append((next_wp, RoadOption.RIGHT))
+
+        self.set_global_plan(plan, clean_queue=True)
 
     def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
         """
