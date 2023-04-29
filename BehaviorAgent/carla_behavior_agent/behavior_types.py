@@ -13,7 +13,6 @@ class Cautious(object):
     min_proximity_threshold = 12
     braking_distance = 6
     tailgate_counter = 0
-    overtake_counter = 0
 
 class Normal(object):
     """Class for Normal agent."""
@@ -24,7 +23,6 @@ class Normal(object):
     min_proximity_threshold = 10
     braking_distance = 5
     tailgate_counter = 0
-    overtake_counter = 0
 
 class Aggressive(object):
     """Class for Aggressive agent."""
@@ -35,15 +33,3 @@ class Aggressive(object):
     min_proximity_threshold = 8
     braking_distance = 4
     tailgate_counter = -1
-    overtake_counter = 0
-
-class Personal(object):
-    """Class for Normal agent."""
-    max_speed = 35
-    speed_lim_dist = 3
-    speed_decrease = 7
-    safety_time = 3
-    min_proximity_threshold = 10
-    braking_distance = 5
-    tailgate_counter = 0
-    overtake_counter = 0

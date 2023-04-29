@@ -16,6 +16,7 @@ from local_planner import RoadOption
 from behavior_types import Cautious, Aggressive, Normal, Personal
 
 from misc import get_speed, positive, is_within_distance, compute_distance
+from misc import printdir
 
 
 class BehaviorAgent(BasicAgent):
@@ -56,9 +57,6 @@ class BehaviorAgent(BasicAgent):
         self._ending_overtake = False
         self._destination_waypoint = None
 
-        self._overtake_threshold = 10
-        self._change_lane_threshold = 4
-
         # Parameters for agent behavior
         if behavior == 'cautious':
             self._behavior = Cautious()
@@ -68,9 +66,6 @@ class BehaviorAgent(BasicAgent):
 
         elif behavior == 'aggressive':
             self._behavior = Aggressive()
-
-        elif behavior == 'personal':
-            self._behavior = Personal()
 
     def _update_information(self):
         """
@@ -92,6 +87,7 @@ class BehaviorAgent(BasicAgent):
         if self._incoming_direction is None:
             self._incoming_direction = RoadOption.LANEFOLLOW
 
+        # Save final destination waypoint.
         if self._destination_waypoint is None:
             if not self._overtaking:
                 self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
@@ -102,31 +98,33 @@ class BehaviorAgent(BasicAgent):
         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < distance and v.id != self._vehicle.id]
 
         if check_behind is False:
-            vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(vehicle_list,distance,up_angle_th=90)
-            if vehicle_state: #occupata
+            vehicle_state, vehicle, distance = self._vehicle_detected_other_lane( vehicle_list, distance, up_angle_th=90)
+            if vehicle_state:
+                print("OTHER LANE OCCUPATA DA: " + str(vehicle))
                 return True
             return False
-
         else:
-            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90,  check_rear=True)
-            vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)
-
+            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane( vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True)
+            vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane( vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)
             if vehicle_state_ahead and vehicle_state_behind:
+                print(f"OTHER LANE OCCUPATA AHEAD: {vehicle_ahead} e BEHIND: {vehicle_behind} distanti {dist(vehicle_ahead, vehicle_behind)}")
                 return dist(vehicle_ahead, vehicle_behind) <= self._vehicle.bounding_box.extent.x * 2 + 5
-   
-            elif vehicle_state_ahead: #occupata
+            elif vehicle_state_ahead:
+                print("OTHER LANE OCCUPATA AHEAD DA: " + str(vehicle_ahead))
                 return True
             elif vehicle_state_behind:
+                print(f"VEICOLO BEHIND {vehicle_behind} è lontano {distance_behind}")
                 return distance_behind < self._vehicle.bounding_box.extent.x * 2.5
             return False
-    
+
     def _other_lane_occupied_bis(self, ego_loc, distance):
         vehicle_list = self._world.get_actors().filter("*vehicle*")
         def dist(v, w):return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < distance and v.id != self._vehicle.id]
 
-        vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(vehicle_list,distance,up_angle_th=90)
+        vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(vehicle_list, distance, up_angle_th=90)
         if vehicle_state:
+            print("OTHER LANE OCCUPATA DA: " + str(vehicle))
             return True, vehicle
         return False, None
 
@@ -193,50 +191,9 @@ class BehaviorAgent(BasicAgent):
         free_space_on_one_side = lane_width / 2 - other_extent
 
         if other_offset > free_space_on_one_side:
+            print('other_offset is larger thant free space on one side')
             return True, other_offset - free_space_on_one_side
         return False, 0
-
-    def _overtake(self,vehicle, debug=True):
-        ego_vehicle_loc = self._vehicle.get_location()
-        ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-        
-        if self._ending_overtake:
-            print("sto terminando sorpasso")
-            if not self._local_planner.has_incoming_waypoint():
-                self._ending_overtake = False
-                self._overtaking = False
-                route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
-                self._local_planner.set_global_plan(route_trace, True)
-                print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
-            target_speed = min([self._behavior.max_speed, self._speed_limit])
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
-            return control
-        elif self._overtaking:
-            print("sorpasso in corso...")
-            if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied(ego_vehicle_loc, 30, check_behind=True):
-                    print("RIENTRO")
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
-                        self._ending_overtake = True
-                else:
-                    self.lane_change("left", self._vehicle_heading, 1, 0, 0)
-
-            target_speed = min([self._behavior.max_speed, self._speed_limit])
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
-            return control
-        
-        if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
-            if self._is_slow(vehicle):
-                if not self._other_lane_occupied(ego_vehicle_loc, distance=60) and not self._overtaking:
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
-                        self._overtaking = True
-                        target_speed = min([self._behavior.max_speed, self._speed_limit])
-                        self._local_planner.set_speed(target_speed)
-                        control = self._local_planner.run_step(debug=debug)
-                        return control
-
 
     def collision_and_car_avoid_manager(self, waypoint):
         """
@@ -262,7 +219,7 @@ class BehaviorAgent(BasicAgent):
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40)
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)
 
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
                 self._tailgating(waypoint, vehicle_list)
@@ -339,7 +296,7 @@ class BehaviorAgent(BasicAgent):
         print("obstacle_state", obstacle_state,"obstacle", obstacle, "distance", distance)
         return obstacle_state, obstacle, distance
 
-    def car_following_manager(self, vehicle, distance, debug=True):
+    def car_following_manager(self, vehicle, distance, debug=False):
         """
         Module in charge of car-following behaviors when there's
         someone in front of us.
@@ -356,24 +313,22 @@ class BehaviorAgent(BasicAgent):
         print("distance: ", distance, "Velocità ego: ", self._speed,"Velocità veicolo davanti: ", vehicle_speed)
         if self._behavior.safety_time > ttc > 0.0:
             target_speed = min([
-                positive(vehicle_speed - self._behavior.speed_decrease),
-                self._behavior.max_speed,
-                self._speed_limit - self._behavior.speed_lim_dist])
+                positive(vehicle_speed - self._behavior.speed_decrease), self._behavior.max_speed,
+                self._speed_limit - self._behavior.speed_lim_dist
+            ])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
-        # Actual safety distance area, try to follow the speed of the vehicle in front.
         elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time:
             target_speed = min([
-                max(self._min_speed, vehicle_speed),
-                self._behavior.max_speed,
-                self._speed_limit - self._behavior.speed_lim_dist])
+                max(self._min_speed, vehicle_speed), self._behavior.max_speed,
+                self._speed_limit - self._behavior.speed_lim_dist
+            ])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
+
         else:
-            target_speed = min([
-                self._behavior.max_speed,
-                self._speed_limit - self._behavior.speed_lim_dist])
+            target_speed = min([self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
@@ -426,7 +381,20 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()  # se è rosso si ferma
         
-       
+        # 2.3: Lane Invasion (degli altri)
+        vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(ego_vehicle_loc, distance=70)
+        if vehicle_state_invasion:
+            invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
+            if invasion_state:
+                print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
+                self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
+
+                target_speed = min([self._behavior.max_speed, self._speed_limit])
+                self._local_planner.set_speed(target_speed)
+                control = self._local_planner.run_step(debug=debug)
+                return control
+        else:
+            print('LANE INVASION: FALSE')
 
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
