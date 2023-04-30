@@ -465,7 +465,7 @@ class BehaviorAgent(BasicAgent):
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
-                        if not self._other_lane_occupied(ego_vehicle_loc, distance=60) and not self._overtaking:
+                        if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 self._overtaking = True
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
