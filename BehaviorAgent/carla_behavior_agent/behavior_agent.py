@@ -163,8 +163,7 @@ class BehaviorAgent(BasicAgent):
 
         behind_vehicle_state, behind_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, low_angle_th=160)
         if behind_vehicle_state and self._speed < get_speed(behind_vehicle):
-            if (right_turn == carla.LaneChange.Right or right_turn ==
-                    carla.LaneChange.Both) and waypoint.lane_id * right_wpt.lane_id > 0 and right_wpt.lane_type == carla.LaneType.Driving:
+            if (right_turn == carla.LaneChange.Right or right_turn == carla.LaneChange.Both) and waypoint.lane_id * right_wpt.lane_id > 0 and right_wpt.lane_type == carla.LaneType.Driving:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
                 if not new_vehicle_state:
                     # se non ci sono veicoli che ci ostacolano, cambia corsia, avvio la manovra di cambio corsia
@@ -442,9 +441,9 @@ class BehaviorAgent(BasicAgent):
         elif self._overtaking:
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied(ego_vehicle_loc, 30, check_behind=True):
+                if not self._other_lane_occupied(ego_vehicle_loc, 15, check_behind=True):
                     print("RIENTRO")
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1):
                         self._ending_overtake = True
                 #else:
                 #    self.lane_change("left", self._vehicle_heading, 1, 0, 0) #senza non fa quella cacata al tientro 
