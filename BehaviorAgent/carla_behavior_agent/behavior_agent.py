@@ -446,11 +446,8 @@ class BehaviorAgent(BasicAgent):
                     print("RIENTRO")
                     if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                         self._ending_overtake = True
-                else:
+                #else:
                 #    self.lane_change("left", self._vehicle_heading, 1, 0, 0) #senza non fa quella cacata al tientro 
-                    target_speed = min([self._behavior.max_speed, self._speed_limit])
-                    self._local_planner.set_speed(target_speed)
-                    control = self._local_planner.run_step(debug=debug)
 
             target_speed = min([self._behavior.max_speed, self._speed_limit])
             self._local_planner.set_speed(target_speed)
