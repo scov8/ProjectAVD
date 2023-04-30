@@ -13,7 +13,7 @@ import numpy as np
 import carla
 from basic_agent import BasicAgent
 from local_planner import RoadOption
-from behavior_types import Cautious, Aggressive, Normal, Personal
+from behavior_types import Cautious, Aggressive, Normal, Custom
 
 from misc import get_speed, positive, is_within_distance, compute_distance
 
@@ -51,9 +51,11 @@ class BehaviorAgent(BasicAgent):
         self._min_speed = 5
         self._behavior = None
         self._sampling_resolution = 4.5
+        self._steer = 0
+        self._brake = 0
+        self._throttle = 0
 
         self._overtake_threshold = 10
-        self._change_lane_threshold = 4
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -65,8 +67,8 @@ class BehaviorAgent(BasicAgent):
         elif behavior == 'aggressive':
             self._behavior = Aggressive()
 
-        elif behavior == 'personal':
-            self._behavior = Personal()
+        elif behavior == 'custom':
+            self._behavior = Custom()
             
 
     def _update_information(self):
@@ -81,6 +83,11 @@ class BehaviorAgent(BasicAgent):
         if self._direction is None:
             self._direction = RoadOption.LANEFOLLOW
 
+        # controls: throttle, brake and steer
+        """self._brake = self.get_brake()
+        self._throttle = self.get_throttle()
+        self._steer = self.get_steer()
+        """
         self._look_ahead_steps = int((self._speed_limit) / 10)
 
         self._incoming_waypoint, self._incoming_direction = self._local_planner.get_incoming_waypoint_and_direction(
@@ -88,22 +95,31 @@ class BehaviorAgent(BasicAgent):
         if self._incoming_direction is None:
             self._incoming_direction = RoadOption.LANEFOLLOW
 
-    def stop_signs_manager(self):
-        actor_list = self._world.get_actors()
-        stops_list = actor_list.filter("*traffic.traffic_sign.stop*")
-        print('###############################################')
-        print(stops_list)
-        print('###############################################')
-        affected, _ = self._affected_by_stop_sign(stops_list)
+    def stop_signs_manager(self, waypoint):
+        stops_list = self._world.get_actors().filter('*stop*') if not self._stops_list else self._stops_list
+        print('\n', stops_list, '\n')
+        def dist(v): return v.get_location().distance(waypoint.transform.location)
+        stops_list = [v for v in stops_list if dist(v) < 10]
+        stops_list.sort(key=dist)
 
-        return affected
+        if self._direction == RoadOption.CHANGELANELEFT:
+            stop_state, stop, distance = self._stop_sing_detected(stops_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=-1)
+        elif self._direction == RoadOption.CHANGELANERIGHT:
+            stop_state, stop, distance = self._stop_sing_detected(stops_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1)
+        else:
+            stop_state, stop, distance = self._stop_sing_detected(stops_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=45)
+        
+        return stop_state, stop, distance
 
     def traffic_light_manager(self):
         """
         This method is in charge of behaviors for red lights.
         """
-        actor_list = self._world.get_actors()
-        lights_list = actor_list.filter("*traffic_light*")
+        lights_list = self._world.get_actors().filter("*traffic_light*") if not self._lights_list else self._lights_list
+        
         affected, _ = self._affected_by_traffic_light(lights_list)
 
         return affected
@@ -341,7 +357,7 @@ class BehaviorAgent(BasicAgent):
 
         return control
 
-    def run_step(self, debug=False):  # il debug era false
+    def run_step(self, debug=False):
         """
         Execute one step of navigation.
 
@@ -350,7 +366,7 @@ class BehaviorAgent(BasicAgent):
 
         chiamato ad ogni run step del sistema, gestisce semafori, stop, pedoni ect
         """
-        self._update_information()
+        self._update_information()        
 
         control = None
 
@@ -366,8 +382,9 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()  # se è rosso si ferma
 
-        if self.stop_signs_manager():
-            return self.add_emergency_stop()
+        if self.stop_signs_manager(ego_vehicle_wp)[0]:
+            print('stop:', self.stop_signs_manager(ego_vehicle_wp))
+            return self.emergency_stop()
         
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(
@@ -433,8 +450,8 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         # 3: Intersection behavior
-        # è una fregatura, ci dice se stiamo nellincrocio ma la gestione non è diversa da quella del behavior
-        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
+        # è una fregatura, ci dice se stiamo nell'incrocio ma la gestione non è diversa da quella del behavior
+        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]): 
             target_speed = min([
                 self._behavior.max_speed,
                 self._speed_limit - 5])

@@ -28,4 +28,4 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --host=${CARLA_HOST} \
 --port=${CARLA_PORT} \
 --timeout=${TIMEOUT} \
---traffic-manager-port=${CARLA_TRAFFIC_MANAGER_PORT}
+--traffic-manager-port=${CARLA_TRAFFIC_MANAGER_PORT} 

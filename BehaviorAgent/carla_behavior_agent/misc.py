@@ -39,6 +39,7 @@ def get_speed(vehicle):
 
     return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
 
+
 def get_trafficlight_trigger_location(traffic_light):
     """
     Calculates the yaw of the waypoint that represents the trigger volume of the traffic light
@@ -171,3 +172,29 @@ def positive(num):
         :param num: value to check
     """
     return num if num > 0.0 else 0.0
+
+
+def get_location_in_distance_from_wp(waypoint, distance, stop_at_junction=True):
+    """
+    Returns the location at a given distance along a given waypoint, and the traveled distance.
+    
+    Args:
+        waypoint (carla.Waypoint): The starting waypoint.
+        distance (float): The desired distance to travel along the waypoint.
+        stop_at_junction (bool): Whether to stop the search if an intersection is encountered.
+        
+    Returns:
+        Tuple containing the location at the desired distance along the waypoint, and the traveled distance.
+    """
+    traveled_distance = 0
+    while not (waypoint.is_intersection and stop_at_junction) and traveled_distance < distance:
+        wp_next = waypoint.next(1.0)
+        if wp_next:
+            waypoint_new = wp_next[-1]
+            traveled_distance += waypoint_new.transform.location.distance(waypoint.transform.location)
+            waypoint = waypoint_new
+        else:
+            break
+
+    return waypoint.transform.location, traveled_distance
+

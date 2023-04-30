@@ -42,9 +42,9 @@ class Aggressive(object):
     overtake_counter = 0
     overtake_doing = 0
 
-class Personal(object):
+class Custom(object):
     """Class for Normal agent."""
-    max_speed = 35
+    max_speed = 40
     speed_lim_dist = 3
     speed_decrease = 7
     safety_time = 3
