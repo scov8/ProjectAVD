@@ -16,7 +16,8 @@ from local_planner import LocalPlanner, RoadOption
 from global_route_planner import GlobalRoutePlanner
 from misc import (get_speed, is_within_distance,
                                get_trafficlight_trigger_location,
-                               compute_distance)
+                               compute_distance,
+                               is_within_trigger_volume)
 # from perception.perfectTracker.gt_tracker import PerfectTracker
 
 class BasicAgent(object):
@@ -106,17 +107,7 @@ class BasicAgent(object):
 
         self._stops_list = self._world.get_actors().filter("*stop*")
         self._stops_map = {} # Dictionary mapping a stop sing to a wp corrspoing to its trigger volume location
-
-    """
-    def get_steer(self):
-        return self._vehicle.steer
-    
-    def get_throttle(self):
-        return self._vehicle.throttle
-    
-    def get_brake(self):
-        return self._vehicle.brake
-    """
+ 
     def add_emergency_stop(self, control):
         """
         Overwrites the throttle a brake values of a control to perform an emergency stop.
@@ -250,6 +241,9 @@ class BasicAgent(object):
     def ignore_vehicles(self, active=True):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
+    
+    def is_junction(self, waypoint):
+        return waypoint.is_junction and not self._affected_by_traffic_light()[0]
 
     def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
@@ -285,10 +279,10 @@ class BasicAgent(object):
         if self._ignore_traffic_lights:
             return (False, None) 
 
-        if not lights_list:
+        if lights_list is None:
             lights_list = self._world.get_actors().filter("*traffic_light*")
 
-        if not max_distance:
+        if max_distance is None:
             max_distance = self._base_tlight_threshold 
 
         if self._last_traffic_light:
@@ -332,20 +326,46 @@ class BasicAgent(object):
 
         return (False, None)
     
-    def _stop_sing_detected(self, stops_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
-        """
-        considero al momento solo la gestione dell'incrocio senza segnale, in quanto non riesco a rilevarlo
-        """
+    def _affected_by_stop_sign(self, vehicle=None, stops_list=None, max_distance=None):
         if self._ignore_stop_signs:
-            return (False, None, -1) # False = non cosideriamo il segnale, None = nessun oggetto segnale, -1 = distanza dall'oggetto
+            return (False, None) # False = non cosideriamo il segnale, None = nessun oggetto segnale, -1 = distanza dall'oggetto
         
-        if not stops_list:
+        if stops_list is None:
             stops_list = self._stops_list
         
-        if not max_distance:
-            max_distance = self._base_tlight_threshold
+        if vehicle is None:
+            vehicle = self._vehicle
         
-        return self._vehicle_obstacle_detected(stops_list, max_distance, up_angle_th, low_angle_th, lane_offset)
+        if max_distance is None:
+            max_distance = self._base_vehicle_threshold
+        
+        ego_vehicle_location = self._vehicle.get_location()
+        ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
+
+        for stop_sing in stops_list:
+            if stop_sing.id in self._stops_map:
+                trigger_wp = self._stops_map[stop_sing.id]
+            else:
+                trigger_location = get_trafficlight_trigger_location(stop_sing) # is_within_trigger_volume(vehicle, stop_sing, stop_sing.trigger_volume) # ottengo un boolean
+                trigger_wp = self._map.get_waypoint(trigger_location)
+                self._stops_map[stop_sing.id] = trigger_wp
+            
+            if trigger_wp.transform.location.distance(ego_vehicle_location) > max_distance: continue
+                
+            if trigger_wp.road_id != ego_vehicle_waypoint.road_id: continue
+
+            ve_dir = ego_vehicle_waypoint.transform.get_forward_vector()
+            wp_dir = trigger_wp.transform.get_forward_vector() # valuriamo anche l'orientamento del veicolo
+            dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z # dove dobbiamo andare
+
+            if dot_ve_wp < 0: continue 
+
+            if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]): # valutazione sulla distanza
+                self._last_stop_sign = stop_sing
+                return (True, stop_sing)
+
+        return (False, None)
+
 
     def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
         """

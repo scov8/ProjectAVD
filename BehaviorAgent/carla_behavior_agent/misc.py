@@ -40,6 +40,45 @@ def get_speed(vehicle):
     return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
 
 
+def vehicle_in_trigger_volume(vehicle, obj, trigger_volume_size=2.0):
+    """
+    DEPRECATABLE!
+    
+    Check if the vehicle is inside the trigger volume of an object.
+    """
+    # Get the location of the vehicle and the object
+    vehicle_loc = vehicle.get_location()
+    obj_loc = obj.get_transform().location
+
+    # Calculate the distance between the vehicle and the object
+    distance = math.sqrt((vehicle_loc.x - obj_loc.x)**2 + (vehicle_loc.y - obj_loc.y)**2)
+
+    # Check if the distance is within the trigger volume size
+    return distance <= trigger_volume_size
+
+
+def is_within_trigger_volume(vehicle, object, object_trigger_volume=2.0):
+    """
+    Check if the vehicle is within the trigger volume of the object
+
+    :param vehicle: vehicle
+    :param object: object (traffic_light/stop_sign)
+    :param object_trigger_volume: Trigger volume of the object
+    :return: Boolean
+    """
+    vehicle_transform = vehicle.get_transform()
+    object_transform = object.get_transform()
+
+    # Get the location of the trigger volume
+    trigger_loc = object_transform.transform(object_trigger_volume.location)
+
+    # Calculate the distance between the vehicle and the trigger volume location
+    distance = compute_distance(vehicle_transform.location, trigger_loc)
+
+    # Check if the vehicle is within the trigger volume
+    return is_within_distance(vehicle_transform, object_transform, object_trigger_volume.extent.x) and distance <= object_trigger_volume.extent.z
+
+
 def get_trafficlight_trigger_location(traffic_light):
     """
     Calculates the yaw of the waypoint that represents the trigger volume of the traffic light

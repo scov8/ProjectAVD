@@ -83,11 +83,6 @@ class BehaviorAgent(BasicAgent):
         if self._direction is None:
             self._direction = RoadOption.LANEFOLLOW
 
-        # controls: throttle, brake and steer
-        """self._brake = self.get_brake()
-        self._throttle = self.get_throttle()
-        self._steer = self.get_steer()
-        """
         self._look_ahead_steps = int((self._speed_limit) / 10)
 
         self._incoming_waypoint, self._incoming_direction = self._local_planner.get_incoming_waypoint_and_direction(
@@ -97,22 +92,15 @@ class BehaviorAgent(BasicAgent):
 
     def stop_signs_manager(self, waypoint):
         stops_list = self._world.get_actors().filter('*stop*') if not self._stops_list else self._stops_list
-        print('\n', stops_list, '\n')
+        # print('\n', stops_list, '\n')
         def dist(v): return v.get_location().distance(waypoint.transform.location)
         stops_list = [v for v in stops_list if dist(v) < 10]
-        stops_list.sort(key=dist)
+        # print(stop_list[0].trigger_volume) # BoundingBox(Location(x=-3.510037, y=5.304008, z=-0.025508), Extent(x=0.685752, y=1.491250, z=1.014414), Rotation(pitch=0.000000, yaw=0.067261, roll=0.000000)) 
+        print(str(len(stops_list)) + '\n' if len(stops_list) > 0 else '', end='')
+        if len(stops_list) > 1:
+            stops_list.sort(key=dist)
 
-        if self._direction == RoadOption.CHANGELANELEFT:
-            stop_state, stop, distance = self._stop_sing_detected(stops_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=-1)
-        elif self._direction == RoadOption.CHANGELANERIGHT:
-            stop_state, stop, distance = self._stop_sing_detected(stops_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1)
-        else:
-            stop_state, stop, distance = self._stop_sing_detected(stops_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=45)
-        
-        return stop_state, stop, distance
+        return self._affected_by_stop_sign(self._vehicle, stops_list)[0]
 
     def traffic_light_manager(self):
         """
@@ -382,8 +370,8 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()  # se è rosso si ferma
 
-        if self.stop_signs_manager(ego_vehicle_wp)[0]:
-            print('stop:', self.stop_signs_manager(ego_vehicle_wp))
+        if self.stop_signs_manager(ego_vehicle_wp):
+            print('--------------- [stop] ------------------')
             return self.emergency_stop()
         
         # 2.1: Pedestrian avoidance behaviors
