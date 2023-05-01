@@ -15,7 +15,7 @@ from basic_agent import BasicAgent
 from local_planner import RoadOption
 from behavior_types import Cautious, Aggressive, Normal
 
-from misc import get_speed, positive, is_within_distance, compute_distance, get_steer
+from misc import get_speed, positive, is_within_distance, compute_distance, get_steering
 
 class BehaviorAgent(BasicAgent):
     """
@@ -73,7 +73,7 @@ class BehaviorAgent(BasicAgent):
         vehicle based on the surrounding world.
         """
         self._speed = get_speed(self._vehicle)
-        self._steer = get_steer(self._vehicle)
+        self._steer = get_steering(self._vehicle)
         self._speed_limit = self._vehicle.get_speed_limit()
         self._local_planner.set_speed(self._speed_limit)
         self._vehicle_heading = self._vehicle.get_transform().rotation.yaw
