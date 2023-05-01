@@ -387,7 +387,7 @@ class BehaviorAgent(BasicAgent):
             invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-5, 2)
+                self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
                 self._local_planner.set_speed(target_speed)
                 control = self._local_planner.run_step(debug=debug)
@@ -417,10 +417,17 @@ class BehaviorAgent(BasicAgent):
                 self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
-
             if self._speed < 0.01 or self._overtaking:
-                #self.obstacle_manager(obstacle, distance)
-                pass
+                if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
+                    if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
+                        if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
+                            if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                                self._overtaking = True
+                                target_speed = max([self._behavior.max_speed, self._speed_limit])
+                                self._local_planner.set_speed(target_speed)
+                                control = self._local_planner.run_step(debug=debug)
+                                return control
+                #pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01:
                 return self.emergency_stop()
             elif distance < 15 and self._speed > 0.01:
@@ -485,9 +492,7 @@ class BehaviorAgent(BasicAgent):
         # 3: Intersection behavior
         # è una fregatura, ci dice se stiamo nellincrocio ma la gestione non è diversa da quella del behavior
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
-            target_speed = min([
-                self._behavior.max_speed,
-                self._speed_limit - 5])
+            target_speed = min([self._behavior.max_speed, self._speed_limit - 5])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
@@ -499,9 +504,7 @@ class BehaviorAgent(BasicAgent):
         # 4: Normal behavior
         else:
             # se non ci sono pedoni, nemmeno macchine che ci stanno davanti, allora procediamo normalmente
-            target_speed = min([
-                self._behavior.max_speed,
-                self._speed_limit - self._behavior.speed_lim_dist])
+            target_speed = min([self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
             # adattiamo il local planner a seguire la nostra velocità, dentro al local ci sono i controllori e cambia la vel
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
