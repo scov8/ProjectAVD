@@ -417,7 +417,7 @@ class BehaviorAgent(BasicAgent):
                 self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
-            if self._speed < 0.01 or self._overtaking:
+            if self._speed < 0.01:
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
                         if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
@@ -428,11 +428,11 @@ class BehaviorAgent(BasicAgent):
                                 control = self._local_planner.run_step(debug=debug)
                                 return control
                 #pass
-            elif distance < self._behavior.braking_distance and self._speed > 0.01:
+            elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking:
                 return self.emergency_stop()
-            elif distance < 15 and self._speed > 0.01:
+            elif distance < 15 and self._speed > 0.01 and not self._overtaking:
                 return self.soft_stop()
-            elif distance < 30 and self._speed > 0.01:
+            elif distance < 30 and self._speed > 0.01 and not self._overtaking:
                 return self.no_throttle()
 
         # 2.2.1: overtake behavior
