@@ -249,7 +249,8 @@ class BasicAgent(object):
         distance = 0
         while distance < on_the_right_distance:
             next_wps = plan[-1][0].next(step_distance)
-            next_wp = self._map.get_waypoint(next_wps[0].transform.location + carla.Location(y=offset), project_to_road=False)
+            offset_vector = carla.Vector3D(offset, 0.0, 0.0)
+            next_wp = self._map.get_waypoint(next_wps[0].transform.location + offset_vector, project_to_road=False)
 
             if not next_wp:
                 print("\nSTAY ON THE RIGHT ERROR 1\n")
