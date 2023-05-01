@@ -72,6 +72,7 @@ class BehaviorAgent(BasicAgent):
         vehicle based on the surrounding world.
         """
         self._speed = get_speed(self._vehicle)
+        self._steer = get_steer(self._vehicle)
         self._speed_limit = self._vehicle.get_speed_limit()
         self._local_planner.set_speed(self._speed_limit)
         self._vehicle_heading = self._vehicle.get_transform().rotation.yaw
@@ -365,6 +366,8 @@ class BehaviorAgent(BasicAgent):
 
         control = None
 
+        print("speed", self._speed, "steer", self._steer)
+
         if self._behavior.tailgate_counter > 0:
             self._behavior.tailgate_counter -= 1
 
@@ -488,6 +491,10 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
+        # se sto andando molto veloce e con lo sterzo ho un valore sopra al 0.5, allora rallento
+        elif self._speed > 40 and abs(self._steer) > 0.4:
+            return self.no_throttle()
+
         # 4: Normal behavior
         else:
             # se non ci sono pedoni, nemmeno macchine che ci stanno davanti, allora procediamo normalmente
@@ -514,12 +521,6 @@ class BehaviorAgent(BasicAgent):
         return control
 
     def soft_stop(self):
-        """
-        Overwrites the throttle a brake values of a control to perform an emergency stop.
-        The steering is kept the same to avoid going out of the lane when stopping during turns
-
-            :param speed (carl.VehicleControl): control to be modified
-        """
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = 0.2
@@ -527,12 +528,6 @@ class BehaviorAgent(BasicAgent):
         return control
 
     def no_throttle(self):
-        """
-        Overwrites the throttle a brake values of a control to perform an emergency stop.
-        The steering is kept the same to avoid going out of the lane when stopping during turns
-
-            :param speed (carl.VehicleControl): control to be modified
-        """
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = 0.0

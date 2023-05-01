@@ -39,6 +39,9 @@ def get_speed(vehicle):
 
     return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
 
+def get_steer(vehicle):
+    return vehicle.get_steering()
+
 def get_trafficlight_trigger_location(traffic_light):
     """
     Calculates the yaw of the waypoint that represents the trigger volume of the traffic light
