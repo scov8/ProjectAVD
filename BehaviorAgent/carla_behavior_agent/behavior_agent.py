@@ -391,7 +391,8 @@ class BehaviorAgent(BasicAgent):
                 if vehicle_state_invasion:
                     invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
                     if invasion_state:
-                        return self.add_emergency_stop()
+                        return self.emergency_stop()
+                    
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
                 self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
