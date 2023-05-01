@@ -387,7 +387,7 @@ class BehaviorAgent(BasicAgent):
             invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
             if invasion_state:
 
-                vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(ego_vehicle_loc, distance=35)
+                vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(ego_vehicle_loc, distance=40)
                 if vehicle_state_invasion:
                     invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
                     if invasion_state:
