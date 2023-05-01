@@ -108,7 +108,6 @@ class BehaviorAgent(BasicAgent):
         else:
             vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane( vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True)
             vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane( vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)
-            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1) #mio
             if vehicle_state_ahead and vehicle_state_behind:
                 print(f"OTHER LANE OCCUPATA AHEAD: {vehicle_ahead} e BEHIND: {vehicle_behind} distanti {dist(vehicle_ahead, vehicle_behind)}")
                 return dist(vehicle_ahead, vehicle_behind) <= self._vehicle.bounding_box.extent.x * 2 + 5
@@ -118,9 +117,6 @@ class BehaviorAgent(BasicAgent):
             elif vehicle_state_behind:
                 print(f"VEICOLO BEHIND {vehicle_behind} è lontano {distance_behind}")
                 return distance_behind < self._vehicle.bounding_box.extent.x * 2.5
-            elif new_vehicle_state: #mio
-                print("OTHER LANE OCCUPATA AHEAD DA a sx mia: " + str(vehicle_ahead)) #mio
-                return True #mio
             return False
 
     def _other_lane_occupied_bis(self, ego_loc, distance):
