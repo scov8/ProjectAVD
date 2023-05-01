@@ -382,13 +382,13 @@ class BehaviorAgent(BasicAgent):
             return self.emergency_stop()  # se è rosso si ferma
         
         # 2.3: Lane Invasion (degli altri)
-        vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(ego_vehicle_loc, distance=70)
+        vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(ego_vehicle_loc, distance=30) #70mt
         if vehicle_state_invasion:
             invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
                 self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
-
+                return self.emergency_stop()
                 target_speed = min([self._behavior.max_speed, self._speed_limit])
                 self._local_planner.set_speed(target_speed)
                 control = self._local_planner.run_step(debug=debug)
