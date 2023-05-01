@@ -493,7 +493,8 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         # se sto andando molto veloce e con lo sterzo ho un valore sopra al 0.5, allora rallento
-        elif self._speed > 45 and abs(self._steer) > 90:
+        elif self._speed > 45 and self._steer > 90:
+            print("velocità troppo alta, rallentooooooooooooooooooooooooooooooo")
             return self.no_throttle()
 
         # 4: Normal behavior
