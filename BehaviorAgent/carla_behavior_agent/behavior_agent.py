@@ -11,12 +11,14 @@ traffic signs, and has different possible configurations. """
 import random
 import numpy as np
 import carla
+
 from basic_agent import BasicAgent
 from local_planner import RoadOption
 from behavior_types import Cautious, Aggressive, Normal, Custom
 
 from misc import get_speed, positive, is_within_distance, compute_distance
 
+flag = True
 
 class BehaviorAgent(BasicAgent):
     """
@@ -354,6 +356,8 @@ class BehaviorAgent(BasicAgent):
 
         chiamato ad ogni run step del sistema, gestisce semafori, stop, pedoni ect
         """
+        global flag
+
         self._update_information()        
 
         control = None
@@ -372,7 +376,11 @@ class BehaviorAgent(BasicAgent):
 
         if self.stop_signs_manager(ego_vehicle_wp):
             print('--------------- [stop] ------------------')
-            return self.emergency_stop()
+            if flag:
+                start = carla.Timestamp.elapsed_seconds
+                flag = False
+            if (start - carla.Timestamp.elapsed_seconds) < 3.0:
+                return self.emergency_stop()
         
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(
