@@ -18,8 +18,6 @@ from behavior_types import Cautious, Aggressive, Normal, Custom
 
 from misc import get_speed, positive, is_within_distance, compute_distance
 
-flag = True
-
 class BehaviorAgent(BasicAgent):
     """
     BehaviorAgent implements an agent that navigates scenes to reach a given
@@ -356,8 +354,6 @@ class BehaviorAgent(BasicAgent):
 
         chiamato ad ogni run step del sistema, gestisce semafori, stop, pedoni ect
         """
-        global flag
-
         self._update_information()        
 
         control = None
@@ -374,13 +370,9 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()  # se è rosso si ferma
 
-        if self.stop_signs_manager(ego_vehicle_wp):
-            print('--------------- [stop] ------------------')
-            if flag:
-                start = carla.Timestamp.elapsed_seconds
-                flag = False
-            if (start - carla.Timestamp.elapsed_seconds) < 3.0:
-                return self.emergency_stop()
+        # if self.stop_signs_manager(ego_vehicle_wp):
+        #     print('--------------- [stop] ------------------')
+        #     return self.emergency_stop()
         
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(
@@ -447,13 +439,17 @@ class BehaviorAgent(BasicAgent):
 
         # 3: Intersection behavior
         # è una fregatura, ci dice se stiamo nell'incrocio ma la gestione non è diversa da quella del behavior
-        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]): 
+        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
+            # controllo comportamento in caso di incrocio con senale di stop
+            if self.stop_signs_manager(ego_vehicle_wp):
+                print('--------------- [stop] ------------------')
+                return self.emergency_stop()
             target_speed = min([
                 self._behavior.max_speed,
                 self._speed_limit - 5])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
-
+        
         # 4: Normal behavior
         else:
             # se non ci sono pedoni, nemmeno macchine che ci stanno davanti, allora procediamo normalmente
