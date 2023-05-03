@@ -17,7 +17,7 @@ from global_route_planner import GlobalRoutePlanner
 from misc import (get_speed, is_within_distance,
                                get_trafficlight_trigger_location,
                                compute_distance,
-                               is_within_trigger_volume)
+                               distance_vehicle)
 # from perception.perfectTracker.gt_tracker import PerfectTracker
 
 class BasicAgent(object):
@@ -52,6 +52,8 @@ class BasicAgent(object):
         
         self._last_stop_sign = None
         self._last_traffic_light = None
+
+        self._junction_counter = 0
 
         # Base parameters
         self._ignore_traffic_lights = True  # CHANGE TO FALSEEE!!!!
@@ -241,9 +243,25 @@ class BasicAgent(object):
     def ignore_vehicles(self, active=True):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
-    
-    def is_junction(self, waypoint):
-        return waypoint.is_junction and not self._affected_by_traffic_light()[0]
+
+    def _vehicle_in_junction(self, waypoint, vehicle_list=None, check_lane='left'):
+        if not waypoint.is_junction:
+            return (False, None, -1)
+        
+        if self._ignore_vehicles:
+            return (False, None, -1)
+        
+        if vehicle_list is None:
+            vehicle_list = self._world.get_actors().filter("*vehicle*")
+        
+        if check_lane != 'left' or check_lane != 'right':
+            return (False, None, -1)
+        elif check_lane == 'left':
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=150, lane_offset=-1)
+        elif check_lane == 'right':
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=150, lane_offset=1)
+        else:
+            return (False, None, -1)
 
     def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
@@ -342,6 +360,21 @@ class BasicAgent(object):
         ego_vehicle_location = self._vehicle.get_location()
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
+        if self._last_stop_sign:
+            l_vehicle_state, l_vehicle, l_distance = self._left_vehicle_in_junction()
+            r_vehicle_state, r_vehicle, r_distance = self._right_vehicle_in_junction()
+            
+            if not l_vehicle_state and not r_vehicle_state:
+                self._last_stop_sign = None
+            elif (l_vehicle_state and not r_vehicle_state) or (l_vehicle_state and r_vehicle_state):
+                return (True, self._last_stop_sign)
+            elif (r_vehicle_state and not l_vehicle_state):
+                # avanaza fino al waypoint prima della collisione
+                dist = distance_vehicle(ego_vehicle_waypoint, r_vehicle.get_transform())
+                pass
+            else:
+                return (True, self._last_stop_sign)
+
         for stop_sing in stops_list:
             if stop_sing.id in self._stops_map:
                 trigger_wp = self._stops_map[stop_sing.id]
@@ -365,7 +398,6 @@ class BasicAgent(object):
                 return (True, stop_sing)
 
         return (False, None)
-
 
     def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
         """
