@@ -146,6 +146,10 @@ def compute_magnitude_angle(target_location, current_location, orientation):
     return (norm_target, d_angle)
 
 
+def time_to_collision(vehicle_transform, target_transform):
+    pass
+
+
 def distance_vehicle(waypoint, vehicle_transform):
     """
     Returns the 2D distance from a waypoint to a vehicle

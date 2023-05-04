@@ -257,9 +257,9 @@ class BasicAgent(object):
         if check_lane != 'left' or check_lane != 'right':
             return (False, None, -1)
         elif check_lane == 'left':
-            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=150, lane_offset=-1)
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
         elif check_lane == 'right':
-            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=150, lane_offset=1)
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
         else:
             return (False, None, -1)
 
@@ -325,7 +325,7 @@ class BasicAgent(object):
             if trigger_wp.transform.location.distance(ego_vehicle_location) > max_distance:
                 continue
 
-            if trigger_wp.road_id != ego_vehicle_waypoint.road_id: # se si trova nel raggio d'azione 
+            if trigger_wp.road_id != ego_vehicle_waypoint.road_id: # if it's on the same road of the ego
                 continue
 
             ve_dir = ego_vehicle_waypoint.transform.get_forward_vector()
@@ -333,7 +333,7 @@ class BasicAgent(object):
             dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z # dove dbb andare 
 
             if dot_ve_wp < 0: # sta dietro
-                continue 
+                continue
 
             if traffic_light.state != carla.TrafficLightState.Red:
                 continue
@@ -361,8 +361,8 @@ class BasicAgent(object):
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
         if self._last_stop_sign:
-            l_vehicle_state, l_vehicle, l_distance = self._left_vehicle_in_junction()
-            r_vehicle_state, r_vehicle, r_distance = self._right_vehicle_in_junction()
+            l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(check_lane='left')
+            r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(check_lane='right')
             
             if not l_vehicle_state and not r_vehicle_state:
                 self._last_stop_sign = None
@@ -391,7 +391,9 @@ class BasicAgent(object):
             wp_dir = trigger_wp.transform.get_forward_vector() # valuriamo anche l'orientamento del veicolo
             dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z # dove dobbiamo andare
 
-            if dot_ve_wp < 0: continue 
+            if dot_ve_wp < 0: continue
+
+            if trigger_wp == self._stops_map[self._last_stop_sign.id]: continue
 
             if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]): # valutazione sulla distanza
                 self._last_stop_sign = stop_sing
