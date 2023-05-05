@@ -393,7 +393,12 @@ class BehaviorAgent(BasicAgent):
                 control = self._local_planner.run_step(debug=debug)
                 return control
         else:
+            plan = [] # mio
+            plan.append((ego_vehicle_wp, RoadOption.LANEFOLLOW))# mio
+            self.set_global_plan(plan, clean_queue=True)# mio
             print('LANE INVASION: FALSE')
+            control = self._local_planner.run_step(debug=debug)# mio
+            return control# mio
 
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
