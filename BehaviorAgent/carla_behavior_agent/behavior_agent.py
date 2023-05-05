@@ -387,7 +387,7 @@ class BehaviorAgent(BasicAgent):
             invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2, 2)
+                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.5, 2)
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
                 self._local_planner.set_speed(target_speed)
                 control = self._local_planner.run_step(debug=debug)
@@ -491,10 +491,10 @@ class BehaviorAgent(BasicAgent):
 
         # 3: Intersection behavior
         # è una fregatura, ci dice se stiamo nellincrocio ma la gestione non è diversa da quella del behavior
-        #elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
-        #    target_speed = min([self._behavior.max_speed, self._speed_limit - 5])
-        #    self._local_planner.set_speed(target_speed)
-        #    control = self._local_planner.run_step(debug=debug)
+        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
+            target_speed = min([self._behavior.max_speed, self._speed_limit - 5])
+            self._local_planner.set_speed(target_speed)
+            control = self._local_planner.run_step(debug=debug)
 
         # se sto andando molto veloce e con lo sterzo ho un valore sopra al 0.5, allora rallento
         elif self._speed > 45 and self._steer > 90:
