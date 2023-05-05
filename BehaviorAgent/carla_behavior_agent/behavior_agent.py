@@ -193,7 +193,7 @@ class BehaviorAgent(BasicAgent):
 
         if other_offset > free_space_on_one_side:
             print('other_offset is larger thant free space on one side')
-            return True, free_space_on_one_side - other_offset
+            return True, other_offset - free_space_on_one_side
         return False, 0
 
     def collision_and_car_avoid_manager(self, waypoint):
@@ -498,6 +498,7 @@ class BehaviorAgent(BasicAgent):
 
         # se sto andando molto veloce e con lo sterzo ho un valore sopra al 0.5, allora rallento
         elif self._speed > 45 and self._steer > 90:
+            print("velocità troppo alta, rallentooooooooooooooooooooooooooooooo")
             return self.no_throttle()
 
         # 4: Normal behavior
