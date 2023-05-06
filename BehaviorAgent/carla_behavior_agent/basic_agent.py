@@ -259,6 +259,7 @@ class BasicAgent(object):
                 return []
             distance += next_wps[0].transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.RIGHT))
+            plan.append((next_wp, RoadOption.LANEFOLLOW))
 
         self.set_global_plan(plan, clean_queue=True)
 
