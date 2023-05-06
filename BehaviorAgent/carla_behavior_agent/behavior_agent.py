@@ -393,7 +393,7 @@ class BehaviorAgent(BasicAgent):
                 self._local_planner.set_speed(target_speed)
                 control = self._local_planner.run_step(debug=debug)
                 return control
-        elif not self._other_lane_occupied(ego_vehicle_loc,distance=5, check_behind=True)[0]:
+        elif not self._other_lane_occupied(ego_vehicle_loc, distance=5, check_behind=True):
             print('LANE INVASION: FALSE')
             self._local_planner.set_lat_offset(0.0) # mio
             route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
