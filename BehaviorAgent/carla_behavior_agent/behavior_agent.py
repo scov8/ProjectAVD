@@ -56,6 +56,7 @@ class BehaviorAgent(BasicAgent):
         self._overtaking = False
         self._ending_overtake = False
         self._destination_waypoint = None
+        self._restringimento = False
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -389,15 +390,17 @@ class BehaviorAgent(BasicAgent):
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
                 self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2, 2) #con -2 va  ma struscia, con 3 fa inverisone
                 #self._local_planner.set_lat_offset(offset_invasion) # mio
+                self._restringimento = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
                 self._local_planner.set_speed(target_speed)
                 control = self._local_planner.run_step(debug=debug)
                 return control
-        elif not self._other_lane_occupied(ego_vehicle_loc, distance=5, check_behind=True):
+        elif self._restringimento:
             print('LANE INVASION: FALSE')
             self._local_planner.set_lat_offset(0.0) # mio
-            #route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
-            #self._local_planner.set_global_plan(route_trace,  clean_queue=True)
+            route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
+            self._local_planner.set_global_plan(route_trace,  clean_queue=True)
+            self._restringimento = False
 
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
