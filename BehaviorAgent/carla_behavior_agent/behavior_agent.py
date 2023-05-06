@@ -396,6 +396,8 @@ class BehaviorAgent(BasicAgent):
         else:
             print('LANE INVASION: FALSE')
             self._local_planner.set_lat_offset(0.0) # mio
+            route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
+            self._local_planner.set_global_plan(route_trace,  clean_queue=True)
 
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
