@@ -425,7 +425,7 @@ class BehaviorAgent(BasicAgent):
 
             # Emergency brake if the car is very close.
             if self._speed < 0.01:
-                '''if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
+                if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
                         if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
@@ -433,8 +433,8 @@ class BehaviorAgent(BasicAgent):
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
                                 self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
-                                return control'''
-                pass
+                                return control
+                #pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking:
                 return self.emergency_stop()
             elif distance < 15 and self._speed > 0.01 and not self._overtaking:
