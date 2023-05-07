@@ -452,7 +452,7 @@ class BehaviorAgent(BasicAgent):
                 else:
                     self.lane_change("left", self._vehicle_heading, 1, 0, 0)
 
-            target_speed = min([self._behavior.max_speed, self._speed_limit])
+            target_speed = max([self._behavior.max_speed, self._speed_limit]) # new: max al posto di min 
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
             return control
