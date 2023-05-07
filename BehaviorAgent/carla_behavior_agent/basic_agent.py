@@ -488,7 +488,6 @@ class BasicAgent(object):
 
         # ID della corsia da controllare. é sempre quella opposta alla mia.
         lane_id = -ego_wpt.lane_id
-        lane_id2 = ego_wpt.lane_id + 1 # new
 
         # Calcolo location che identifica il fronte del mio ego vehicle.
         ego_forward_vector = ego_transform.get_forward_vector()
@@ -503,11 +502,11 @@ class BasicAgent(object):
             target_transform = target_vehicle.get_transform()
             target_wpt = self._map.get_waypoint(target_transform.location, lane_type=carla.LaneType.Any)
             if not ego_wpt.is_junction or not target_wpt.is_junction:
-                if target_wpt.road_id != ego_wpt.road_id or (target_wpt.lane_id != lane_id or target_wpt.lane_id != lane_id2): # new
+                if target_wpt.road_id != ego_wpt.road_id or target_wpt.lane_id != lane_id:
                     next_wpt = self._local_planner.get_incoming_waypoint_and_direction(steps=3)[0]
                     if not next_wpt:
                         continue
-                    if target_wpt.road_id != next_wpt.road_id or (target_wpt.lane_id != lane_id or target_wpt.lane_id != lane_id2): # new
+                    if target_wpt.road_id != next_wpt.road_id or target_wpt.lane_id != lane_id:
                         continue
 
                 # Prendo location del centro del veicolo target.
