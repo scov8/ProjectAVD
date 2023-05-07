@@ -373,7 +373,7 @@ class BehaviorAgent(BasicAgent):
             invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.3, 2) #con -2 va  ma struscia, con 3 fa inverisone
+                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.3, 2) # new: con -2 va  ma struscia, con 3 fa inverisone
                 #self._local_planner.set_lat_offset(offset_invasion) # mio
                 self._restringimento = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
@@ -410,7 +410,7 @@ class BehaviorAgent(BasicAgent):
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
                         if not self._other_lane_occupied(ego_vehicle_loc, distance=70):
-                            if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 2 al posto di 1.5
+                            if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # new: 2 al posto di 1.5
                                 print("cambio corsia a sinistra per ostacolo")
                                 self._overtaking_obj = True
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
@@ -445,7 +445,7 @@ class BehaviorAgent(BasicAgent):
         elif self._overtaking or self._overtaking_obj: # new
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied(ego_vehicle_loc, 15, check_behind=True):
+                if not self._other_lane_occupied(ego_vehicle_loc, 5, check_behind=True): # new: 15 al posto di 5
                     print("RIENTRO")
                     if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                         self._ending_overtake = True
@@ -475,7 +475,7 @@ class BehaviorAgent(BasicAgent):
                         new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th= 90, up_angle_th=180, lane_offset=-1) # new
                         if not new_vehicle_state and not new_vehicle_state2:
                             if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
-                                if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 2 al posto di 1.5
+                                if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # new: 2 al posto di 1.5
                                     self._overtaking = True
                                     target_speed = max([self._behavior.max_speed, self._speed_limit])
                                     self._local_planner.set_speed(target_speed)
