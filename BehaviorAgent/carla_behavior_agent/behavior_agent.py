@@ -471,7 +471,7 @@ class BehaviorAgent(BasicAgent):
                     if self._is_slow(vehicle):
                         vehicle_list = self._world.get_actors().filter("*vehicle*") # new
                         def dist(v, w):return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x # new
-                        vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < distance and v.id != self._vehicle.id] # new
+                        vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id] # new
                         new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=180, lane_offset=-1) # new
                         new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th= 90, up_angle_th=180, lane_offset=-1) # new
                         if not new_vehicle_state and not new_vehicle_state2:
