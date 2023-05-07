@@ -269,6 +269,8 @@ class BasicAgent(object):
         and the other 3 fine tune the maneuver
         """
         speed = self._vehicle.get_velocity().length()
+        if speed < 3:
+            speed = 3
         path = self._generate_lane_change_path(
             self._map.get_waypoint(self._vehicle.get_location()),
             direction,
