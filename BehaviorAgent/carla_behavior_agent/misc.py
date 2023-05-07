@@ -146,8 +146,28 @@ def compute_magnitude_angle(target_location, current_location, orientation):
     return (norm_target, d_angle)
 
 
-def time_to_collision(vehicle_transform, target_transform):
-    pass
+def time_to_collision(ego_vehicle_waypoint, current_location, vehicle, target_waypoint, target, waypoint_list):
+    vehicle_transform = vehicle.get_transform()
+    target_transform = target.get_transform()
+    
+    ego_dir = ego_vehicle_waypoint.transform.get_forward_vector()
+    tar_dir = target_waypoint.get_forward_vector()
+
+    dot_prod_ego_tar = ego_dir.x * tar_dir.x + ego_dir.y * tar_dir.y + ego_dir.z * tar_dir.z
+
+    if dot_prod_ego_tar < 0:
+        return -1
+    
+    tar_speed = get_speed(target)
+    hyp = distance_vehicle(ego_vehicle_waypoint, target_transform)
+
+    norm_target, d_angle = compute_magnitude_angle(target.get_location(), current_location, target_transform.rotation.yaw)
+
+    if d_angle > 180:
+        return -1
+    
+
+
 
 
 def distance_vehicle(waypoint, vehicle_transform):

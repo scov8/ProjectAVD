@@ -218,8 +218,7 @@ class BehaviorAgent(BasicAgent):
         """
 
         walker_list = self._world.get_actors().filter("*walker.pedestrian*")
-        def dist(w): return w.get_location().distance(
-            waypoint.transform.location)
+        def dist(w): return w.get_location().distance(waypoint.transform.location)
         walker_list = [w for w in walker_list if dist(w) < 10]
         walker_list.sort(key=dist)
 

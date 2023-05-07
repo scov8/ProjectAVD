@@ -393,7 +393,8 @@ class BasicAgent(object):
 
             if dot_ve_wp < 0: continue
 
-            if trigger_wp == self._stops_map[self._last_stop_sign.id]: continue
+            if self._last_stop_sign is not None:
+                if trigger_wp == self._stops_map[self._last_stop_sign.id]: continue
 
             if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]): # valutazione sulla distanza
                 self._last_stop_sign = stop_sing
