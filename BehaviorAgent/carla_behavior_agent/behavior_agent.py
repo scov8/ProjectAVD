@@ -417,7 +417,7 @@ class BehaviorAgent(BasicAgent):
                                 self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
                                 return control
-                pass
+                #pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking_obj:
                 return self.emergency_stop()
             elif distance < 13 and self._speed > 0.01 and not self._overtaking_obj:
