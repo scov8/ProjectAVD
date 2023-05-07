@@ -318,7 +318,7 @@ class BehaviorAgent(BasicAgent):
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.)
 
-        print("distance: ", distance, "Velocità ego: ", self._speed,"Velocità veicolo davanti: ", vehicle_speed)
+        print("VEICOLO DAVANTI. Distance: ", distance, "Velocità ego: ", self._speed,"Velocità veicolo davanti: ", vehicle_speed)
         if self._behavior.safety_time > ttc > 0.0:
             target_speed = min([
                 positive(vehicle_speed - self._behavior.speed_decrease), self._behavior.max_speed,
@@ -412,6 +412,7 @@ class BehaviorAgent(BasicAgent):
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
                         if not self._other_lane_occupied(ego_vehicle_loc, distance=70):
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                                print("cambio corsia a sinistra per ostacolo")
                                 self._overtaking_obj = True
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
                                 self._local_planner.set_speed(target_speed)
