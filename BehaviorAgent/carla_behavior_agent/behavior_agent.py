@@ -442,7 +442,7 @@ class BehaviorAgent(BasicAgent):
                 pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking_obj:
                 return self.emergency_stop()
-            elif distance < 10 and self._speed > 0.01 and not self._overtaking_obj:
+            elif distance < 13 and self._speed > 0.01 and not self._overtaking_obj:
                 return self.soft_stop()
             elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
                 return self.no_throttle()
