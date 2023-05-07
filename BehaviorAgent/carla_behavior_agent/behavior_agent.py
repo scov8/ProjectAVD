@@ -54,6 +54,7 @@ class BehaviorAgent(BasicAgent):
         self._sampling_resolution = 4.5
         self._prev_direction = RoadOption.LANEFOLLOW
         self._overtaking = False
+        self._overtaking_obj = False
         self._ending_overtake = False
         self._destination_waypoint = None
         self._restringimento = False
@@ -94,9 +95,14 @@ class BehaviorAgent(BasicAgent):
         if self._destination_waypoint is None:
             if not self._overtaking:
                 self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
+            if not self._overtaking_obj:
+                self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
 
     def _other_lane_occupied(self, ego_loc, distance, check_behind=False):
-        vehicle_list = self._world.get_actors().filter("*vehicle*")
+        if self._overtaking_obj: # new
+            vehicle_list = self._world.get_actors().filter("*static*") # new
+        else: # new
+            vehicle_list = self._world.get_actors().filter("*vehicle*")
         def dist(v, w):return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < distance and v.id != self._vehicle.id]
 
@@ -425,20 +431,20 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
             if self._speed < 0.01:
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
-                    if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
-                        if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
+                    if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
+                        if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking_obj:
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
-                                self._overtaking = True
+                                self._overtaking_obj = True
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
                                 self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
                                 return control
                 pass
-            elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking:
+            elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking_obj:
                 return self.emergency_stop()
-            elif distance < 15 and self._speed > 0.01 and not self._overtaking:
+            elif distance < 15 and self._speed > 0.01 and not self._overtaking_obj:
                 return self.soft_stop()
-            elif distance < 30 and self._speed > 0.01 and not self._overtaking:
+            elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
                 return self.no_throttle()
 
         # 2.2.1: overtake behavior
@@ -447,6 +453,7 @@ class BehaviorAgent(BasicAgent):
             if not self._local_planner.has_incoming_waypoint():
                 self._ending_overtake = False
                 self._overtaking = False
+                self._overtaking_obj = False # new
                 route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
                 self._local_planner.set_global_plan(route_trace, True)
                 print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
@@ -454,7 +461,7 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
             return control
-        elif self._overtaking:
+        elif self._overtaking or self._overtaking_obj: # new
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
                 if not self._other_lane_occupied(ego_vehicle_loc, 15, check_behind=True):
