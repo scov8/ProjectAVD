@@ -410,7 +410,7 @@ class BehaviorAgent(BasicAgent):
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
                         if not self._other_lane_occupied(ego_vehicle_loc, distance=70):
-                            if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # new: 2 al posto di 1.5
+                            if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 print("cambio corsia a sinistra per ostacolo")
                                 self._overtaking_obj = True
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
@@ -447,7 +447,7 @@ class BehaviorAgent(BasicAgent):
             if not self._local_planner.has_incoming_waypoint():
                 if not self._other_lane_occupied(ego_vehicle_loc, 15, check_behind=True):
                     print("RIENTRO")
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # new: 2 al posto di 1.5
+                    if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                         self._ending_overtake = True
                 else:
                     self.lane_change("left", self._vehicle_heading, 1, 0, 0)
