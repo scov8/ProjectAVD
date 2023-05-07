@@ -373,7 +373,7 @@ class BehaviorAgent(BasicAgent):
             invasion_state, offset_invasion = self._lane_invasion(self._vehicle, vehicle_invasion, ego_vehicle_loc)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.3, 2) #con -2 va  ma struscia, con 3 fa inverisone
+                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2, 2) #con -2 va  ma struscia, con 3 fa inverisone
                 #self._local_planner.set_lat_offset(offset_invasion) # mio
                 self._restringimento = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
@@ -452,7 +452,7 @@ class BehaviorAgent(BasicAgent):
                 #else:
                 #    self.lane_change("left", self._vehicle_heading, 1, 0, 0)
 
-            target_speed = max([self._behavior.max_speed, self._speed_limit]) # new era min
+            target_speed = min([self._behavior.max_speed, self._speed_limit])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
             return control
