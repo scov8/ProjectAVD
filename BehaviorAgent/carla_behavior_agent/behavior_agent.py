@@ -447,12 +447,12 @@ class BehaviorAgent(BasicAgent):
             if not self._local_planner.has_incoming_waypoint():
                 if not self._other_lane_occupied(ego_vehicle_loc, 15, check_behind=True):
                     print("RIENTRO")
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1):
+                    if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                         self._ending_overtake = True
                 else:
                     self.lane_change("left", self._vehicle_heading, 1, 0, 0)
 
-            target_speed = max([self._behavior.max_speed, self._speed_limit])
+            target_speed = min([self._behavior.max_speed, self._speed_limit])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
             return control
@@ -475,7 +475,7 @@ class BehaviorAgent(BasicAgent):
                         new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th= 90, up_angle_th=180, lane_offset=-1) # new
                         if not new_vehicle_state and not new_vehicle_state2:
                             if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
-                                if self.lane_change("left", self._vehicle_heading, 0, 2, 1):
+                                if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                     self._overtaking = True
                                     target_speed = max([self._behavior.max_speed, self._speed_limit])
                                     self._local_planner.set_speed(target_speed)
