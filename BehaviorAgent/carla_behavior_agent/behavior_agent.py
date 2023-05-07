@@ -414,15 +414,18 @@ class BehaviorAgent(BasicAgent):
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 self._overtaking_obj = True
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
-                                self._local_planner.set_speed(70)
+                                self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
                                 return control
                 #pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking_obj:
+                print("sto frenando per ostacolo: EMERGENCY STOP")
                 return self.emergency_stop()
             elif distance < 13 and self._speed > 0.01 and not self._overtaking_obj:
+                print("sto frenando per ostacolo: SOFT STOP")
                 return self.soft_stop()
             elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
+                print("sto frenando per ostacolo: NO THROTTLE")
                 return self.no_throttle()
 
         # 2.2.1: overtake behavior
