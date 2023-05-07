@@ -397,7 +397,7 @@ class BehaviorAgent(BasicAgent):
                 return control
         elif self._restringimento:
             print('LANE INVASION: FALSE')
-            self._local_planner.set_lat_offset(0.0) # mio
+            self._local_planner.set_lat_offset(0.0)
             route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
             self._local_planner.set_global_plan(route_trace,  clean_queue=True)
             self._restringimento = False
@@ -405,7 +405,6 @@ class BehaviorAgent(BasicAgent):
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)  # lo considero fermandomi
 
-        # definisco se esiste un pednone che impatta con il veiolo
         if walker_state:
             # Distance is computed from the center of the two cars,
             # we use bounding boxes to calculate the actual distance
@@ -425,7 +424,7 @@ class BehaviorAgent(BasicAgent):
 
             # Emergency brake if the car is very close.
             if self._speed < 0.01:
-                '''if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
+                if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
                         if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
@@ -433,7 +432,7 @@ class BehaviorAgent(BasicAgent):
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
                                 self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
-                                return control'''
+                                return control
                 pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking:
                 return self.emergency_stop()
