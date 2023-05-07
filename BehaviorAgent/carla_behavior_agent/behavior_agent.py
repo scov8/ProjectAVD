@@ -376,7 +376,7 @@ class BehaviorAgent(BasicAgent):
                 self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2, 2) #con -2 va  ma struscia, con 3 fa inverisone
                 #self._local_planner.set_lat_offset(offset_invasion) # mio
                 self._restringimento = True
-                target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3.5)
+                target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
                 self._local_planner.set_speed(target_speed)
                 control = self._local_planner.run_step(debug=debug)
                 return control
@@ -469,13 +469,19 @@ class BehaviorAgent(BasicAgent):
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
-                        if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
-                            if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
-                                self._overtaking = True
-                                target_speed = max([self._behavior.max_speed, self._speed_limit])
-                                self._local_planner.set_speed(target_speed)
-                                control = self._local_planner.run_step(debug=debug)
-                                return control
+                        vehicle_list = self._world.get_actors().filter("*vehicle*")
+                        def dist(v, w):return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
+                        vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < distance and v.id != self._vehicle.id]
+                        new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=-1)
+                        new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=40, lane_offset=-1)
+                        if not new_vehicle_state and not new_vehicle_state2:
+                            if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking:
+                                if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                                    self._overtaking = True
+                                    target_speed = max([self._behavior.max_speed, self._speed_limit])
+                                    self._local_planner.set_speed(target_speed)
+                                    control = self._local_planner.run_step(debug=debug)
+                                    return control
 
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance:
