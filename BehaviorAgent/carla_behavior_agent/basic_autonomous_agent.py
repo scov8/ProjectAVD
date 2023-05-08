@@ -98,10 +98,10 @@ class MyTeamAgent(AutonomousAgent):
             return carla.VehicleControl()
 
         else:
-            vehicle_list = CarlaDataProvider.get_world().get_actors().filter("*vehicle*")
-            for actor in vehicle_list:
-                if not('role_name' in actor.attributes and actor.attributes['role_name'] == 'hero'):
-                    actor.destroy()
+            # vehicle_list = CarlaDataProvider.get_world().get_actors().filter("*vehicle*")
+            # for actor in vehicle_list:
+            #   if not('role_name' in actor.attributes and actor.attributes['role_name'] == 'hero'):
+            #         actor.destroy()
             controls = self._agent.run_step()
             if self.__show:
                 self.showServer.send_frame("RGB", input_data["Center"][1])

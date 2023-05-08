@@ -1,0 +1,36 @@
+vehicle_type vehicle.ford.mustang |||||| data: Transform(Location(x=248.953659, y=3836.157715, z=363.872070), Rotation(pitch=-0.819670, yaw=-89.557915, roll=-0.006836))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=248.921478, y=3850.820312, z=364.081207), Rotation(pitch=-0.754668, yaw=-89.986061, roll=-0.002747))
+
+vehicle_type vehicle.ford.mustang |||||| data: Transform(Location(x=248.971954, y=3833.568359, z=363.839294), Rotation(pitch=-0.692048, yaw=-89.636963, roll=-0.003784))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=248.922958, y=3848.214355, z=364.041473), Rotation(pitch=-0.952907, yaw=-89.899658, roll=-0.001465))
+
+vehicle_type vehicle.ford.mustang |||||| data: Transform(Location(x=248.972488, y=3833.456543, z=363.837830), Rotation(pitch=-0.685976, yaw=-89.649170, roll=-0.003113))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=248.922958, y=3848.214355, z=364.041290), Rotation(pitch=-0.945681, yaw=-89.899658, roll=-0.000519))
+
+vehicle_type vehicle.mercedes.coupe_2020 |||||| data: Transform(Location(x=-70.271172, y=3515.259521, z=364.390625), Rotation(pitch=0.086921, yaw=-90.608803, roll=0.008071))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.349686, y=3530.028076, z=364.234039), Rotation(pitch=0.696324, yaw=-90.062462, roll=0.000032))
+
+vehicle_type vehicle.mercedes.coupe_2020 |||||| data: Transform(Location(x=-70.275932, y=3511.849365, z=364.423950), Rotation(pitch=0.333819, yaw=-90.236328, roll=-0.000793))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.351875, y=3526.420166, z=364.274841), Rotation(pitch=0.585771, yaw=-90.300896, roll=-0.002777))
+
+vehicle_type vehicle.mercedes.coupe_2020 |||||| data: Transform(Location(x=-70.275932, y=3511.823975, z=364.424286), Rotation(pitch=0.427180, yaw=-90.220627, roll=-0.001434))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.351799, y=3526.420166, z=364.274597), Rotation(pitch=0.594103, yaw=-90.300873, roll=-0.003174))
+
+vehicle_type vehicle.mercedes.coupe_2020 |||||| data: Transform(Location(x=-70.275932, y=3511.788086, z=364.424744), Rotation(pitch=0.501254, yaw=-90.208984, roll=-0.000610))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.351799, y=3526.419189, z=364.274536), Rotation(pitch=0.603700, yaw=-90.306915, roll=-0.002960))
+
+vehicle_type vehicle.mercedes.coupe_2020 |||||| data: Transform(Location(x=-70.275932, y=3511.743164, z=364.425232), Rotation(pitch=0.552986, yaw=-90.194084, roll=0.000000))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.351799, y=3526.418457, z=364.274536), Rotation(pitch=0.612702, yaw=-90.302307, roll=-0.003510))
+
+vehicle_type vehicle.mercedes.coupe_2020 |||||| data: Transform(Location(x=-70.275856, y=3511.690430, z=364.425842), Rotation(pitch=0.587956, yaw=-90.183289, roll=-0.000488))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.351875, y=3526.416748, z=364.274475), Rotation(pitch=0.621267, yaw=-90.298645, roll=-0.002930))
+
+vehicle_type vehicle.mercedes.coupe_2020 |||||| data: Transform(Location(x=-70.277031, y=3504.141846, z=364.497986), Rotation(pitch=0.177708, yaw=-90.038689, roll=-0.000305))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.366013, y=3518.803711, z=364.352051), Rotation(pitch=1.053878, yaw=-90.060333, roll=-0.002625))
+
+vehicle_type vehicle.mercedes.coupe_2020 |||||| data: Transform(Location(x=-70.100388, y=3499.739990, z=364.541077), Rotation(pitch=0.763847, yaw=-85.543488, roll=0.011924))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.374611, y=3514.394531, z=364.396545), Rotation(pitch=0.499430, yaw=-89.666130, roll=0.004936))
+
+vehicle_type vehicle.chevrolet.impala |||||| data: Transform(Location(x=-76.134842, y=3492.280518, z=364.743347), Rotation(pitch=-1.638180, yaw=-0.011414, roll=0.063323))
+ego: vehicle.lincoln.mkz_2020 |||||| data: Transform(Location(x=-70.665466, y=3494.658936, z=364.600616), Rotation(pitch=0.149690, yaw=-93.469696, roll=1.126717))
+

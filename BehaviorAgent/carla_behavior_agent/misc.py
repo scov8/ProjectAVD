@@ -233,7 +233,7 @@ def get_location_in_distance_from_wp(waypoint, distance, stop_at_junction=True):
         Tuple containing the location at the desired distance along the waypoint, and the traveled distance.
     """
     traveled_distance = 0
-    while not (waypoint.is_intersection and stop_at_junction) and traveled_distance < distance:
+    while not (waypoint.is_junction and stop_at_junction) and traveled_distance < distance:
         wp_next = waypoint.next(1.0)
         if wp_next:
             waypoint_new = wp_next[-1]

@@ -1,0 +1,4 @@
+right_vector: 	(x=1.000000,  y=-0.000759, z=0.0000028)
+forward_vector:	(x=-0.000758, y=-0.999854, z=-0.017090)
+
+bounding_box: 	(Location(x=-0.006378, y=0.000005, z=0.748827), Extent(x=2.446191, y=0.918357, z=0.745139), Rotation(pitch=0, yaw=0, roll=0))

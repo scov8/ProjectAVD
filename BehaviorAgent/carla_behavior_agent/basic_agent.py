@@ -361,8 +361,8 @@ class BasicAgent(object):
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
         if self._last_stop_sign:
-            l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(check_lane='left')
-            r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(check_lane='right')
+            l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='left')
+            r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='right')
             
             if not l_vehicle_state and not r_vehicle_state:
                 self._last_stop_sign = None
@@ -467,7 +467,7 @@ class BasicAgent(object):
                 # cotruisco un poligono sulla mia posizione
                 route_bb = [] # creo una lista vuota, dove ci saranno i miei punti estremi e poi creo il poligono
                 ego_location = ego_transform.location
-                extent_y = self._vehicle.bounding_box.extent.y
+                extent_y = self._vehicle.bounding_box.extent.y # metà della distanza ruota destra ruota sinistra totale del veicolo
                 r_vec = ego_transform.get_right_vector()
                 p1 = ego_location + carla.Location(extent_y * r_vec.x, extent_y * r_vec.y)
                 p2 = ego_location + carla.Location(-extent_y * r_vec.x, -extent_y * r_vec.y)
