@@ -238,7 +238,6 @@ class BehaviorAgent(BasicAgent):
         vehicle_list = [v for v in vehicle_list if dist(
             v) < 45 and v.id != self._vehicle.id]
         vehicle_list.sort(key=dist)
-        print("VEHICLE LIST: " + str(vehicle_list))
 
         if self._direction == RoadOption.CHANGELANELEFT:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(

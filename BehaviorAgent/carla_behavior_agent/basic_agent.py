@@ -591,12 +591,13 @@ class BasicAgent(object):
             y=ego_extent * ego_forward_vector.y,
         )
 
+        print("Ego wpt: ", ego_wpt.lane_id)
         for target_vehicle in vehicle_list:
             target_transform = target_vehicle.get_transform()
             target_wpt = self._map.get_waypoint(
                 target_transform.location, lane_type=carla.LaneType.Any)
             if not ego_wpt.is_junction or not target_wpt.is_junction:
-                if target_wpt.road_id != ego_wpt.road_id or target_wpt.lane_id != ego_wpt.lane_id + lane_offset or 1:
+                if target_wpt.road_id != ego_wpt.road_id or target_wpt.lane_id != ego_wpt.lane_id + lane_offset or target_wpt.lane_id != 2:
                     next_wpt = self._local_planner.get_incoming_waypoint_and_direction(steps=3)[
                         0]
                     if not next_wpt:
