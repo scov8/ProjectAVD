@@ -598,7 +598,7 @@ class BasicAgent(object):
                 target_transform.location, lane_type=carla.LaneType.Any)
             print("Target wpt: ", target_wpt.lane_id)
             if not ego_wpt.is_junction or not target_wpt.is_junction:
-                if target_wpt.road_id != ego_wpt.road_id or target_wpt.lane_id != ego_wpt.lane_id + lane_offset or target_wpt.lane_id != ego_wpt.lane_id + 1:
+                if target_wpt.road_id != ego_wpt.road_id or target_wpt.lane_id != ego_wpt.lane_id + lane_offset:
                     next_wpt = self._local_planner.get_incoming_waypoint_and_direction(steps=3)[
                         0]
                     if not next_wpt:
