@@ -396,7 +396,7 @@ class BehaviorAgent(BasicAgent):
         # vede se esiste in un certo range un semaforo e vede se è rosso,si ferma e si salva che è rosso al semaforo.
         if self.traffic_light_manager():
             return self.emergency_stop()  # se è rosso si ferma
-
+        """
         # 2.3: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(
             ego_vehicle_loc, distance=70)
@@ -420,7 +420,7 @@ class BehaviorAgent(BasicAgent):
                 ego_vehicle_wp, self._destination_waypoint)
             self._local_planner.set_global_plan(route_trace,  clean_queue=True)
             self._restringimento = False
-
+        """
         # 2.1: Pedestrian avoidance behaviors
         walker_state, walker, w_distance = self.pedestrian_avoid_manager(
             ego_vehicle_wp)  # lo considero fermandomi
