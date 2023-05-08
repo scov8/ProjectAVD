@@ -603,7 +603,7 @@ class BasicAgent(object):
                         0]
                     if not next_wpt:
                         continue
-                    if target_wpt.road_id != next_wpt.road_id or target_wpt.lane_id != next_wpt.lane_id + lane_offset:
+                    if target_wpt.road_id != next_wpt.road_id or target_wpt.lane_id != next_wpt.lane_id + lane_offset or lane_offset == 0 and target_wpt.lane_id != next_wpt.lane_id + 1:
                         continue
 
                 target_forward_vector = target_transform.get_forward_vector()
