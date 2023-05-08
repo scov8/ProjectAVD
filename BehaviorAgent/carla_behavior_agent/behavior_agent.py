@@ -110,13 +110,12 @@ class BehaviorAgent(BasicAgent):
         vehicle_list = [v for v in vehicle_list if dist(
             v, self._vehicle) < distance and v.id != self._vehicle.id]
 
-        for v in vehicle_list:
-            print(dist(v, self._vehicle))
         if check_behind is False:
             vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(
                 vehicle_list, distance, up_angle_th=90)
             if vehicle_state:
-                print("OTHER LANE OCCUPATA DA: " + str(vehicle))
+                print("OTHER LANE OCCUPATA DA: ", str(vehicle),
+                      "CON DISTANZA: ", dist(vehicle, self._vehicle))
                 return True
             return False
         else:
