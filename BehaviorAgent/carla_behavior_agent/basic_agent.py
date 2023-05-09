@@ -639,7 +639,7 @@ class BasicAgent(object):
             if check_overtake_list and self._near_vehicle_list[0][1].type_id not in self._overtake_list:
                 return (False, None, -1)
             return self._near_vehicle_list[0]
-        elif lane_offset == 0 and for_vehicle == True:
+        elif lane_offset == 0:
             return self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1, check_overtake_list=True)
 
         return (False, None, -1)
