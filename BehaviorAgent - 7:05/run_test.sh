@@ -1,22 +1,24 @@
 #!/bin/bash
-#qdtrack_ training.xml
-# export ROUTES=${LEADERBOARD_ROOT}/data/routes_controlling.xml
-export ROUTES=/workspace/team_code/route_controlling.xml
+export ROUTES=/workspace/team_code/routes_avddiem_exam.xml
+#export ROUTES=/workspace/team_code/routes_1.xml
 export REPETITIONS=1
 export DEBUG_CHALLENGE=1
-export TEAM_AGENT=/workspace/team_code/carla_basic_agent/basic_autonomous_agent.py
-export TEAM_CONFIG=/workspace/team_code/carla_basic_agent/config_agent_basic.json
-export CHECKPOINT_ENDPOINT=${LEADERBOARD_ROOT}/results.json
+export TEAM_AGENT=/workspace/team_code/carla_behavior_agent/basic_autonomous_agent.py
+export TEAM_CONFIG=/workspace/team_code/carla_behavior_agent/config_agent_basic.json
 export CHALLENGE_TRACK_CODENAME=SENSORS
-export CARLA_HOST=127.0.0.1
-export CARLA_PORT=6000
+#export CARLA_HOST=193.205.163.183
+#export CARLA_PORT=6054
+#export CARLA_TRAFFIC_MANAGER_PORT=6056
+#export CARLA_HOST=127.0.0.1
+#export CARLA_PORT=6000
+#export CARLA_TRAFFIC_MANAGER_PORT=8000
+export CARLA_HOST=0.0.0.0
+export CARLA_PORT=2000
 export CARLA_TRAFFIC_MANAGER_PORT=8000
 export CHECKPOINT_ENDPOINT=/workspace/team_code/results/simulation_results.json
 export DEBUG_CHECKPOINT_ENDPOINT=/workspace/team_code/results/live_results.txt
 export RESUME=0
 export TIMEOUT=60
-# 193.205.163.183
-# 193.205.163.17
 
 python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --routes=${ROUTES} \
@@ -33,4 +35,4 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --host=${CARLA_HOST} \
 --port=${CARLA_PORT} \
 --timeout=${TIMEOUT} \
---traffic-manager-port=${CARLA_TRAFFIC_MANAGER_PORT} 
+--traffic-manager-port=${CARLA_TRAFFIC_MANAGER_PORT}

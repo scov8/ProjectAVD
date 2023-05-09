@@ -10,7 +10,7 @@ This module provides an NPC agent to control the ego vehicle
 from __future__ import print_function
 
 import carla
-from basic_agent import BasicAgent
+from behavior_agent import BehaviorAgent
 from srunner.scenariomanager.carla_data_provider import CarlaDataProvider
 import importlib
 
@@ -34,7 +34,6 @@ class MyTeamAgent(AutonomousAgent):
     def setup(self, path_to_conf_file):
         """
         Setup the agent parameters
-        fase di caricamento delle impostazioni
         """
         self.track = Track.SENSORS
 
@@ -67,56 +66,47 @@ class MyTeamAgent(AutonomousAgent):
         ]
         """
         return self.configs["sensors"]
+    
+    def set_global_plan(self, global_plan_gps, global_plan_world_coord):
+        """
+        Set the plan (route) for the agent
+        """
+        self._global_plan_world_coord = global_plan_world_coord
+        self._global_plan = global_plan_gps
 
     def run_step(self, input_data, timestamp):
         """
         Execute one step of navigation. 
         """
         if not self._agent:
-            """inizializzo per la prima volta l'agente"""
+            
             # Search for the ego actor
             hero_actor = None
-            for actor in CarlaDataProvider.get_world().get_actors(): # prendo tutti i veicoli e cerco quello che ha il ruolo di hero (cioè quello che devo controllare)
+            for actor in CarlaDataProvider.get_world().get_actors():
                 if 'role_name' in actor.attributes and actor.attributes['role_name'] == 'hero':
-                    hero_actor = actor # scegliamo il primo che trova, cioè quello che devo controllare
+                    hero_actor = actor
 
             if not hero_actor:
                 return carla.VehicleControl()
             
-            self._agent = BasicAgent(hero_actor, opt_dict=self.configs)
+            self._agent = BehaviorAgent(hero_actor, opt_dict=self.configs)
 
-            plan = []
-            prev_wp = None
-            for transform, _ in self._global_plan_world_coord: # per ottenere il percorso da seguire, prendo i waypoint e li converto in trasformazioni
-                wp = CarlaDataProvider.get_map().get_waypoint(transform.location) # in partcolare qst fnc sceglie il percorso da seguire
-                if prev_wp:
-                    plan.extend(self._agent.trace_route(prev_wp, wp)) # aggiungo i waypoint al percorso, e poi plan viene dato all'agente
-                prev_wp = wp
+            plan = [(CarlaDataProvider.get_map().get_waypoint(x[0].location),x[1]) for x in self._global_plan_world_coord]
 
             self._agent.set_global_plan(plan)
 
             return carla.VehicleControl()
 
         else:
-            # questa seconda parte viene eseguita ad ogni step e contiene due ooperazioni importanti, cancella i veicoli che non sono il mio e invia i comandi di controllo
-            # Release other vehicles 
-            vehicle_list = CarlaDataProvider.get_world().get_actors().filter("*vehicle*")
-            for actor in vehicle_list:  # nel for elimino tutti i veicoli che non sono il mio
-                if not('role_name' in actor.attributes and actor.attributes['role_name'] == 'hero'):
-                    actor.destroy()
-            
-            # questa seconda operazione: leggento tutti le informazioni del veicolo viene generato il controllo da attuare
-            controls = self._agent.run_step() # controllo da attuare, che poi passa al server per poterlo attuare
-            # questo blocco di codice serve per mostrare la cam della macchina e il percorso che deve seguire oltre i comandi di controllo
-            if self.__show: # vediamo la cam della macchina e il percorso che deve seguire oltre i comandi di controllo
+            controls = self._agent.run_step()
+            if self.__show:
                 self.showServer.send_frame("RGB", input_data["Center"][1])
                 self.showServer.send_data("Controls",{ 
                 "steer":controls.steer, 
                 "throttle":controls.throttle, 
                 "brake": controls.brake,
                 })
-            # ci salviamo i dati di velocità che ci sever per avere la percezione della velocità e poter effettuare il plot con il file utils.py
-            if len(self.configs["SaveSpeedData"]) > 0: # salva i dati di velocità
+            if len(self.configs["SaveSpeedData"]) > 0:
                 with open("team_code/"+self.configs["SaveSpeedData"],"a") as fp:
                     fp.write(str(timestamp)+";"+str(input_data["Speed"][1]["speed"] * 3.6)+";"+str(self.configs["target_speed"])+"\n")
                     fp.close()

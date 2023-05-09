@@ -39,6 +39,10 @@ def get_speed(vehicle):
 
     return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
 
+def get_steering(vehicle):
+    vel = vehicle.get_angular_velocity()
+    return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
+
 def get_trafficlight_trigger_location(traffic_light):
     """
     Calculates the yaw of the waypoint that represents the trigger volume of the traffic light
@@ -79,26 +83,28 @@ def is_within_distance(target_transform, reference_transform, max_distance, angl
         target_transform.location.x - reference_transform.location.x,
         target_transform.location.y - reference_transform.location.y
     ])
-    norm_target = np.linalg.norm(target_vector)
+    norm_target = np.linalg.norm(target_vector) # calcolo la norma del vettore e mi da la distanza tra i due veicoli
 
     # If the vector is too short, we can simply stop here
     if norm_target < 0.001:
         return True
 
-    # Further than the max distance
-    if norm_target > max_distance:
+    # Further than the max distance -  lo ignoro semplicemente
+    if norm_target > max_distance: 
         return False
 
     # We don't care about the angle, nothing else to check
-    if not angle_interval:
+    if not angle_interval: # se non valuto gli angoli sto sempre in collisione
         return True
 
     min_angle = angle_interval[0]
     max_angle = angle_interval[1]
 
-    fwd = reference_transform.get_forward_vector()
-    forward_vector = np.array([fwd.x, fwd.y])
-    angle = math.degrees(math.acos(np.clip(np.dot(forward_vector, target_vector) / norm_target, -1., 1.)))
+    fwd = reference_transform.get_forward_vector() # transformo per numpy array
+    forward_vector = np.array([fwd.x, fwd.y]) # vettore direzione veicolo
+    angle = math.degrees(math.acos(np.clip(np.dot(forward_vector, target_vector) / norm_target, -1., 1.))) # prendo il coseno tra i due vettori 
+
+    # ho l'angolo tra i 2 veicoli e la loro distanza  
 
     return min_angle < angle < max_angle
 

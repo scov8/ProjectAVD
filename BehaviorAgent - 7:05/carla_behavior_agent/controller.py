@@ -151,18 +151,17 @@ class PIDLongitudinalController():
             :return: throttle/brake control
         """
 
-        error = target_speed - current_speed # calcolo l'errore
-        self._error_buffer.append(error) # mi salvo l'errore nel buffer xke devo salvarmi l'integrale dell'errore, consideriamo gli ultimi 10 errori
+        error = target_speed - current_speed
+        self._error_buffer.append(error)
 
         if len(self._error_buffer) >= 2:
-            _de = (self._error_buffer[-1] - self._error_buffer[-2]) / self._dt # calcolo la derivata dell'errore (raporto incrementale degli ultimi 2)
-            _ie = sum(self._error_buffer) * self._dt # calcolo l'integrale dell'errore
+            _de = (self._error_buffer[-1] - self._error_buffer[-2]) / self._dt
+            _ie = sum(self._error_buffer) * self._dt
         else:
             _de = 0.0
             _ie = 0.0
-        
-        # legge del controllo del PID
-        return np.clip((self._k_p * error) + (self._k_d * _de) + (self._k_i * _ie), -1.0, 1.0) # si usa il clip per non andare oltre i limiti
+
+        return np.clip((self._k_p * error) + (self._k_d * _de) + (self._k_i * _ie), -1.0, 1.0)
 
     def change_parameters(self, K_P, K_I, K_D, dt):
         """Changes the PID parameters"""
@@ -237,7 +236,6 @@ class StanleyLateralController():
             :return: steering control in the range [-1, 1]
         """
         # Get ego vehicle observations
-        # in questo primo blocco vediamo le osservazioni che abbiamo del nostro veicolo (posizione, velocità, rotazione)
         ego_loc = vehicle_transform.location
         speed_estimate = get_speed(self._vehicle)
         observed_heading = np.deg2rad(vehicle_transform.rotation.yaw)
@@ -245,15 +243,11 @@ class StanleyLateralController():
         observed_y = ego_loc.y
         
         # Get Target Waypoint
-        #prendo il punto più vicino alla mia posizione e poi vado avanti fino a quando non trovo un punto che mi da la distanza che voglio, ed è un indice che mi dice dove andare
-        ce_idx = self._get_lookahead_index(ego_loc,self._lookahead_distance) # ottengo l'indice del punto più vicino alla mia posizione, una volta trovato questo punto, vado avanti 
-                                                                             # fino a quando non trovo un punto che mi da la distanza che voglio, ed è un indice che mi dice dove andare
+        ce_idx = self._get_lookahead_index(ego_loc,self._lookahead_distance)
         desired_x = self._wps[ce_idx][0].transform.location.x
         desired_y = self._wps[ce_idx][0].transform.location.y
         
         # Get Target Heading
-        # per la traiettoria che vogliamo seguire, dobbiamo sapere anche come arrivarci, per farlo dobbiamo calcolare la direzione del punto successivo 
-        # e poi fare la differenza tra il punto successivo e quello attuale. se sono all'ultimo punto, allora prendo il punto precedente e faccio la differenza
         if ce_idx < len(self._wps)-1:
             desired_heading_x = self._wps[ce_idx+1][0].transform.location.x - self._wps[ce_idx][0].transform.location.x
             desired_heading_y = self._wps[ce_idx+1][0].transform.location.y - self._wps[ce_idx][0].transform.location.y
@@ -261,7 +255,6 @@ class StanleyLateralController():
             desired_heading_x = self._wps[ce_idx][0].transform.location.x - self._wps[ce_idx-1][0].transform.location.x
             desired_heading_y = self._wps[ce_idx][0].transform.location.y - self._wps[ce_idx-1][0].transform.location.y
         
-        # ottenuto questo vettore calcolo la direzione e la distanza
         # Trajectory Heading
         desired_heading = atan2(desired_heading_y, desired_heading_x)
         
@@ -269,8 +262,6 @@ class StanleyLateralController():
         dd=hypot(desired_heading_x, desired_heading_y)
         
         # Crosstrack error
-        # calcolo l'errore tra la posizione attuale e la posizione che voglio raggiungere
-        # questa formula ci dice la distanza tra il punto attuale (più vicino)e la retta che passa per il punto che voglio raggiungere e la direzione che voglio prendere 
         lateral_error = \
               ((observed_x-desired_x)*desired_heading_y -
               (observed_y-desired_y)*desired_heading_x) / (dd + sys.float_info.epsilon)
@@ -288,7 +279,7 @@ class StanleyLateralController():
         
         # Stanley Control Law   
         steering += atan(self._kv * lateral_error /
-                               (self._ks + speed_estimate)) # questo è il controllo vero e proprio, dove si calcola la velocità di sterzata
+                               (self._ks + speed_estimate))
         
         # print("Current Heading: ", observed_heading, " - Desired Heading: ", desired_heading)
         # print("Heading error: ", steering_error, "Crosstrack error: ", lateral_error)
@@ -302,14 +293,11 @@ class StanleyLateralController():
         self._ks = Ks
         self._dt = dt
     
-    def setWaypoints(self, wps): # quello che succede è che il primo punto è sempre quello che hai già visto, quindi non serve
-        """Sets trajectory to follow and filters spurious points
-        la traiettoria deve essere una sequenza di punti, quindi una lista di liste di waypoint
-        """
+    def setWaypoints(self, wps):
+        """Sets trajectory to follow and filters spurious points"""
         self._wps = [wps[0]]
         for i in range(1, len(wps) - 1):
-            # sia per x che y, calcola al distanza tra il punto precedente e quello attuale e se è maggiore di 0.5 lo aggiunge, se è 0 lo scarta
-            trj_heading_x = wps[i][0].transform.location.x - self._wps[-1][0].transform.location.x 
+            trj_heading_x = wps[i][0].transform.location.x - self._wps[-1][0].transform.location.x
             trj_heading_y = wps[i][0].transform.location.y - self._wps[-1][0].transform.location.y
             
             dd = hypot(trj_heading_x, trj_heading_y)

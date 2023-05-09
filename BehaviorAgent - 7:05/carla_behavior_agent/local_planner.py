@@ -137,6 +137,9 @@ class LocalPlanner(object):
         self.target_waypoint, self.target_road_option = (current_waypoint, RoadOption.LANEFOLLOW)
         self._waypoints_queue.append((self.target_waypoint, self.target_road_option))
 
+    def set_lat_offset(self, offset):
+        self._vehicle_controller._lat_controller._offset = offset
+
     def set_speed(self, speed):
         """
         Changes the target speed
@@ -267,10 +270,16 @@ class LocalPlanner(object):
             self.target_waypoint, self.target_road_option = self._waypoints_queue[0]
             control = self._vehicle_controller.run_step(self._target_speed, self.target_waypoint)
 
-        #if debug:
-        #    draw_waypoints(self._vehicle.get_world(), [self.target_waypoint], 1.0)
+        if debug:
+            draw_waypoints(self._vehicle.get_world(), [self.target_waypoint], 1.0)
 
         return control
+
+    def has_incoming_waypoint(self):
+        """
+        Returns whether the list of waypoints has more than 1 element.
+        """
+        return len(self._waypoints_queue) > 1
 
     def get_incoming_waypoint_and_direction(self, steps=3):
         """
