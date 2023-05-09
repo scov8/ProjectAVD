@@ -370,6 +370,7 @@ class BasicAgent(object):
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
         if self._last_stop_sign:
+            print('-------- last_stop_sign if --------------')
             l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='left')
             r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='right')
             
