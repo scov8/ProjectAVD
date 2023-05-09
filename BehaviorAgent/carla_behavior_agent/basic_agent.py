@@ -679,6 +679,7 @@ class BasicAgent(object):
             self._near_vehicle_list = sorted(
                 self._near_vehicle_list, key=lambda t: t[2])
             print(self._near_vehicle_list[0])
+            print(self._near_vehicle_list[0][1].type_id)
             if overtake_police_and_bike and self._near_vehicle_list[0][1].type_id not in self._overtake_list:
                 return (False, None, -1)
             return self._near_vehicle_list[0]
