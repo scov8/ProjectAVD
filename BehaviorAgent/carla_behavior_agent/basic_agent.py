@@ -65,7 +65,7 @@ class BasicAgent(object):
         self._max_brake = 0.5
         self._offset = 0
         self._near_vehicle_list = []
-        self._overtake_list = ["vehicle.dodge_charger.police_2020"]
+        self._overtake_list = ["vehicle.dodge.charger_police_2020"]
 
         # Change parameters according to the dictionary
         if 'target_speed' in opt_dict:
