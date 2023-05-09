@@ -254,7 +254,9 @@ class BehaviorAgent(BasicAgent):
                 self._tailgating(waypoint, vehicle_list)
         print("vehicle_state: ", vehicle_state,
               "vehicle: ", vehicle, "distance: ", distance)
-        print("TYPE: ", vehicle.type)
+        print("TYPE: ", vehicle.type_id)
+        # GET VEHICLE TYPE
+
         return vehicle_state, vehicle, distance
 
     def pedestrian_avoid_manager(self, waypoint):
