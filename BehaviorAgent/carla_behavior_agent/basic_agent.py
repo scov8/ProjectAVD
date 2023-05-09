@@ -562,7 +562,7 @@ class BasicAgent(object):
                 self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135,  check_second_lane=True)
         return (False, None, -1)
 
-    def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0, for_vehicle=False):
+    def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0, for_vehicle=False, overtake_police_and_bike=False):
         """
         Method to check if there is a vehicle in front of the agent blocking its path.
 
@@ -680,7 +680,10 @@ class BasicAgent(object):
             return self._near_vehicle_list[0]
         elif lane_offset == 0 and for_vehicle == True:
             return self._vehicle_obstacle_detected(vehicle_list, max(
-                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
+                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1, overtake_police_and_bike=True)
+
+        if overtake_police_and_bike:
+            print("OVERTAKE POLICE AND BIKE")
 
         return (False, None, -1)
 
