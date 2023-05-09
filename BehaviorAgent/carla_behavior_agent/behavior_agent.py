@@ -253,7 +253,7 @@ class BehaviorAgent(BasicAgent):
 
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
                 self._tailgating(waypoint, vehicle_list)
-        if vehicle.id in self.blacklist:
+        if vehicle.id in self._blacklist:
             return False, None, None
         print("vehicle_state: ", vehicle_state,
               "vehicle: ", vehicle, "distance: ", distance)
