@@ -65,7 +65,7 @@ class BasicAgent(object):
         self._max_brake = 0.5
         self._offset = 0
         self._near_vehicle_list = []
-        self._overtake_list = ["vehicle.tesla.model3", "vehicle.audi.a2"]
+        self._overtake_list = ["vehicle.dodge_charger.police"]
 
         # Change parameters according to the dictionary
         if 'target_speed' in opt_dict:
@@ -679,8 +679,8 @@ class BasicAgent(object):
             self._near_vehicle_list = sorted(
                 self._near_vehicle_list, key=lambda t: t[2])
             print(self._near_vehicle_list[0])
-            # if overtake_police_and_bike and self._near_vehicle_list[0].type_id not in self._overtake_list:
-            #    return (False, None, -1)
+            if overtake_police_and_bike and self._near_vehicle_list[0][1].type_id not in self._overtake_list:
+                return (False, None, -1)
             return self._near_vehicle_list[0]
         elif lane_offset == 0 and for_vehicle == True:
             return self._vehicle_obstacle_detected(vehicle_list, max(
