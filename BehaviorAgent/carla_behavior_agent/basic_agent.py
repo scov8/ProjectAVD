@@ -476,7 +476,7 @@ class BasicAgent(object):
 
         return (False, None, -1)
 
-    def _vehicle_detected_other_lane(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, check_rear=False):
+    def _vehicle_detected_other_lane(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, check_rear=False, check_second_lane=False):
         """
         Controlla se ci sono veicoli nella corsia adiacente.
 
@@ -510,6 +510,9 @@ class BasicAgent(object):
 
         # ID della corsia da controllare. é sempre quella opposta alla mia.
         lane_id = -ego_wpt.lane_id
+
+        if check_second_lane:
+            lane_id *= 2
 
         # Calcolo location che identifica il fronte del mio ego vehicle.
         ego_forward_vector = ego_transform.get_forward_vector()
@@ -551,6 +554,12 @@ class BasicAgent(object):
             self._near_vehicle_list = sorted(
                 self._near_vehicle_list, key=lambda t: t[2])
             return self._near_vehicle_list[0]
+        elif check_rear and not check_second_lane:
+            return self._vehicle_detected_other_lane(vehicle_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True, check_second_lane=True)
+        elif not check_second_lane:
+            return self._vehicle_detected_other_lane(vehicle_list, max(
+                self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135,  check_second_lane=True)
         return (False, None, -1)
 
     def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0, for_vehicle=False):
