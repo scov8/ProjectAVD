@@ -65,6 +65,7 @@ class BasicAgent(object):
         self._max_brake = 0.5
         self._offset = 0
         self._near_vehicle_list = []
+        self._overtake_list = ["vehicle.tesla.model3", "vehicle.audi.a2"]
 
         # Change parameters according to the dictionary
         if 'target_speed' in opt_dict:
@@ -677,13 +678,12 @@ class BasicAgent(object):
         if len(self._near_vehicle_list) > 0:
             self._near_vehicle_list = sorted(
                 self._near_vehicle_list, key=lambda t: t[2])
+            if overtake_police_and_bike and self._near_vehicle_list[0].type_id in self._overtake_list:
+                return (False, None, -1)
             return self._near_vehicle_list[0]
         elif lane_offset == 0 and for_vehicle == True:
             return self._vehicle_obstacle_detected(vehicle_list, max(
                 self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1, overtake_police_and_bike=True)
-
-        if overtake_police_and_bike:
-            print("OVERTAKE POLICE AND BIKE")
 
         return (False, None, -1)
 
