@@ -254,14 +254,23 @@ class BasicAgent(object):
         if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
         
-        if check_lane != 'left' or check_lane != 'right':
+        junction = waypoint.get_junction()
+
+        for vehicle in vehicle_list:
+            print('--------------- for ----------------')
+            ve_wpt = self._map.get_waypoint(vehicle.get_locaation())
+            if junction is not None and ve_wpt.get_junction().id == junction.id:
+                print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
+                print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
+
+        '''if check_lane != 'left' or check_lane != 'right':
             return (False, None, -1)
         elif check_lane == 'left':
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
         elif check_lane == 'right':
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
         else:
-            return (False, None, -1)
+            return (False, None, -1)'''
 
     def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
