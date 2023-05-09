@@ -492,7 +492,7 @@ class BasicAgent(object):
         lane_id = -ego_wpt.lane_id
 
         if check_second_lane:
-            lane_id *= 2
+            lane_id = -(ego_wpt.lane_id+1)
 
         # Calcolo location che identifica il fronte del mio ego vehicle.
         ego_forward_vector = ego_transform.get_forward_vector()
