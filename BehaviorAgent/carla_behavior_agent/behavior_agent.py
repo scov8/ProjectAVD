@@ -60,9 +60,6 @@ class BehaviorAgent(BasicAgent):
         self._ending_overtake = False
         self._destination_waypoint = None
         self._restringimento = False
-        self._world = self._vehicle.get_world()
-        self._map = self._world.get_map()
-        self._intersections = []
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -601,22 +598,22 @@ class BehaviorAgent(BasicAgent):
                 if waypoints[i].road_id != waypoints[j].road_id:
                     intersections.append((waypoints[i], waypoints[j]))
 
-        print('Found', len(intersections), 'intersections.'
-        vehicle_location=self._vehicle.get_location()
-        vehicle_yaw=math.radians(self._vehicle.get_transform().rotation.yaw)
-        closest_intersection=None
-        closest_distance=float('inf')
+        print('Found', len(intersections), 'intersections.')
+        vehicle_location = self._vehicle.get_location()
+        vehicle_yaw = math.radians(self._vehicle.get_transform().rotation.yaw)
+        closest_intersection = None
+        closest_distance = float('inf')
         for intersection in intersections:
-            intersection_location=intersection.location
-            intersection_direction=math.atan2(
+            intersection_location = intersection.location
+            intersection_direction = math.atan2(
                 intersection_location.y - vehicle_location.y, intersection_location.x - vehicle_location.x)
-            intersection_distance=math.sqrt(
+            intersection_distance = math.sqrt(
                 (intersection_location.x - vehicle_location.x)**2 + (intersection_location.y - vehicle_location.y)**2)
-            relative_direction=abs(math.degrees(
+            relative_direction = abs(math.degrees(
                 vehicle_yaw - intersection_direction))
             if relative_direction <= 90 and intersection_distance < closest_distance:
-                closest_intersection=intersection_location
-                closest_distance=intersection_distance
+                closest_intersection = intersection_location
+                closest_distance = intersection_distance
         if closest_intersection is not None:
             print('Closest intersection:', closest_intersection,
                   'Distance:', closest_distance)
