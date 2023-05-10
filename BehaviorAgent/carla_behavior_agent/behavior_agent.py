@@ -63,8 +63,8 @@ class BehaviorAgent(BasicAgent):
         self._world = self._vehicle.get_world()
         self._map = self._world.get_map()
         self._intersections = []
-        resolution = 3.0
-        waypoints = map.generate_waypoints(resolution)
+
+        waypoints = self._local_planner._waypoints_queue
         for i in range(len(waypoints)):
             for j in range(i+1, len(waypoints)):
                 if waypoints[i].road_id != waypoints[j].road_id:
