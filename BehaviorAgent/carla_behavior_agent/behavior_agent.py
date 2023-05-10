@@ -592,11 +592,9 @@ class BehaviorAgent(BasicAgent):
 
     def closest_intersection(self):
         intersections = []
-        waypoints = self._local_planner._waypoints_queue[-1]
-        print("WAYPOINTS: ", waypoints)
-        for w in waypoints:
-            #print("w: ", w)
-            if w.is_junction:
+        for i in len(self._local_planner._waypoints_queue):
+            print("w: ", self._local_planner._waypoints_queue[i][0])
+            if self._local_planner._waypoints_queue[i][0].is_junction:
                 intersections.append(w)
 
         print('Found', len(intersections), 'intersections.')
