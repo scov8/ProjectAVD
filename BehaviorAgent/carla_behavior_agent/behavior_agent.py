@@ -604,7 +604,7 @@ class BehaviorAgent(BasicAgent):
         closest_intersection = None
         closest_distance = float('inf')
         for intersection in intersections:
-            intersection_location = intersection.location
+            intersection_location = intersection.transform.location
             intersection_direction = math.atan2(
                 intersection_location.y - vehicle_location.y, intersection_location.x - vehicle_location.x)
             intersection_distance = math.sqrt(
