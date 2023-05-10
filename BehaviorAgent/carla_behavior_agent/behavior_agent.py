@@ -62,7 +62,7 @@ class BehaviorAgent(BasicAgent):
         self._restringimento = False
         self._world = self._vehicle.get_world()
         self._map = self._world.get_map()
-        self._intersections = map.get_intersections()
+        self._intersections = map.get_topology()
 
         # Parameters for agent behavior
         if behavior == 'cautious':
