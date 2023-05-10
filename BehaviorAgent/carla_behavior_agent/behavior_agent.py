@@ -10,6 +10,7 @@ traffic signs, and has different possible configurations. """
 
 import random
 import numpy as np
+import math
 import carla
 from basic_agent import BasicAgent
 from local_planner import RoadOption
@@ -59,6 +60,9 @@ class BehaviorAgent(BasicAgent):
         self._ending_overtake = False
         self._destination_waypoint = None
         self._restringimento = False
+        self._world = self._vehicle.get_world()
+        self._map = self._world.get_map()
+        self._intersections = map.get_intersections()
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -521,7 +525,7 @@ class BehaviorAgent(BasicAgent):
                             self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th=90, up_angle_th=180, lane_offset=-1)
 
                         if not new_vehicle_state and not new_vehicle_state2:
-                            if not self._other_lane_occupied(ego_vehicle_loc, distance=80) and not self._overtaking:
+                            if not self._other_lane_occupied(ego_vehicle_loc, distance=80) and not self._overtaking and self.closest_intersection(self._intersections) > 200:
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                     self._overtaking = True
                                     target_speed = max(
@@ -588,3 +592,27 @@ class BehaviorAgent(BasicAgent):
         control.brake = 0.0
         control.hand_brake = False
         return control
+
+    def closest_intersection(self, intersections):
+        vehicle_location = self._vehicle.get_location()
+        vehicle_yaw = math.radians(self._vehicle.get_transform().rotation.yaw)
+        closest_intersection = None
+        closest_distance = float('inf')
+        for intersection in intersections:
+            intersection_location = intersection.location
+            intersection_direction = math.atan2(
+                intersection_location.y - vehicle_location.y, intersection_location.x - vehicle_location.x)
+            intersection_distance = math.sqrt(
+                (intersection_location.x - vehicle_location.x)**2 + (intersection_location.y - vehicle_location.y)**2)
+            relative_direction = abs(math.degrees(
+                vehicle_yaw - intersection_direction))
+            if relative_direction <= 90 and intersection_distance < closest_distance:
+                closest_intersection = intersection_location
+                closest_distance = intersection_distance
+        if closest_intersection is not None:
+            print('Closest intersection:', closest_intersection,
+                  'Distance:', closest_distance)
+        else:
+            print('No intersections found.')
+
+        return closest_distance
