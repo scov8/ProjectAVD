@@ -595,7 +595,8 @@ class BehaviorAgent(BasicAgent):
         for i in range(len(self._local_planner._waypoints_queue)):
             print("w: ", self._local_planner._waypoints_queue[i][0])
             if self._local_planner._waypoints_queue[i][0].is_junction:
-                intersections.append(w)
+                intersections.append(
+                    self._local_planner._waypoints_queue[i][0])
 
         print('Found', len(intersections), 'intersections.')
         vehicle_location = self._vehicle.get_location()
