@@ -523,6 +523,7 @@ class BehaviorAgent(BasicAgent):
 
                         if not new_vehicle_state and not new_vehicle_state2:
                             if not self._other_lane_occupied(ego_vehicle_loc, distance=80) and not self._overtaking and self.closest_intersection() > 200:
+                                print("SORPASOOOOOOOOOOOOOO")
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                     self._overtaking = True
                                     target_speed = max(
@@ -593,12 +594,10 @@ class BehaviorAgent(BasicAgent):
     def closest_intersection(self):
         intersections = []
         for i in range(len(self._local_planner._waypoints_queue)):
-            print("w: ", self._local_planner._waypoints_queue[i][0])
             if self._local_planner._waypoints_queue[i][0].is_junction:
                 intersections.append(
                     self._local_planner._waypoints_queue[i][0])
 
-        print('Found', len(intersections), 'intersections.')
         vehicle_location = self._vehicle.get_location()
         vehicle_yaw = math.radians(self._vehicle.get_transform().rotation.yaw)
         closest_intersection = None
