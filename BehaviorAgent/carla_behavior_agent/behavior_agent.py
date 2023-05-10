@@ -155,6 +155,18 @@ class BehaviorAgent(BasicAgent):
         affected, _ = self._affected_by_traffic_light(lights_list)
 
         return affected
+    
+    def stop_sign_manager(self):
+        """
+        This method is in charge of behaviors for red lights.
+        """
+        ego_vehicle_loc = self._vehicle.get_location()
+        ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
+        stop_list= ego_vehicle_wp.get_landmarks_of_type(30, 206)
+        print("STOP LISST:", stop_list)
+        affected, _ = self._affected_by_stop_sign(stop_list)
+
+        return affected
 
     def _tailgating(self, waypoint, vehicle_list):
         """
@@ -174,8 +186,7 @@ class BehaviorAgent(BasicAgent):
         left_wpt = waypoint.get_left_lane()
         right_wpt = waypoint.get_right_lane()
 
-        behind_vehicle_state, behind_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(
-            self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, low_angle_th=160)
+        behind_vehicle_state, behind_vehicle, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, low_angle_th=160)
         if behind_vehicle_state and self._speed < get_speed(behind_vehicle):
             if (right_turn == carla.LaneChange.Right or right_turn == carla.LaneChange.Both) and waypoint.lane_id * right_wpt.lane_id > 0 and right_wpt.lane_type == carla.LaneType.Driving:
                 new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)

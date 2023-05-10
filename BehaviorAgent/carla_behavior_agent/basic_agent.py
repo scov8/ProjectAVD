@@ -51,6 +51,7 @@ class BasicAgent(object):
             self._map = self._world.get_map()
 
         self._last_traffic_light = None
+        self._last_stop_sign = None
 
         # Base parameters
         self._ignore_traffic_lights = False
@@ -110,6 +111,7 @@ class BasicAgent(object):
         self._lights_list = self._world.get_actors().filter("*traffic_light*")
         # Dictionary mapping a traffic light to a wp corrspoing to its trigger volume location
         self._lights_map = {}
+        self._stop_map = {}
 
     def add_emergency_stop(self, control):
         """
@@ -358,6 +360,60 @@ class BasicAgent(object):
             if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]):
                 self._last_traffic_light = traffic_light
                 return (True, traffic_light)
+
+        return (False, None)
+    
+    def _affected_by_stop_sign(self, stop_list=None, max_distance=None):
+        # se si vogliono ignorare i semafori si andrà sempre avanti
+        if self._ignore_stop_signs:
+            return (False, None)
+
+        # se non sono stati passati i semafori
+        if not stop_list:
+            ego_vehicle_loc = self._vehicle.get_location()
+            ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
+            stop_list= ego_vehicle_wp.get_landmarks_of_type(30, 206)
+
+        # distanza di default massima
+        if not max_distance:
+            max_distance = self._base_tlight_threshold
+
+        if self._last_stop_sign:
+            if self._last_stop_sign.state != carla.TrafficLightState.Red:
+                self._last_stop_sign = None
+            else:
+                return (True, self._last_stop_sign)
+
+        ego_vehicle_location = self._vehicle.get_location()
+        ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
+
+        for stop_sign in stop_list:
+            if stop_sign.id in self._stop_map:
+                trigger_wp = self._stop_map[stop_sign.id]
+            else:
+                trigger_location = get_trafficlight_trigger_location(stop_sign)
+                trigger_wp = self._map.get_waypoint(trigger_location)
+                self._stop_map[stop_sign.id] = trigger_wp
+
+            if trigger_wp.transform.location.distance(ego_vehicle_location) > max_distance:
+                continue
+
+            if trigger_wp.road_id != ego_vehicle_waypoint.road_id:
+                continue
+
+            ve_dir = ego_vehicle_waypoint.transform.get_forward_vector()
+            wp_dir = trigger_wp.transform.get_forward_vector()
+            dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z
+
+            if dot_ve_wp < 0:
+                continue
+
+            if stop_sign.state != carla.TrafficLightState.Red:
+                continue
+
+            if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]):
+                self._last_stop_sign = stop_sign
+                return (True, stop_sign)
 
         return (False, None)
 
