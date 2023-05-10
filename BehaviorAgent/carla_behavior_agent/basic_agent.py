@@ -256,21 +256,29 @@ class BasicAgent(object):
         
         junction = waypoint.get_junction()
 
+        def _print_vehicle_info(vehicle, is_ego=False):
+            print('||||| vehicle_type:' if not is_ego else '||||| ego:', end='')
+            print(vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
+
         for vehicle in vehicle_list:
             print('--------------- for ----------------')
-            ve_wpt = self._map.get_waypoint(vehicle.get_locaation())
+            ve_wpt = self._map.get_waypoint(vehicle.get_location())
             if junction is not None and ve_wpt.get_junction().id == junction.id:
-                print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
-                print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
+                _print_vehicle_info(vehicle)
+                _print_vehicle_info(self._vehicle)
+                # print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
+                # print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
 
-        '''if check_lane != 'left' or check_lane != 'right':
+        '''
+        if check_lane != 'left' or check_lane != 'right':
             return (False, None, -1)
         elif check_lane == 'left':
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
         elif check_lane == 'right':
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
         else:
-            return (False, None, -1)'''
+            return (False, None, -1)
+        '''
 
     def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
@@ -369,7 +377,7 @@ class BasicAgent(object):
         ego_vehicle_location = self._vehicle.get_location()
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
-        if self._last_stop_sign:
+        if self._last_stop_sign is not None:
             print('-------- last_stop_sign if --------------')
             l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='left')
             r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='right')
