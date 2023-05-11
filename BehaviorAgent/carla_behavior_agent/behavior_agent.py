@@ -502,8 +502,8 @@ class BehaviorAgent(BasicAgent):
             # controllo comportamento in caso di incrocio con segnale di stop e controllo se il veicolo non è già fermo
             if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
                 print('--------------- [stop] ------------------')
-                return self.decelerate()
-                # return self.emergency_stop()
+                #return self.decelerate()
+                return self.emergency_stop()
             target_speed = min([self._behavior.max_speed, self._speed_limit])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
