@@ -406,10 +406,6 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()
 
-        # 2.0: Stop sign behavior
-        if self.stop_sign_manager():
-            return self.emergency_stop()
-
         # 2.3: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(
             ego_vehicle_loc, distance=60)
