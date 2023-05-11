@@ -270,10 +270,8 @@ class StanleyLateralController():
         steering = (desired_heading-observed_heading)
         
         # Normalization to [-pi, pi]
-        while (steering<-np.pi):
-            steering += 2*np.pi
-        while (steering>np.pi):
-            steering -= 2*np.pi
+        while steering < -np.pi: steering += 2 * np.pi
+        while steering > np.pi:  steering -= 2 * np.pi
             
         steering_error = steering
         
@@ -287,11 +285,14 @@ class StanleyLateralController():
         
         return np.clip(steering, -1.0, 1.0)
 
-    def change_parameters(self, Kv, Ks, dt):
-        """Changes the Stanley parameters"""
-        self._kv = Kv
-        self._ks = Ks
-        self._dt = dt
+    def change_parameters(self, Kv=None, Ks=None, dt=None):
+        """
+        Changes the Stanley parameters. If the parameter is not specified it 
+        will be used the default value (i.e. the value specified when initialized).
+        """
+        self._kv = Kv if Kv is not None else self._kv
+        self._ks = Ks if Ks is not None else self._ks
+        self._dt = dt if dt is not None else self._dt
     
     def setWaypoints(self, wps):
         """Sets trajectory to follow and filters spurious points"""

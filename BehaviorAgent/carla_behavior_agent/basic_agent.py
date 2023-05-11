@@ -247,13 +247,13 @@ class BasicAgent(object):
     def _vehicle_in_junction(self, waypoint, vehicle_list=None, check_lane='left'):
         if not waypoint.is_junction:
             return (False, None, -1)
-        
+        print('------------ primo if ------------------')
         if self._ignore_vehicles:
             return (False, None, -1)
-        
+        print('------------ secondo if ------------------')
         if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
-        
+        print('------------ terzo if ------------------')
         junction = waypoint.get_junction()
 
         for vehicle in vehicle_list:
