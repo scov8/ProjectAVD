@@ -167,11 +167,9 @@ class BehaviorAgent(BasicAgent):
         return affected
 
     def stop_signs_manager(self, waypoint):
-        stops_list = self._world.get_actors().filter(
-            '*stop*') if not self._stops_list else self._stops_list
-        # print('\n', stops_list, '\n')
-        def dist(v): return v.get_location().distance(
-            waypoint.transform.location)
+        stops_list = self._world.get_actors().filter('*stop*') if not self._stops_list else self._stops_list
+        print('\n', stops_list, '\n')
+        def dist(v): return v.get_location().distance(waypoint.transform.location)
         stops_list = [v for v in stops_list if dist(v) < 10]
         # print(stop_list[0].trigger_volume) # BoundingBox(Location(x=-3.510037, y=5.304008, z=-0.025508), Extent(x=0.685752, y=1.491250, z=1.014414), Rotation(pitch=0.000000, yaw=0.067261, roll=0.000000))
         print(str(len(stops_list)) + '\n' if len(stops_list) > 0 else '', end='')
