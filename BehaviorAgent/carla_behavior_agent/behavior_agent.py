@@ -550,16 +550,13 @@ class BehaviorAgent(BasicAgent):
                 control = self.car_following_manager(vehicle, distance)
 
         # 3: Intersection behavior
-        # è una fregatura, ci dice se stiamo nell'incrocio ma la gestione non è diversa da quella del behavior
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
             # controllo comportamento in caso di incrocio con segnale di stop e controllo se il veicolo non è già fermo
             if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
                 print('--------------- [stop] ------------------')
                 return self.decelerate()
                 # return self.emergency_stop()
-            target_speed = min([
-                self._behavior.max_speed,
-                self._speed_limit - 5])
+            target_speed = min([self._behavior.max_speed, self._speed_limit - 5])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
@@ -571,8 +568,7 @@ class BehaviorAgent(BasicAgent):
         # 4: Normal behavior
         else:
             # se non ci sono pedoni, nemmeno macchine che ci stanno davanti, allora procediamo normalmente
-            target_speed = min(
-                [self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
+            target_speed = min([self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
             # adattiamo il local planner a seguire la nostra velocità, dentro al local ci sono i controllori e cambia la vel
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
