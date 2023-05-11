@@ -434,7 +434,7 @@ class BehaviorAgent(BasicAgent):
         # è una fregatura, ci dice se stiamo nell'incrocio ma la gestione non è diversa da quella del behavior
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
             # controllo comportamento in caso di incrocio con segnale di stop e controllo se il veicolo non è già fermo
-            if self.stop_signs_manager(ego_vehicle_wp) and get_speed(self._vehicle) > 1.0:
+            if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
                 print('--------------- [stop] ------------------')
                 return self.decelerate()
                 # return self.emergency_stop()
