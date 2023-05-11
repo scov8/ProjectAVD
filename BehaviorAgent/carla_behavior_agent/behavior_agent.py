@@ -359,14 +359,16 @@ class BehaviorAgent(BasicAgent):
         if self._behavior.tailgate_counter > 0:
             self._behavior.tailgate_counter -= 1
 
-        # prende le info del veicolo
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
         # 1: Red lights and stops behavior
-        # vede se esiste in un certo range un semaforo e vede se è rosso,si ferma e si salva che è rosso al semaforo.
         if self.traffic_light_manager():
-            return self.emergency_stop()  # se è rosso si ferma
+            return self.emergency_stop()
+        
+        # 2.0: Stop sign behavior
+        if self.stop_sign_manager():
+            return self.emergency_stop()
 
         # 2.3: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_bis(ego_vehicle_loc, distance=60)
