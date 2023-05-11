@@ -82,9 +82,9 @@ def get_stopsign_trigger_location(stop_sign):
     base_transform = stop_sign.transform
     base_rot = base_transform.rotation.yaw
     area_loc = base_transform.transform(stop_sign.trigger_volume.location)
-    area_ext = stop_sign.trigger_volume.extent
+    #area_ext = stop_sign.trigger_volume.extent
 
-    point = rotate_point(carla.Vector3D(0, 0, area_ext.z), math.radians(base_rot))
+    point = rotate_point(carla.Vector3D(0, 0, 0), math.radians(base_rot))
     point_location = area_loc + carla.Location(x=point.x, y=point.y)
 
     return carla.Location(point_location.x, point_location.y, point_location.z)
