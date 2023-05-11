@@ -244,7 +244,7 @@ class BehaviorAgent(BasicAgent):
 
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
                 self._tailgating(waypoint, vehicle_list)
-        print("vehicle_state: ", vehicle_state,"vehicle: ", vehicle, "distance: ", distance)
+        print("vehicle_state: ", vehicle_state,"vehicle: ", vehicle, "distance: ", distance, "type v", vehicle_list[0].type_id)
         # GET VEHICLE TYPE
 
         return vehicle_state, vehicle, distance
@@ -461,8 +461,7 @@ class BehaviorAgent(BasicAgent):
             return control
 
         # 2.2: Car following behaviors
-        vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(
-            ego_vehicle_wp)
+        vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
 
         if vehicle_state:
             # Distance is computed from the center of the two cars,
