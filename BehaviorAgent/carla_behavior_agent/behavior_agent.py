@@ -162,7 +162,7 @@ class BehaviorAgent(BasicAgent):
         """
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-        stop_list= ego_vehicle_wp.get_landmarks_of_type(30, "206", True)
+        stop_list= ego_vehicle_wp.get_landmarks_of_type(3000, "206", True)
         print("STOP LISST:", stop_list)
         affected, _ = self._affected_by_stop_sign(stop_list)
 
