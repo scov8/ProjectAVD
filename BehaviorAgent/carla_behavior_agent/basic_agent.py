@@ -14,7 +14,7 @@ from shapely.geometry import Polygon
 
 from local_planner import LocalPlanner, RoadOption
 from global_route_planner import GlobalRoutePlanner
-from misc import (get_speed, is_within_distance, get_trafficlight_trigger_location, compute_distance, get_stopsign_trigger_location)
+from misc import (get_speed, is_within_distance, get_trafficlight_trigger_location,compute_distance, get_stopsign_trigger_location)
 # from perception.perfectTracker.gt_tracker import PerfectTracker
 
 
@@ -389,7 +389,7 @@ class BasicAgent(object):
             if stop_sign.id in self._stop_map:
                 trigger_wp = self._stop_map[stop_sign.id]
             else:
-                trigger_location = get_stopsign_trigger_location(stop_sign)
+                trigger_location = self._map.get_waypoint(stop_sign).transform.location
                 trigger_wp = self._map.get_waypoint(trigger_location)
                 self._stop_map[stop_sign.id] = trigger_wp
 
