@@ -121,7 +121,7 @@ class BasicAgent(object):
         if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
             def dist(v): return v.get_location().distance(waypoint.transform.location)
-            vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id]
+            vehicle_list = [v for v in vehicle_list if dist(v) < 35 and v.id != self._vehicle.id]
             vehicle_list.sort(key=dist)
         print('------------ terzo if ------------------')
         junction = waypoint.get_junction()
@@ -416,9 +416,9 @@ class BasicAgent(object):
 
             if not l_vehicle_state and not r_vehicle_state:
                 self._last_stop_sign = None
-            elif (l_vehicle_state and not r_vehicle_state) or (l_vehicle_state and r_vehicle_state) or (not l_vehicle_state and r_vehicle_state):
+            elif (l_vehicle_state and not r_vehicle_state) or (l_vehicle_state and r_vehicle_state):
                 return (True, self._last_stop_sign)
-            elif (not r_vehicle_state and not l_vehicle_state):
+            elif (r_vehicle_state and not l_vehicle_state):
                 # avanaza fino al waypoint prima della collisione
                 dist = distance_vehicle(ego_vehicle_waypoint, r_vehicle.get_transform())
                 pass

@@ -504,7 +504,7 @@ class BehaviorAgent(BasicAgent):
                 print('--------------- [stop] ------------------')
                 return self.decelerate()
                 # return self.emergency_stop()
-            target_speed = min([self._behavior.max_speed, self._speed_limit - 5])
+            target_speed = min([self._behavior.max_speed, self._speed_limit])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
