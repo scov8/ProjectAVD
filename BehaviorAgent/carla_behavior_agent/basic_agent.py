@@ -14,7 +14,7 @@ from shapely.geometry import Polygon
 
 from local_planner import LocalPlanner, RoadOption
 from global_route_planner import GlobalRoutePlanner
-from misc import (get_speed, is_within_distance, get_trafficlight_trigger_location,compute_distance, get_stopsign_trigger_location)
+from misc import (get_speed, is_within_distance, get_trafficlight_trigger_location,compute_distance)
 # from perception.perfectTracker.gt_tracker import PerfectTracker
 
 
