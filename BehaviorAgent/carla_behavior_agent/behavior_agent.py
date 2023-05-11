@@ -608,6 +608,14 @@ class BehaviorAgent(BasicAgent):
         control.hand_brake = False
         return control
 
+    def decelerate(self):
+        control = carla.VehicleControl()
+        control.throttle = 0.0
+        control.hand_brake = False
+        speed = get_speed(self._vehicle)
+        control.brake = abs(speed / 2 - speed)/0.65 % self._max_brake
+        return control
+
     def closest_intersection(self):
         intersections = []
         for i in range(len(self._local_planner._waypoints_queue)):
