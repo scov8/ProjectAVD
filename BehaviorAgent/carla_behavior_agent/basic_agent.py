@@ -372,7 +372,7 @@ class BasicAgent(object):
         if not stop_list:
             ego_vehicle_loc = self._vehicle.get_location()
             ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-            stop_list= ego_vehicle_wp.get_landmarks_of_type(30, 206, True)
+            stop_list= ego_vehicle_wp.get_landmarks_of_type(30, "206", True)
 
         # distanza di default massima
         if not max_distance:
