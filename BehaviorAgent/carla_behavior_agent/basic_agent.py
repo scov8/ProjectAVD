@@ -143,7 +143,7 @@ class BasicAgent(object):
         if check_lane != 'left' or check_lane != 'right':
             return (False, None, -1)
         elif check_lane == 'left':
-            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
         elif check_lane == 'right':
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
         else:
@@ -416,9 +416,9 @@ class BasicAgent(object):
 
             if not l_vehicle_state and not r_vehicle_state:
                 self._last_stop_sign = None
-            elif (l_vehicle_state and not r_vehicle_state) or (l_vehicle_state and r_vehicle_state):
+            elif (l_vehicle_state and not r_vehicle_state) or (l_vehicle_state and r_vehicle_state) or (not l_vehicle_state and r_vehicle_state):
                 return (True, self._last_stop_sign)
-            elif (r_vehicle_state and not l_vehicle_state):
+            elif (not r_vehicle_state and not l_vehicle_state):
                 # avanaza fino al waypoint prima della collisione
                 dist = distance_vehicle(ego_vehicle_waypoint, r_vehicle.get_transform())
                 pass
