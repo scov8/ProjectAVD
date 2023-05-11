@@ -14,8 +14,7 @@ from shapely.geometry import Polygon
 
 from local_planner import LocalPlanner, RoadOption
 from global_route_planner import GlobalRoutePlanner
-from misc import (get_speed, is_within_distance,
-                  get_trafficlight_trigger_location, compute_distance, distance_vehicle)
+from misc import (get_speed, is_within_distance, get_trafficlight_trigger_location, compute_distance, distance_vehicle)
 # from perception.perfectTracker.gt_tracker import PerfectTracker
 
 
@@ -65,8 +64,7 @@ class BasicAgent(object):
         self._max_brake = 0.5
         self._offset = 0
         self._near_vehicle_list = []
-        self._overtake_list = [
-            "vehicle.dodge.charger_police_2020", "vehicle.diamondback.century"]
+        self._overtake_list = ["vehicle.dodge.charger_police_2020", "vehicle.diamondback.century"]
         self._junction_counter = 0
 
         # Change parameters according to the dictionary
@@ -101,11 +99,9 @@ class BasicAgent(object):
                 self._global_planner = grp_inst
             else:
                 print("Warning: Ignoring the given map as it is not a 'carla.Map'")
-                self._global_planner = GlobalRoutePlanner(
-                    self._map, self._sampling_resolution)
+                self._global_planner = GlobalRoutePlanner(self._map, self._sampling_resolution)
         else:
-            self._global_planner = GlobalRoutePlanner(
-                self._map, self._sampling_resolution)
+            self._global_planner = GlobalRoutePlanner(self._map, self._sampling_resolution)
 
         # Get the static elements of the scene
         self._lights_list = self._world.get_actors().filter("*traffic_light*")
@@ -124,13 +120,15 @@ class BasicAgent(object):
         print('------------ secondo if ------------------')
         if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
+            def dist(v): return v.get_location().distance(waypoint.transform.location)
+            vehicle_list = [v for v in vehicle_list if dist(v) < 30 and v.id != self._vehicle.id]
+            vehicle_list.sort(key=dist)
         print('------------ terzo if ------------------')
         junction = waypoint.get_junction()
 
         def _print_vehicle_info(vehicle, is_ego=False):
             print('||||| vehicle_type:' if not is_ego else '||||| ego:', end='')
-            print(vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(
-            ), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
+            print(vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
 
         for vehicle in vehicle_list:
             print('--------------- for ----------------')
@@ -422,10 +420,8 @@ class BasicAgent(object):
 
         if self._last_stop_sign is not None:
             print('-------- last_stop_sign if --------------')
-            l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(
-                ego_vehicle_waypoint, check_lane='left')
-            r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(
-                ego_vehicle_waypoint, check_lane='right')
+            l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='left')
+            r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='right')
 
             if not l_vehicle_state and not r_vehicle_state:
                 self._last_stop_sign = None
