@@ -121,7 +121,7 @@ class BasicAgent(object):
         if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
             def dist(v): return v.get_location().distance(waypoint.transform.location)
-            vehicle_list = [v for v in vehicle_list if dist(v) < 35 and v.id != self._vehicle.id]
+            vehicle_list = [v for v in vehicle_list if dist(v) < 40 and v.id != self._vehicle.id]
             vehicle_list.sort(key=dist)
         print('------------ terzo if ------------------')
         junction = waypoint.get_junction()
