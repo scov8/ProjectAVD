@@ -15,7 +15,7 @@ from shapely.geometry import Polygon
 from local_planner import LocalPlanner, RoadOption
 from global_route_planner import GlobalRoutePlanner
 from misc import (get_speed, is_within_distance,
-                  get_trafficlight_trigger_location, compute_distance)
+                  get_trafficlight_trigger_location, compute_distance, distance_vehicle)
 # from perception.perfectTracker.gt_tracker import PerfectTracker
 
 
@@ -67,6 +67,7 @@ class BasicAgent(object):
         self._near_vehicle_list = []
         self._overtake_list = [
             "vehicle.dodge.charger_police_2020", "vehicle.diamondback.century"]
+        self._junction_counter = 0
 
         # Change parameters according to the dictionary
         if 'target_speed' in opt_dict:
@@ -110,7 +111,46 @@ class BasicAgent(object):
         self._lights_list = self._world.get_actors().filter("*traffic_light*")
         # Dictionary mapping a traffic light to a wp corrspoing to its trigger volume location
         self._lights_map = {}
-        self._stop_map = {}
+        self._stops_list = self._world.get_actors().filter("*stop*")
+        # Dictionary mapping a stop sing to a wp corrspoing to its trigger volume location
+        self._stops_map = {}
+
+    def _vehicle_in_junction(self, waypoint, vehicle_list=None, check_lane='left'):
+        if not waypoint.is_junction:
+            return (False, None, -1)
+        print('------------ primo if ------------------')
+        if self._ignore_vehicles:
+            return (False, None, -1)
+        print('------------ secondo if ------------------')
+        if vehicle_list is None:
+            vehicle_list = self._world.get_actors().filter("*vehicle*")
+        print('------------ terzo if ------------------')
+        junction = waypoint.get_junction()
+
+        def _print_vehicle_info(vehicle, is_ego=False):
+            print('||||| vehicle_type:' if not is_ego else '||||| ego:', end='')
+            print(vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(
+            ), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
+
+        for vehicle in vehicle_list:
+            print('--------------- for ----------------')
+            ve_wpt = self._map.get_waypoint(vehicle.get_location())
+            if junction is not None and ve_wpt.get_junction().id == junction.id:
+                _print_vehicle_info(vehicle)
+                _print_vehicle_info(self._vehicle)
+                # print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
+                # print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
+
+        '''
+        if check_lane != 'left' or check_lane != 'right':
+            return (False, None, -1)
+        elif check_lane == 'left':
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
+        elif check_lane == 'right':
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
+        else:
+            return (False, None, -1)
+        '''
 
     def add_emergency_stop(self, control):
         """
@@ -363,38 +403,50 @@ class BasicAgent(object):
 
         return (False, None)
 
-    def _affected_by_stop_sign(self, stop_list=None, max_distance=None):
-        # se si vogliono ignorare i semafori si andrà sempre avanti
+    def _affected_by_stop_sign(self, vehicle=None, stops_list=None, max_distance=None):
         if self._ignore_stop_signs:
+            # False = non cosideriamo il segnale, None = nessun oggetto segnale, -1 = distanza dall'oggetto
             return (False, None)
 
-        # se non sono stati passati i semafori
-        if not stop_list:
-            ego_vehicle_loc = self._vehicle.get_location()
-            ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-            stop_list = ego_vehicle_wp.get_landmarks_of_type(30, "206", True)
+        if stops_list is None:
+            stops_list = self._stops_list
 
-        # distanza di default massima
-        if not max_distance:
-            max_distance = self._base_tlight_threshold
+        if vehicle is None:
+            vehicle = self._vehicle
 
-        if self._last_stop_sign:
-            if self._last_stop_sign.state != carla.TrafficLightState.Red:
-                self._last_stop_sign = None
-            else:
-                return (True, self._last_stop_sign)
+        if max_distance is None:
+            max_distance = self._base_vehicle_threshold
 
         ego_vehicle_location = self._vehicle.get_location()
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
-        for stop_sign in stop_list:
-            if stop_sign.id in self._stop_map:
-                trigger_wp = self._stop_map[stop_sign.id]
+        if self._last_stop_sign is not None:
+            print('-------- last_stop_sign if --------------')
+            l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(
+                ego_vehicle_waypoint, check_lane='left')
+            r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(
+                ego_vehicle_waypoint, check_lane='right')
+
+            if not l_vehicle_state and not r_vehicle_state:
+                self._last_stop_sign = None
+            elif (l_vehicle_state and not r_vehicle_state) or (l_vehicle_state and r_vehicle_state):
+                return (True, self._last_stop_sign)
+            elif (r_vehicle_state and not l_vehicle_state):
+                # avanaza fino al waypoint prima della collisione
+                dist = distance_vehicle(
+                    ego_vehicle_waypoint, r_vehicle.get_transform())
+                pass
             else:
-                # get the location of the stop sign
-                trigger_location = stop_sign.transform.location
+                return (True, self._last_stop_sign)
+
+        for stop_sing in stops_list:
+            if stop_sing.id in self._stops_map:
+                trigger_wp = self._stops_map[stop_sing.id]
+            else:
+                # is_within_trigger_volume(vehicle, stop_sing, stop_sing.trigger_volume) # ottengo un boolean
+                trigger_location = get_trafficlight_trigger_location(stop_sing)
                 trigger_wp = self._map.get_waypoint(trigger_location)
-                self._stop_map[stop_sign.id] = trigger_wp
+                self._stops_map[stop_sing.id] = trigger_wp
 
             if trigger_wp.transform.location.distance(ego_vehicle_location) > max_distance:
                 continue
@@ -403,18 +455,22 @@ class BasicAgent(object):
                 continue
 
             ve_dir = ego_vehicle_waypoint.transform.get_forward_vector()
+            # valuriamo anche l'orientamento del veicolo
             wp_dir = trigger_wp.transform.get_forward_vector()
-            dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z
+            dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + \
+                ve_dir.z * wp_dir.z  # dove dobbiamo andare
 
             if dot_ve_wp < 0:
                 continue
 
-            if stop_sign.state != carla.TrafficLightState.Red:
-                continue
+            if self._last_stop_sign is not None:
+                if trigger_wp == self._stops_map[self._last_stop_sign.id]:
+                    continue
 
+            # valutazione sulla distanza
             if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]):
-                self._last_stop_sign = stop_sign
-                return (True, stop_sign)
+                self._last_stop_sign = stop_sing
+                return (True, stop_sing)
 
         return (False, None)
 
