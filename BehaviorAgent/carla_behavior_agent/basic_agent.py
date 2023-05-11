@@ -389,8 +389,8 @@ class BasicAgent(object):
             if stop_sign.id in self._stop_map:
                 trigger_wp = self._stop_map[stop_sign.id]
             else:
-                trigger_location = self._map.get_waypoint(stop_sign).transform.location
-                trigger_wp = self._map.get_waypoint(trigger_location)
+                trigger_wp = self._map.get_closest_waypoint(stop_sign)
+                #trigger_wp = self._map.get_waypoint(trigger_location)
                 self._stop_map[stop_sign.id] = trigger_wp
 
             if trigger_wp.transform.location.distance(ego_vehicle_location) > max_distance:
