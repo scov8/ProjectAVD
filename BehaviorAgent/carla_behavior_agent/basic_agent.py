@@ -244,18 +244,13 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def _vehicle_in_junction(self, waypoint, vehicle_list=None, check_lane='left'):
-        print('$$$$$ waypoint is junction?', waypoint.is_junction)
-        if not waypoint.is_junction:
-            print('------------ primo if ------------------')
-            return (False, None, -1)
-        
+    def _vehicle_next_junction(self, waypoint, vehicle_list=None, check_lane='left'):
         if self._ignore_vehicles:
             return (False, None, -1)
-        print('------------ secondo if ------------------')
+
         if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
-        print('------------ terzo if ------------------')
+
         junction = waypoint.get_junction()
 
         def _print_vehicle_info(vehicle, is_ego=False):
@@ -381,8 +376,8 @@ class BasicAgent(object):
 
         if self._last_stop_sign is not None:
             print('-------- last_stop_sign if --------------')
-            l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='left')
-            r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='right')
+            l_vehicle_state, l_vehicle, l_distance = self._vehicle_next_junction(ego_vehicle_waypoint, check_lane='left')
+            r_vehicle_state, r_vehicle, r_distance = self._vehicle_next_junction(ego_vehicle_waypoint, check_lane='right')
             
             if not l_vehicle_state and not r_vehicle_state:
                 self._last_stop_sign = None
