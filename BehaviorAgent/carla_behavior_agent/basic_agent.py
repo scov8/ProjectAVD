@@ -145,7 +145,7 @@ class BasicAgent(object):
         elif check_lane == 'left':
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
         elif check_lane == 'right':
-            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=135, lane_offset=-1)
         else:
             return (False, None, -1)
 
