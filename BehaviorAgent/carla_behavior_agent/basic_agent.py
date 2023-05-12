@@ -250,6 +250,9 @@ class BasicAgent(object):
 
         if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
+            def dist(v): return v.get_location().distance(waypoint.transform.location)
+            vehicle_list = [v for v in vehicle_list if dist(v) < 43 and v.id != self._vehicle.id]
+            vehicle_list.sort(key=dist)
 
         junction = waypoint.get_junction()
 
@@ -265,7 +268,6 @@ class BasicAgent(object):
                 _print_vehicle_info(self._vehicle, True)
                 # print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
                 # print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
-
         '''
         if check_lane != 'left' or check_lane != 'right':
             return (False, None, -1)
