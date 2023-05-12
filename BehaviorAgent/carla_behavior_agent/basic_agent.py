@@ -265,7 +265,7 @@ class BasicAgent(object):
             ve_wpt = self._map.get_waypoint(vehicle.get_location())
             if junction is not None and ve_wpt.get_junction().id == junction.id:
                 _print_vehicle_info(vehicle)
-                _print_vehicle_info(self._vehicle)
+                _print_vehicle_info(self._vehicle, True)
                 # print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
                 # print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
 
