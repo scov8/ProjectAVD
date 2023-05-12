@@ -143,6 +143,7 @@ class BehaviorAgent(BasicAgent):
     def _is_slow(self, vehicle):
         vel = vehicle.get_velocity().length()
         acc = vehicle.get_acceleration().length()
+        print("VELOCITA VEICOLO: ", vel, "ACCELERAZIONE: ", acc)
         return acc <= 1.0 and vel < 3
 
     def traffic_light_manager(self):
