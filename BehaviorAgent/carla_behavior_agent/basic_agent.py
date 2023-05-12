@@ -254,9 +254,9 @@ class BasicAgent(object):
             vehicle_list = [v for v in vehicle_list if dist(v) < 43 and v.id != self._vehicle.id]
             vehicle_list.sort(key=dist)
 
-        junction = waypoint.get_junction()
+        # junction = waypoint.get_junction()
 
-        def _print_vehicle_info(vehicle, is_ego=False):
+        '''def _print_vehicle_info(vehicle, is_ego=False):
             print('||||| vehicle_type:' if not is_ego else '||||| ego:', end='')
             print(vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
 
@@ -277,7 +277,6 @@ class BasicAgent(object):
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
         else:
             return (False, None, -1)
-        '''
 
     def lane_change(self, direction, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
