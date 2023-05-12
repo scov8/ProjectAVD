@@ -114,16 +114,16 @@ class BasicAgent(object):
     def _vehicle_in_junction(self, waypoint, vehicle_list=None, check_lane='left'):
         if not waypoint.is_junction:
             return (False, None, -1)
-        print('------------ primo if ------------------')
+
         if self._ignore_vehicles:
             return (False, None, -1)
-        print('------------ secondo if ------------------')
+
         if vehicle_list is None:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
             def dist(v): return v.get_location().distance(waypoint.transform.location)
             vehicle_list = [v for v in vehicle_list if dist(v) < 43 and v.id != self._vehicle.id]
             vehicle_list.sort(key=dist)
-        print('------------ terzo if ------------------')
+
         junction = waypoint.get_junction()
 
         def _print_vehicle_info(vehicle, is_ego=False):
@@ -145,7 +145,7 @@ class BasicAgent(object):
         elif check_lane == 'left':
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
         elif check_lane == 'right':
-            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=135, lane_offset=1)
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
         else:
             return (False, None, -1)
 
