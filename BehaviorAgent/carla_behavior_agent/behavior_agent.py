@@ -326,8 +326,7 @@ class BehaviorAgent(BasicAgent):
         ttc = distance / delta_v if delta_v != 0 else distance / \
             np.nextafter(0., 1.)
 
-        print("VEICOLO DAVANTI. Distance: ", distance, "Velocità ego: ",
-              self._speed, "Velocità veicolo davanti: ", vehicle_speed)
+        print("VEICOLO DAVANTI. Distance: ", distance, "Velocità ego: ",self._speed, "Velocità veicolo davanti: ", vehicle_speed)
         if self._behavior.safety_time > ttc > 0.0:
             target_speed = min([positive(vehicle_speed - self._behavior.speed_decrease), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
             self._local_planner.set_speed(target_speed)
@@ -401,12 +400,10 @@ class BehaviorAgent(BasicAgent):
                 return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
-        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(
-            ego_vehicle_wp)
+        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
 
         if obstacle_state:
-            distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
-                self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+            distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
             if self._speed < 0.01:
@@ -498,10 +495,10 @@ class BehaviorAgent(BasicAgent):
         # 3: Intersection behavior
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
             # controllo comportamento in caso di incrocio con segnale di stop e controllo se il veicolo non è già fermo
-            #if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
-            #    print('--------------- [stop] ------------------')
+            if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
+                print('--------------- [stop] ------------------')
                 #return self.decelerate()
-            #    return self.emergency_stop()
+                return self.emergency_stop()
             target_speed = min([self._behavior.max_speed, self._speed_limit])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
