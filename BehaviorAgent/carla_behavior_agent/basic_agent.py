@@ -245,6 +245,7 @@ class BasicAgent(object):
         self._ignore_vehicles = active
 
     def _vehicle_in_junction(self, waypoint, vehicle_list=None, check_lane='left'):
+        print('$$$$$ waypoint is junction?', waypoint.is_junction)
         if not waypoint.is_junction:
             print('------------ primo if ------------------')
             return (False, None, -1)
