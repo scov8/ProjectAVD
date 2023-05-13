@@ -578,7 +578,7 @@ class BehaviorAgent(BasicAgent):
 
         return closest_distance
 
-    def copy_waypoints(waypoints):
+    def copy_waypointsself(self, waypoints):
         copied_waypoints = []
         for waypoint in waypoints:
             copied_waypoint = carla.Transform(
