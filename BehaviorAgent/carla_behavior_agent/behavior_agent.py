@@ -88,8 +88,7 @@ class BehaviorAgent(BasicAgent):
 
         self._look_ahead_steps = int((self._speed_limit) / 10)
 
-        self._incoming_waypoint, self._incoming_direction = self._local_planner.get_incoming_waypoint_and_direction(
-            steps=self._look_ahead_steps)
+        self._incoming_waypoint, self._incoming_direction = self._local_planner.get_incoming_waypoint_and_direction(steps=self._look_ahead_steps)
         if self._incoming_direction is None:
             self._incoming_direction = RoadOption.LANEFOLLOW
 
@@ -478,6 +477,7 @@ class BehaviorAgent(BasicAgent):
 
                         if not new_vehicle_state and not new_vehicle_state2:
                             if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking and self.closest_intersection() > 200:
+                                self._save_path_waypoint()
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 1.5 al posto di 2
                                     self._overtaking = True
                                     target_speed = max([self._behavior.max_speed, self._speed_limit])
@@ -577,3 +577,8 @@ class BehaviorAgent(BasicAgent):
             print('No intersections found.')
 
         return closest_distance
+
+    def _save_path_waypoint(self):
+        for i in range(len(self._local_planner._waypoints_queue)):
+            self._path_waypoint.append(self._local_planner._waypoints_queue[i][0])
+        self._local_planner.set_global_plan(self._path_waypoint, stop_waypoint_creation=True, clean_queue=True)
