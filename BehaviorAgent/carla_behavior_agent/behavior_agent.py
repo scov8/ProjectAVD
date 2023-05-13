@@ -241,7 +241,7 @@ class BehaviorAgent(BasicAgent):
         elif self._direction == RoadOption.CHANGELANERIGHT:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1)
         else:
-            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 5), up_angle_th=60)
+            vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)
 
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
                 self._tailgating(waypoint, vehicle_list)
@@ -444,7 +444,7 @@ class BehaviorAgent(BasicAgent):
         elif self._overtaking or self._overtaking_obj:
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied(ego_vehicle_loc, 15, check_behind=True):
+                if not self._other_lane_occupied(ego_vehicle_loc, 2, check_behind=True):
                     print("RIENTRO")
                     if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                         self._ending_overtake = True
