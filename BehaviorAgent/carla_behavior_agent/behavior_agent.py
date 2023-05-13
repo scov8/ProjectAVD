@@ -578,8 +578,17 @@ class BehaviorAgent(BasicAgent):
 
         return closest_distance
 
+    def copy_waypoints(waypoints):
+        copied_waypoints = []
+        for waypoint in waypoints:
+            copied_waypoint = carla.Transform(
+                carla.Location(waypoint.location.x, waypoint.location.y, waypoint.location.z),
+                carla.Rotation(waypoint.rotation.pitch, waypoint.rotation.yaw, waypoint.rotation.roll)
+            )
+            copied_waypoints.append(copied_waypoint)
+        return copied_waypoints
+
     def _save_path_waypoint(self):
-        path_waypoint = []
-        for i in range(len(self._local_planner._waypoints_queue)):
-            path_waypoint.append(self._local_planner._waypoints_queue[i][0])
-        self._local_planner._waypoints_queue = path_waypoint[:]
+        waypoints_list = self.copy_waypoints(self._local_planner._waypoints_queue)
+
+        self._local_planner._waypoints_queue = self.copy_waypoints(waypoints_list)
