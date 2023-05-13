@@ -582,4 +582,4 @@ class BehaviorAgent(BasicAgent):
         path_waypoint = []
         for i in range(len(self._local_planner._waypoints_queue)):
             path_waypoint.append(self._local_planner._waypoints_queue[i][0])
-        self._local_planner.set_global_plan(path_waypoint, stop_waypoint_creation=True, clean_queue=True)
+        self._local_planner._waypoints_queue = path_waypoint[:]
