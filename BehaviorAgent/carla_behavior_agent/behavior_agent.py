@@ -125,7 +125,7 @@ class BehaviorAgent(BasicAgent):
                 return True
             elif vehicle_state_behind:
                 print(f"VEICOLO BEHIND {vehicle_behind} è lontano {distance_behind}")
-                return distance_behind < self._vehicle.bounding_box.extent.x * 2.5
+                return distance_behind - 3 < self._vehicle.bounding_box.extent.x * 2.5
             return False
 
     def _other_lane_occupied_bis(self, ego_loc, distance):
