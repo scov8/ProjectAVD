@@ -444,9 +444,9 @@ class BehaviorAgent(BasicAgent):
         elif self._overtaking or self._overtaking_obj:
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied(ego_vehicle_loc, 8, check_behind=True):
+                if not self._other_lane_occupied(ego_vehicle_loc, 7, check_behind=True): #era 15 ora 7
                     print("RIENTRO")
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 ora 1.5
                         self._ending_overtake = True
                 else:
                     self.lane_change("left", self._vehicle_heading, 1, 0, 0)
