@@ -477,7 +477,6 @@ class BehaviorAgent(BasicAgent):
 
                         if not new_vehicle_state and not new_vehicle_state2:
                             if not self._other_lane_occupied(ego_vehicle_loc, distance=70) and not self._overtaking and self.closest_intersection() > 200:
-                                self._save_path_waypoint()
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 1.5 al posto di 2
                                     self._overtaking = True
                                     target_speed = max([self._behavior.max_speed, self._speed_limit])
@@ -577,18 +576,3 @@ class BehaviorAgent(BasicAgent):
             print('No intersections found.')
 
         return closest_distance
-
-    def copy_waypointsself(self, waypoints):
-        copied_waypoints = []
-        for waypoint in waypoints:
-            copied_waypoint = carla.Transform(
-                carla.Location(waypoint.location.x, waypoint.location.y, waypoint.location.z),
-                carla.Rotation(waypoint.rotation.pitch, waypoint.rotation.yaw, waypoint.rotation.roll)
-            )
-            copied_waypoints.append(copied_waypoint)
-        return copied_waypoints
-
-    def _save_path_waypoint(self):
-        waypoints_list = self.copy_waypoints(self._local_planner._waypoints_queue)
-
-        self._local_planner._waypoints_queue = self.copy_waypoints(waypoints_list)
