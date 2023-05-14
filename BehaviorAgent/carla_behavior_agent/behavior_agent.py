@@ -496,7 +496,6 @@ class BehaviorAgent(BasicAgent):
             # controllo comportamento in caso di incrocio con segnale di stop e controllo se il veicolo non è già fermo
             if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
                 print('--------------- [stop] ------------------')
-                #return self.decelerate()
                 return self.emergency_stop()
             target_speed = min([self._behavior.max_speed, self._speed_limit-5])
             self._local_planner.set_speed(target_speed)
@@ -542,14 +541,6 @@ class BehaviorAgent(BasicAgent):
         control.throttle = 0.0
         control.brake = 0.0
         control.hand_brake = False
-        return control
-
-    def decelerate(self):
-        control = carla.VehicleControl()
-        control.throttle = 0.0
-        control.hand_brake = False
-        speed = get_speed(self._vehicle)
-        control.brake = abs(speed / 2 - speed)/0.65 % self._max_brake
         return control
 
     def closest_intersection(self):
