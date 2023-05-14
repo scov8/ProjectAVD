@@ -437,6 +437,8 @@ class BehaviorAgent(BasicAgent):
                 self._overtaking_obj = False
                 route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
                 print(f"Prima  route trace len: {len(route_trace)}")
+                print("trace route: ", route_trace)
+                print("ego_vehicle_wp.id: ", ego_vehicle_wp.id)
                 route_trace = route_trace[ego_vehicle_wp.id:]
                 print(f"route trace len: {len(route_trace)}")
                 self._local_planner.set_global_plan(route_trace, True)
