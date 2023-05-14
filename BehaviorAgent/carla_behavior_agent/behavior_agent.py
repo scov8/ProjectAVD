@@ -444,8 +444,8 @@ class BehaviorAgent(BasicAgent):
 
                 print(f"route_trace: {route_trace}")
                 print(f"route_trace_p: {route_trace_p}")
-                print("to find", (self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction))
-                route_trace = route_trace[(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction):]
+                print("to find", (self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0])
+                route_trace = route_trace[(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]:]
                 self._local_planner.set_global_plan(route_trace, True)
                 print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
             target_speed = min([self._behavior.max_speed, self._speed_limit])
