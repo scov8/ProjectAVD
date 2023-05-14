@@ -437,7 +437,7 @@ class BehaviorAgent(BasicAgent):
                 self._overtaking_obj = False
                 route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
 
-                distanze = [math.dist(ego_vehicle_wp, waypoint) for waypoint, _ in route_trace]
+                distanze = [math.sqrt((ego_vehicle_wp[0] - waypoint[0])**2 + (ego_vehicle_wp[1] - waypoint[1])**2) for waypoint, _ in route_trace]
                 indice_waypoint_vicino = distanze.index(min(distanze))
                 #nuova_route_trace = route_trace[indice_waypoint_vicino:]
                 #route_trace = nuova_route_trace
