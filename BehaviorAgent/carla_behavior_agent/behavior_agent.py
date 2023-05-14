@@ -437,7 +437,7 @@ class BehaviorAgent(BasicAgent):
                 self._overtaking = False
                 self._overtaking_obj = False
                 #route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
-                
+                print("coda ", self._waypoints_queue_copy)
                 def primo_elemento(t):
                     return t[0]
                 route_trace_p = list(map(primo_elemento, self._waypoints_queue_copy))
