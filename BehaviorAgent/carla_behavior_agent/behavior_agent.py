@@ -445,8 +445,8 @@ class BehaviorAgent(BasicAgent):
                 print("route trace p ", route_trace_p)
                 print("ASSO",(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction))
                 print("VAR",(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0])
-                print("TY VAR",(type(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]))
-
+                x = (self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]
+                print("x ", type(x))
                 route_trace = self._waypoints_queue_copy[(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]:]
 
                 self._local_planner.set_global_plan(route_trace, True)
