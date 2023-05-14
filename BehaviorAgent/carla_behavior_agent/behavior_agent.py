@@ -438,7 +438,7 @@ class BehaviorAgent(BasicAgent):
                 route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
                 print(f"Prima  route trace len: {len(route_trace)}")
                 print("trace route: ", route_trace)
-                print("ego_vehicle_wp: ", route_trace.index(ego_vehicle_wp))
+                print("ego_vehicle_wp: ", route_trace.index((ego_vehicle_wp,self._direction)))
                 route_trace = route_trace[route_trace.index((ego_vehicle_wp,self._direction)):]
                 print(f"route trace len: {len(route_trace)}")
                 self._local_planner.set_global_plan(route_trace, True)
