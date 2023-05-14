@@ -60,7 +60,8 @@ class BehaviorAgent(BasicAgent):
         self._ending_overtake = False
         self._destination_waypoint = None
         self._restringimento = False
-        self._wp_overtake =  self._local_planner._waypoints_queue
+        self._wp_overtake =  None
+        self.first = True
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -354,6 +355,10 @@ class BehaviorAgent(BasicAgent):
         chiamato ad ogni run step del sistema, gestisce semafori, stop, pedoni ect
         """
         self._update_information()
+
+        if self.first:
+            self._wp_overtake =  self._local_planner._waypoints_queue
+            self.first = False
 
         control = None
 
