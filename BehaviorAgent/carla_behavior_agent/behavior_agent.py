@@ -383,7 +383,7 @@ class BehaviorAgent(BasicAgent):
         elif self._restringimento:
             print('LANE INVASION: FALSE')
             self._local_planner.set_lat_offset(0.0)
-            route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
+            route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
             self._local_planner.set_global_plan(route_trace,  clean_queue=True)
             self._restringimento = False
 
