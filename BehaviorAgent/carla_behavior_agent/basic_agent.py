@@ -803,7 +803,7 @@ class BasicAgent(object):
         lane_changes_done = 0
         lane_change_distance = lane_change_distance / lane_changes
         while lane_changes_done < lane_changes:
-            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
+            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90 and abs(plan[-1][0].transform.rotation.yaw - heading) < 360:
                 next_wps = plan[-1][0].previous(lane_change_distance)
             else:
                 next_wps = plan[-1][0].next(lane_change_distance)
@@ -831,7 +831,7 @@ class BasicAgent(object):
         # Percorri l'altra corsia.
         distance = 0
         while distance < distance_other_lane:
-            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
+            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90 and abs(plan[-1][0].transform.rotation.yaw - heading) < 360:
                 next_wps = plan[-1][0].previous(step_distance)
             else:
                 next_wps = plan[-1][0].next(step_distance)
