@@ -96,7 +96,7 @@ class BehaviorAgent(BasicAgent):
         # Save final destination waypoint.
         if self._destination_waypoint is None:
             if not self._overtaking:
-                self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
+                self._destination_waypoint = self._local_planner._waypoints_queue[0][0]
             if not self._overtaking_obj:
                 self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
 
@@ -436,13 +436,10 @@ class BehaviorAgent(BasicAgent):
                 self._overtaking = False
                 self._overtaking_obj = False
                 route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
-
-                print(f"DESTINAZIONE : {self._destination_waypoint.transform.location}")
                 
                 def primo_elemento(t):
                     return t[0]
                 route_trace_p = list(map(primo_elemento, route_trace))
-
                 route_trace = route_trace[(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]:]
 
                 self._local_planner.set_global_plan(route_trace, True)
