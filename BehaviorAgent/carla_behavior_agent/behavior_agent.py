@@ -243,7 +243,7 @@ class BehaviorAgent(BasicAgent):
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)
 
-            if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
+            #if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
                 #self._tailgating(waypoint, vehicle_list)
         print("vehicle_state: ", vehicle_state, "vehicle: ", vehicle, "distance: ", distance)
 
