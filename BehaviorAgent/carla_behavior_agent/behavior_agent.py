@@ -60,6 +60,7 @@ class BehaviorAgent(BasicAgent):
         self._ending_overtake = False
         self._destination_waypoint = None
         self._restringimento = False
+        self._wp_before_overtake = None
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -243,8 +244,8 @@ class BehaviorAgent(BasicAgent):
         else:
             vehicle_state, vehicle, distance = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)
 
-            #if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
-                #self._tailgating(waypoint, vehicle_list)
+            if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0:
+                self._tailgating(waypoint, vehicle_list)
         print("vehicle_state: ", vehicle_state, "vehicle: ", vehicle, "distance: ", distance)
 
         return vehicle_state, vehicle, distance
@@ -434,7 +435,7 @@ class BehaviorAgent(BasicAgent):
                 self._ending_overtake = False
                 self._overtaking = False
                 self._overtaking_obj = False
-                route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
+                route_trace = self.trace_route(self._wp_before_overtake, self._destination_waypoint)
                 self._local_planner.set_global_plan(route_trace, True)
                 print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
             target_speed = min([self._behavior.max_speed, self._speed_limit])
@@ -479,6 +480,7 @@ class BehaviorAgent(BasicAgent):
                             if not self._other_lane_occupied(ego_vehicle_loc, distance=75) and not self._overtaking and self.closest_intersection() > 200:
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 1.5 al posto di 2
                                     self._overtaking = True
+                                    self._wp_before_overtake = ego_vehicle_wp
                                     target_speed = max([self._behavior.max_speed, self._speed_limit])
                                     self._local_planner.set_speed(target_speed)
                                     control = self._local_planner.run_step(debug=debug)
