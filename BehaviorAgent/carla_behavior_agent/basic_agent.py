@@ -776,8 +776,6 @@ class BasicAgent(object):
 
         distance = 0
 
-        print("Yam: ", waypoint.transform.rotation.yaw, "Heading: ", heading)
-
         while distance < distance_same_lane:
             if abs(plan[-1][0].transform.rotation.yaw - heading) > 90 and abs(plan[-1][0].transform.rotation.yaw - heading) < 360:
                 next_wps = plan[-1][0].previous(step_distance)
