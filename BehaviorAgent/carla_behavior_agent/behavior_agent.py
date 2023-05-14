@@ -441,13 +441,10 @@ class BehaviorAgent(BasicAgent):
                 def primo_elemento(t):
                     return t[0]
                 route_trace_p = list(map(primo_elemento, self._waypoints_queue_copy))
+                #route_trace = self._waypoints_queue_copy[(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]:]
 
-                print("route trace p ", route_trace_p)
-                print("ASSO",(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction))
-                print("VAR",(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0])
-                x = (self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]
-                print("x ", type(x))
-                route_trace = self._waypoints_queue_copy[x:]
+                for i in range ((self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0], len(self._waypoints_queue_copy)):
+                    route_trace.append(self._waypoints_queue_copy[i])
 
                 self._local_planner.set_global_plan(route_trace, True)
                 print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
