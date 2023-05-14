@@ -443,6 +443,7 @@ class BehaviorAgent(BasicAgent):
                 route_trace_p = list(map(primo_elemento, self._waypoints_queue_copy))
                 #route_trace = self._waypoints_queue_copy[(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]:]
 
+                route_trace = []
                 for i in range ((self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0], len(self._waypoints_queue_copy)):
                     route_trace.append(self._waypoints_queue_copy[i])
 
