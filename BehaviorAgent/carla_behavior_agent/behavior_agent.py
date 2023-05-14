@@ -541,8 +541,7 @@ class BehaviorAgent(BasicAgent):
 
     def decelerate(self):
         control = carla.VehicleControl()
-        speed = get_speed(self._vehicle)
-        self._local_planner.set_speed(speed/3)
+        self._local_planner.set_speed(20)
         control = self._local_planner.run_step()
         return control
 
