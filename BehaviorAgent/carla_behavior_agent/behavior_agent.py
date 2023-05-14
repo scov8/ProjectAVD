@@ -509,12 +509,12 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         # se sto andando molto veloce e con lo sterzo ho un valore sopra al 0.5, allora rallento
-        elif self._speed > 45 and self._steer > 90 or self.closest_intersection() < 50:
+        elif self._speed > 45 and self._steer > 90 or self.closest_intersection() < 40:
             """
             TO DO: rallenara anche se ci sta un incorvio tra poco  -  or self.closest_intersection() < 150:' 
             """
             print("velocità troppo alta, rallento")
-            return self.no_throttle()
+            return self.decelerate()
 
         # 4: Normal behavior
         else:
@@ -537,6 +537,14 @@ class BehaviorAgent(BasicAgent):
         control.throttle = 0.0
         control.brake = self._max_brake
         control.hand_brake = False
+        return control
+
+    def decelerate(self):
+        control = carla.VehicleControl()
+        control.throttle = 0.0
+        control.hand_brake = False
+        speed = get_speed(self._vehicle)
+        control.brake = abs(speed / 2 - speed)/0.65 % self._max_brake
         return control
 
     def soft_stop(self):
