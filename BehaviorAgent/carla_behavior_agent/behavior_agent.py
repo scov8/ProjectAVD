@@ -61,6 +61,7 @@ class BehaviorAgent(BasicAgent):
         self._destination_waypoint = None
         self._restringimento = False
         self._wp_overtake =  self._map.get_waypoint(self._vehicle.get_location())
+        self._waypoints_queue_copy = None
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -435,13 +436,11 @@ class BehaviorAgent(BasicAgent):
                 self._ending_overtake = False
                 self._overtaking = False
                 self._overtaking_obj = False
-                route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
+                #route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
                 
-                print("primo WP", self._wp_overtake.transform.location)
-
                 def primo_elemento(t):
                     return t[0]
-                route_trace_p = list(map(primo_elemento, route_trace))
+                route_trace_p = list(map(primo_elemento, self._waypoints_queue_copy))
                 route_trace = route_trace[(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]:]
 
                 self._local_planner.set_global_plan(route_trace, True)
@@ -486,6 +485,7 @@ class BehaviorAgent(BasicAgent):
 
                         if not new_vehicle_state and not new_vehicle_state2:
                             if not self._other_lane_occupied(ego_vehicle_loc, distance=75) and not self._overtaking and self.closest_intersection() > 200:
+                                self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 1.5 al posto di 2
                                     self._overtaking = True
                                     target_speed = max([self._behavior.max_speed, self._speed_limit])
