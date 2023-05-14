@@ -439,7 +439,7 @@ class BehaviorAgent(BasicAgent):
                 print(f"Prima  route trace len: {len(route_trace)}")
                 print("trace route: ", route_trace)
                 print("ego_vehicle_wp: ", route_trace.index(ego_vehicle_wp))
-                route_trace = route_trace[route_trace.index(ego_vehicle_wp):]
+                route_trace = route_trace[route_trace.index(ego_vehicle_wp,self._direction):]
                 print(f"route trace len: {len(route_trace)}")
                 self._local_planner.set_global_plan(route_trace, True)
                 print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
