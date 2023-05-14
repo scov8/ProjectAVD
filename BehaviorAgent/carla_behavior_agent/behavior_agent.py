@@ -436,8 +436,12 @@ class BehaviorAgent(BasicAgent):
                 self._overtaking = False
                 self._overtaking_obj = False
                 route_trace = self.trace_route(self._wp_overtake, self._destination_waypoint)
+                
+                def primo_elemento(t):
+                    return t[0]
+                route_trace_p = list(map(primo_elemento, route_trace))
 
-                route_trace = route_trace[route_trace.index((self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace),self._direction)):]
+                route_trace = route_trace[route_trace.index((self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p),self._direction)):]
                 self._local_planner.set_global_plan(route_trace, True)
                 print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
             target_speed = min([self._behavior.max_speed, self._speed_limit])
