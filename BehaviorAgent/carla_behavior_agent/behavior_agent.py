@@ -60,7 +60,7 @@ class BehaviorAgent(BasicAgent):
         self._ending_overtake = False
         self._destination_waypoint = None
         self._restringimento = False
-        self._wp_overtake =  self._map.get_waypoint(self._vehicle.get_location())
+        self._wp_overtake =  self._local_planner._waypoints_queue
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -440,7 +440,7 @@ class BehaviorAgent(BasicAgent):
                 
                 def primo_elemento(t):
                     return t[0]
-                route_trace_p = list(map(primo_elemento, route_trace))
+                route_trace_p = list(map(primo_elemento, self._wp_overtake))
 
                 route_trace = route_trace[(self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0]:]
 
