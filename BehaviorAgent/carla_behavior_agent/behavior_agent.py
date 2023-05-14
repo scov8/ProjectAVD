@@ -509,7 +509,7 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
 
         # se sto andando molto veloce e con lo sterzo ho un valore sopra al 0.5, allora rallento
-        elif self._speed > 45 and self._steer > 90 :
+        elif self._speed > 45 and self._steer > 90 or self.closest_intersection() < 40:
             """
             TO DO: rallenara anche se ci sta un incorvio tra poco  -  or self.closest_intersection() < 150:' 
             """
