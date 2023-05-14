@@ -60,7 +60,6 @@ class BehaviorAgent(BasicAgent):
         self._ending_overtake = False
         self._destination_waypoint = None
         self._restringimento = False
-        self._wp_overtake =  self._map.get_waypoint(self._vehicle.get_location())
         self._waypoints_queue_copy = None
 
         # Parameters for agent behavior
@@ -419,7 +418,6 @@ class BehaviorAgent(BasicAgent):
                                 self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
                                 return control
-                # pass
             elif distance < self._behavior.braking_distance and self._speed > 0.01 and not self._overtaking_obj:
                 print("sto frenando per ostacolo: EMERGENCY STOP")
                 return self.emergency_stop()
@@ -437,15 +435,12 @@ class BehaviorAgent(BasicAgent):
                 self._ending_overtake = False
                 self._overtaking = False
                 self._overtaking_obj = False
-
                 def primo_elemento(t):
                     return t[0]
                 route_trace_p = list(map(primo_elemento, self._waypoints_queue_copy))
-
                 route_trace = []
                 for i in range ((self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0], len(self._waypoints_queue_copy)):
                     route_trace.append(self._waypoints_queue_copy[i])
-
                 self._local_planner.set_global_plan(route_trace, True)
                 print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
             target_speed = min([self._behavior.max_speed, self._speed_limit])
@@ -515,6 +510,9 @@ class BehaviorAgent(BasicAgent):
 
         # se sto andando molto veloce e con lo sterzo ho un valore sopra al 0.5, allora rallento
         elif self._speed > 45 and self._steer > 90:
+            """
+            TO DO: rallenara anche se ci sta un incorvio tra poco  -  or self.closest_intersection() < 150:' 
+            """
             print("velocità troppo alta, rallento")
             return self.no_throttle()
 

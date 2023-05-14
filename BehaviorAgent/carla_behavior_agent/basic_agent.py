@@ -775,6 +775,9 @@ class BasicAgent(object):
         plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
 
         distance = 0
+
+        print("Yam: ", waypoint.transform.rotation.yaw, "Heading: ", heading)
+
         while distance < distance_same_lane:
             if abs(plan[-1][0].transform.rotation.yaw - heading) > 90:
                 next_wps = plan[-1][0].previous(step_distance)
