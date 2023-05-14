@@ -96,7 +96,7 @@ class BehaviorAgent(BasicAgent):
         # Save final destination waypoint.
         if self._destination_waypoint is None:
             if not self._overtaking:
-                self._destination_waypoint = self._local_planner._waypoints_queue[0][0]
+                self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
             if not self._overtaking_obj:
                 self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
 
