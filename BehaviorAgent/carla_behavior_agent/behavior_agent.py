@@ -473,7 +473,6 @@ class BehaviorAgent(BasicAgent):
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 if not self._overtaking and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
-                        print("IL VEICOLO LENTO è:", vehicle)
                         vehicle_list = self._world.get_actors().filter("*vehicle*")
                         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
                         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id]
