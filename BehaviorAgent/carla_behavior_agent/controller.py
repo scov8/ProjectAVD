@@ -356,6 +356,7 @@ class PIDLateralController():
 
         # Get the vector vehicle-target_wp
         if self._offset != 0:
+            print("I'm in offset")
             # Displace the wp to the side
             w_tran = waypoint.transform
             r_vec = w_tran.get_right_vector()
