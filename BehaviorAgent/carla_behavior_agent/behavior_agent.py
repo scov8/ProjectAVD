@@ -398,6 +398,8 @@ class BehaviorAgent(BasicAgent):
             return self.emergency_stop()
         
         self._local_planner.set_lat_offset(3)
+        control = self._local_planner.run_step(debug=debug)
+        return control
 
         # 2.3: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30)
