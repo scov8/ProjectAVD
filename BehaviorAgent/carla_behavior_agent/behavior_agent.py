@@ -100,7 +100,7 @@ class BehaviorAgent(BasicAgent):
             if not self._overtaking_obj:
                 self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
 
-    def _other_lane_occupied_overtaking(self, distance, check_behind=False):
+    def _other_lane_occupied(self, distance, check_behind=False):
         """
         This method returns True if the other lane is occupied by a vehicle.
 
@@ -403,7 +403,7 @@ class BehaviorAgent(BasicAgent):
             invasion_state, offset_invasion = self._lane_invasion(vehicle_invasion)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 3)
+                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.3, 2)
                 # self._local_planner.set_lat_offset(offset_invasion) # mio
                 self._shrinkage = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
@@ -439,7 +439,7 @@ class BehaviorAgent(BasicAgent):
             if self._speed < 0.01:
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
-                        if not self._other_lane_occupied_overtaking(distance=70):
+                        if not self._other_lane_occupied(distance=70):
                             self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 print("cambio corsia a sinistra per ostacolo")
@@ -480,7 +480,7 @@ class BehaviorAgent(BasicAgent):
         elif self._overtaking_vehicle or self._overtaking_obj:
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied_overtaking(8, check_behind=True): #era 15 ora 7
+                if not self._other_lane_occupied(8, check_behind=True): #era 15 ora 7
                     print("RIENTRO")
                     if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 ora 1.5
                         self._ending_overtake = True
@@ -511,7 +511,7 @@ class BehaviorAgent(BasicAgent):
                         new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th=90, up_angle_th=180, lane_offset=-1)
 
                         if not new_vehicle_state and not new_vehicle_state2:
-                            if not self._other_lane_occupied_overtaking(distance=75) and not self._overtaking_vehicle and self.closest_intersection() > 200:
+                            if not self._other_lane_occupied(distance=75) and not self._overtaking_vehicle and self.closest_intersection() > 200:
                                 self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 1.5 al posto di 2
                                     self._overtaking_vehicle = True
