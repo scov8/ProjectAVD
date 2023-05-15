@@ -104,7 +104,7 @@ class VehicleController():
     def setWaypoints(self, waypoints):
         self._lat_controller.setWaypoints(waypoints)
 
-    def set_lat_controller(self, offset):
+    def set_lat_offset(self, offset):
         self._lat_controller._offset = offset
 
 

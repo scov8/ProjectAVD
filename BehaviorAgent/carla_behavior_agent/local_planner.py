@@ -139,7 +139,7 @@ class LocalPlanner(object):
 
     def set_lat_offset(self, offset):
         self._offset = offset
-        self._vehicle_controller.set_lat_controller(offset)
+        self._vehicle_controller.set_lat_offset(offset)
 
     def set_speed(self, speed):
         """
