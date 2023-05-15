@@ -352,25 +352,25 @@ class BehaviorAgent(BasicAgent):
             :param debug: boolean for debugging
             :return control: carla.VehicleControl
         """
-        vehicle_speed = get_speed(vehicle)
-        delta_v = max(1, (self._speed - vehicle_speed) / 3.6)
-        ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.)
+        vehicle_speed = get_speed(vehicle) # get the speed of the vehicle in front of us
+        delta_v = max(1, (self._speed - vehicle_speed) / 3.6) # difference between our speed and the speed of the vehicle in front of us
+        ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision
 
         print("VEICOLO DAVANTI. Distance: ", distance, "Velocità ego: ",self._speed, "Velocità veicolo davanti: ", vehicle_speed)
-        if self._behavior.safety_time > ttc > 0.0:
-            target_speed = min([positive(vehicle_speed - self._behavior.speed_decrease), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
+        if self._behavior.safety_time > ttc > 0.0: # if the time to collision is less than the safety time
+            target_speed = min([positive(vehicle_speed - self._behavior.speed_decrease), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist]) # decrease the speed
+            self._local_planner.set_speed(target_speed) # set the speed
+            control = self._local_planner.run_step(debug=debug) # run the local planner
 
-        elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time:
-            target_speed = min([max(self._min_speed, vehicle_speed), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
+        elif 2 * self._behavior.safety_time > ttc >= self._behavior.safety_time: # if the time to collision is between the safety time and twice the safety time
+            target_speed = min([max(self._min_speed, vehicle_speed), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist]) # keep the speed
+            self._local_planner.set_speed(target_speed) # set the speed
+            control = self._local_planner.run_step(debug=debug) # run the local planner
 
         else:
-            target_speed = min([self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
+            target_speed = min([self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist]) # increase the speed
+            self._local_planner.set_speed(target_speed) # set the speed
+            control = self._local_planner.run_step(debug=debug) # run the local planner
 
         return control
 
@@ -480,7 +480,7 @@ class BehaviorAgent(BasicAgent):
         elif self._overtaking_vehicle or self._overtaking_obj:
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied_overtaking(15, check_behind=True): #era 15 ora 7
+                if not self._other_lane_occupied_overtaking(8, check_behind=True): #era 15 ora 7
                     print("RIENTRO")
                     if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 ora 1.5
                         self._ending_overtake = True
