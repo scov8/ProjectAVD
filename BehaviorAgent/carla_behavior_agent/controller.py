@@ -22,7 +22,7 @@ class VehicleController():
     a vehicle from client side
     """
 
-    def __init__(self, vehicle, args_lateral, args_longitudinal, offset=10, max_throttle=0.75, max_brake=0.3,
+    def __init__(self, vehicle, args_lateral, args_longitudinal, offset=0, max_throttle=0.75, max_brake=0.3,
                  max_steering=0.8):
         """
         Constructor method.
@@ -50,7 +50,7 @@ class VehicleController():
         self._world = self._vehicle.get_world()
         self.past_steering = self._vehicle.get_control().steer
         self._lon_controller = PIDLongitudinalController(self._vehicle, **args_longitudinal)
-        self._lat_controller = PIDLateralController(self._vehicle, offset)
+        self._lat_controller = StanleyLateralController(self._vehicle, offset, **args_lateral)
 
 
     def run_step(self, target_speed, waypoint):
@@ -103,9 +103,6 @@ class VehicleController():
     
     def setWaypoints(self, waypoints):
         self._lat_controller.setWaypoints(waypoints)
-    
-    def set_lat_controller(self, offset):
-        self._lat_controller._offset = offset
 
 
 class PIDLongitudinalController():
@@ -178,7 +175,7 @@ class StanleyLateralController():
     StanleyLateralController implements lateral control using a Stanley.
     """
 
-    def __init__(self, vehicle, offset=10, lookahead_distance=1.0, K_V=1.0, K_S=0.0, dt=0.03):
+    def __init__(self, vehicle, offset=0, lookahead_distance=1.0, K_V=1.0, K_S=0.0, dt=0.03):
         """
         Constructor method.
 
@@ -312,7 +309,7 @@ class PIDLateralController():
     PIDLateralController implements lateral control using a PID.
     """
 
-    def __init__(self, vehicle, offset=10, K_P=1.0, K_I=0.0, K_D=0.0, dt=0.03):
+    def __init__(self, vehicle, offset=0, K_P=1.0, K_I=0.0, K_D=0.0, dt=0.03):
         """
         Constructor method.
 
