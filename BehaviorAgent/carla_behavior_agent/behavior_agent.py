@@ -403,8 +403,8 @@ class BehaviorAgent(BasicAgent):
             invasion_state, offset_invasion = self._lane_invasion(vehicle_invasion)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                #self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.8, 2)
-                self._local_planner.set_lat_offset(-5) # mio
+                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-5, 2)
+                #self._local_planner.set_lat_offset(offset_invasion) # mio
                 self._shrinkage = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
                 self._local_planner.set_speed(target_speed)
