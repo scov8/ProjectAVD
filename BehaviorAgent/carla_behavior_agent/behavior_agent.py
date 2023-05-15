@@ -404,7 +404,7 @@ class BehaviorAgent(BasicAgent):
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
                 #self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.3, 2)
-                self._local_planner.set_lat_offset(5) # mio
+                self._local_planner.set_lat_offset(-5) # mio
                 route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
                 self._local_planner.set_global_plan(route_trace,  clean_queue=True)
 
