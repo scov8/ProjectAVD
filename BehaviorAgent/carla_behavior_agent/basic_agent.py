@@ -244,7 +244,7 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def _vehicle_next_junction(self, waypoint, vehicle_list=None, check_lane='left'):
+    def _vehicle_in_junction(self, waypoint, vehicle_list=None, check_lane='left'):
         if self._ignore_vehicles:
             return (False, None, -1)
 
@@ -274,7 +274,7 @@ class BasicAgent(object):
         elif check_lane == 'left':
             return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=-1)
         elif check_lane == 'right':
-            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=90, lane_offset=1)
+            return self._vehicle_obstacle_detected(vehicle_list, up_angle_th=135, lane_offset=1)
         else:
             return (False, None, -1)
 
@@ -377,8 +377,8 @@ class BasicAgent(object):
 
         if self._last_stop_sign is not None:
             print('-------- last_stop_sign if --------------')
-            l_vehicle_state, l_vehicle, l_distance = self._vehicle_next_junction(ego_vehicle_waypoint, check_lane='left')
-            r_vehicle_state, r_vehicle, r_distance = self._vehicle_next_junction(ego_vehicle_waypoint, check_lane='right')
+            l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='left')
+            r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='right')
             
             if not l_vehicle_state and not r_vehicle_state:
                 self._last_stop_sign = None
