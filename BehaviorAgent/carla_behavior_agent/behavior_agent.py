@@ -397,18 +397,14 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()
         
-        self._local_planner.set_lat_offset(3)
-        control = self._local_planner.run_step(debug=debug)
-        return control
-
         # 2.3: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30)
         if vehicle_state_invasion and not self._overtaking_vehicle and not self._overtaking_obj:
             invasion_state, offset_invasion = self._lane_invasion(vehicle_invasion)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.3, 2)
-                #self._local_planner.set_lat_offset(offset_invasion) # mio
+                #self.stay_on_the_right(ego_vehicle_wp, offset_invasion-2.3, 2)
+                self._local_planner.set_lat_offset(offset_invasion) # mio
                 self._shrinkage = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 3)
                 self._local_planner.set_speed(target_speed)
