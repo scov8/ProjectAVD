@@ -138,6 +138,7 @@ class LocalPlanner(object):
         self._waypoints_queue.append((self.target_waypoint, self.target_road_option))
 
     def set_lat_offset(self, offset):
+        self._offset = offset
         self._vehicle_controller.set_lat_controller(offset)
 
     def set_speed(self, speed):
