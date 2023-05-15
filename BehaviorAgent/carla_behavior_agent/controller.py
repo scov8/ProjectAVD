@@ -15,15 +15,23 @@ import sys
 from math import atan2, atan, hypot
 
 
-class VehicleController():
+class VehicleController:
     """
     VehicleController is the combination of longitudinal PID controller
-    and a Stanley as lateral controller to perform the low level control 
+    and a Stanley as lateral controller to perform the low level control
     a vehicle from client side
     """
 
-    def __init__(self, vehicle, args_lateral, args_longitudinal, offset=0, max_throttle=0.75, max_brake=0.3,
-                 max_steering=0.8):
+    def __init__(
+        self,
+        vehicle,
+        args_lateral,
+        args_longitudinal,
+        offset=1,
+        max_throttle=0.75,
+        max_brake=0.3,
+        max_steering=0.8,
+    ):
         """
         Constructor method.
 
@@ -49,9 +57,12 @@ class VehicleController():
         self._vehicle = vehicle
         self._world = self._vehicle.get_world()
         self.past_steering = self._vehicle.get_control().steer
-        self._lon_controller = PIDLongitudinalController(self._vehicle, **args_longitudinal)
-        self._lat_controller = StanleyLateralController(self._vehicle, offset, **args_lateral)
-
+        self._lon_controller = PIDLongitudinalController(
+            self._vehicle, **args_longitudinal
+        )
+        self._lat_controller = StanleyLateralController(
+            self._vehicle, offset, **args_lateral
+        )
 
     def run_step(self, target_speed, waypoint):
         """
@@ -92,7 +103,6 @@ class VehicleController():
 
         return control
 
-
     def change_longitudinal_PID(self, args_longitudinal):
         """Changes the parameters of the PIDLongitudinalController"""
         self._lon_controller.change_parameters(**args_longitudinal)
@@ -100,12 +110,12 @@ class VehicleController():
     def change_lateral_controller(self, args_lateral):
         """Changes the parameters of the StanleyLateralController"""
         self._lat_controller.change_parameters(**args_lateral)
-    
+
     def setWaypoints(self, waypoints):
         self._lat_controller.setWaypoints(waypoints)
 
 
-class PIDLongitudinalController():
+class PIDLongitudinalController:
     """
     PIDLongitudinalController implements longitudinal control using a PID.
     """
@@ -138,7 +148,7 @@ class PIDLongitudinalController():
         current_speed = get_speed(self._vehicle)
 
         if debug:
-            print('Current speed = {}'.format(current_speed))
+            print("Current speed = {}".format(current_speed))
 
         return self._pid_control(target_speed, current_speed)
 
@@ -161,7 +171,9 @@ class PIDLongitudinalController():
             _de = 0.0
             _ie = 0.0
 
-        return np.clip((self._k_p * error) + (self._k_d * _de) + (self._k_i * _ie), -1.0, 1.0)
+        return np.clip(
+            (self._k_p * error) + (self._k_d * _de) + (self._k_i * _ie), -1.0, 1.0
+        )
 
     def change_parameters(self, K_P, K_I, K_D, dt):
         """Changes the PID parameters"""
@@ -170,12 +182,15 @@ class PIDLongitudinalController():
         self._k_d = K_D
         self._dt = dt
 
-class StanleyLateralController():
+
+class StanleyLateralController:
     """
     StanleyLateralController implements lateral control using a Stanley.
     """
 
-    def __init__(self, vehicle, offset=0, lookahead_distance=1.0, K_V=1.0, K_S=0.0, dt=0.03):
+    def __init__(
+        self, vehicle, offset=1, lookahead_distance=1.0, K_V=1.0, K_S=0.0, dt=0.03
+    ):
         """
         Constructor method.
 
@@ -205,14 +220,19 @@ class StanleyLateralController():
             +1 maximum steering to right
         """
         return self._stanley_control(self._vehicle.get_transform())
-    
+
     def _get_lookahead_index(self, ego_loc, lookahead_distance):
-        min_idx       = 0
-        min_dist      = float("inf")
+        min_idx = 0
+        min_dist = float("inf")
         for i in range(len(self._wps)):
-            dist = np.linalg.norm(np.array([
-                    self._wps[i][0].transform.location.x - ego_loc.x,
-                    self._wps[i][0].transform.location.y - ego_loc.y]))
+            dist = np.linalg.norm(
+                np.array(
+                    [
+                        self._wps[i][0].transform.location.x - ego_loc.x,
+                        self._wps[i][0].transform.location.y - ego_loc.y,
+                    ]
+                )
+            )
             if dist < min_dist:
                 min_dist = dist
                 min_idx = i
@@ -222,12 +242,19 @@ class StanleyLateralController():
         for i in range(min_idx + 1, len(self._wps)):
             if total_dist >= lookahead_distance:
                 break
-            total_dist += np.linalg.norm(np.array([
-                    self._wps[i][0].transform.location.x - self._wps[i-1][0].transform.location.x,
-                    self._wps[i][0].transform.location.y - self._wps[i-1][0].transform.location.y]))
+            total_dist += np.linalg.norm(
+                np.array(
+                    [
+                        self._wps[i][0].transform.location.x
+                        - self._wps[i - 1][0].transform.location.x,
+                        self._wps[i][0].transform.location.y
+                        - self._wps[i - 1][0].transform.location.y,
+                    ]
+                )
+            )
             lookahead_idx = i
         return lookahead_idx
-    
+
     def _stanley_control(self, vehicle_transform):
         """
         Estimate the steering angle of the vehicle based on the Stanley equations
@@ -241,50 +268,62 @@ class StanleyLateralController():
         observed_heading = np.deg2rad(vehicle_transform.rotation.yaw)
         observed_x = ego_loc.x
         observed_y = ego_loc.y
-        
+
         # Get Target Waypoint
-        ce_idx = self._get_lookahead_index(ego_loc,self._lookahead_distance)
+        ce_idx = self._get_lookahead_index(ego_loc, self._lookahead_distance)
         desired_x = self._wps[ce_idx][0].transform.location.x
         desired_y = self._wps[ce_idx][0].transform.location.y
-        
+
         # Get Target Heading
-        if ce_idx < len(self._wps)-1:
-            desired_heading_x = self._wps[ce_idx+1][0].transform.location.x - self._wps[ce_idx][0].transform.location.x
-            desired_heading_y = self._wps[ce_idx+1][0].transform.location.y - self._wps[ce_idx][0].transform.location.y
+        if ce_idx < len(self._wps) - 1:
+            desired_heading_x = (
+                self._wps[ce_idx + 1][0].transform.location.x
+                - self._wps[ce_idx][0].transform.location.x
+            )
+            desired_heading_y = (
+                self._wps[ce_idx + 1][0].transform.location.y
+                - self._wps[ce_idx][0].transform.location.y
+            )
         else:
-            desired_heading_x = self._wps[ce_idx][0].transform.location.x - self._wps[ce_idx-1][0].transform.location.x
-            desired_heading_y = self._wps[ce_idx][0].transform.location.y - self._wps[ce_idx-1][0].transform.location.y
-        
+            desired_heading_x = (
+                self._wps[ce_idx][0].transform.location.x
+                - self._wps[ce_idx - 1][0].transform.location.x
+            )
+            desired_heading_y = (
+                self._wps[ce_idx][0].transform.location.y
+                - self._wps[ce_idx - 1][0].transform.location.y
+            )
+
         # Trajectory Heading
         desired_heading = atan2(desired_heading_y, desired_heading_x)
-        
+
         # Trajectory Distance
-        dd=hypot(desired_heading_x, desired_heading_y)
-        
+        dd = hypot(desired_heading_x, desired_heading_y)
+
         # Crosstrack error
-        lateral_error = \
-              ((observed_x-desired_x)*desired_heading_y -
-              (observed_y-desired_y)*desired_heading_x) / (dd + sys.float_info.epsilon)
-        
+        lateral_error = (
+            (observed_x - desired_x) * desired_heading_y
+            - (observed_y - desired_y) * desired_heading_x
+        ) / (dd + sys.float_info.epsilon)
+
         # Heading error
-        steering = (desired_heading-observed_heading)
-        
+        steering = desired_heading - observed_heading
+
         # Normalization to [-pi, pi]
-        while (steering<-np.pi):
-            steering += 2*np.pi
-        while (steering>np.pi):
-            steering -= 2*np.pi
-            
+        while steering < -np.pi:
+            steering += 2 * np.pi
+        while steering > np.pi:
+            steering -= 2 * np.pi
+
         steering_error = steering
-        
-        # Stanley Control Law   
-        steering += atan(self._kv * lateral_error /
-                               (self._ks + speed_estimate))
-        
+
+        # Stanley Control Law
+        steering += atan(self._kv * lateral_error / (self._ks + speed_estimate))
+
         # print("Current Heading: ", observed_heading, " - Desired Heading: ", desired_heading)
         # print("Heading error: ", steering_error, "Crosstrack error: ", lateral_error)
         # print("Output: ", steering)
-        
+
         return np.clip(steering, -1.0, 1.0)
 
     def change_parameters(self, Kv, Ks, dt):
@@ -292,24 +331,29 @@ class StanleyLateralController():
         self._kv = Kv
         self._ks = Ks
         self._dt = dt
-    
+
     def setWaypoints(self, wps):
         """Sets trajectory to follow and filters spurious points"""
         self._wps = [wps[0]]
         for i in range(1, len(wps) - 1):
-            trj_heading_x = wps[i][0].transform.location.x - self._wps[-1][0].transform.location.x
-            trj_heading_y = wps[i][0].transform.location.y - self._wps[-1][0].transform.location.y
-            
+            trj_heading_x = (
+                wps[i][0].transform.location.x - self._wps[-1][0].transform.location.x
+            )
+            trj_heading_y = (
+                wps[i][0].transform.location.y - self._wps[-1][0].transform.location.y
+            )
+
             dd = hypot(trj_heading_x, trj_heading_y)
             if dd > 0:
                 self._wps.append(wps[i])
-        
-class PIDLateralController():
+
+
+class PIDLateralController:
     """
     PIDLateralController implements lateral control using a PID.
     """
 
-    def __init__(self, vehicle, offset=0, K_P=1.0, K_I=0.0, K_D=0.0, dt=0.03):
+    def __init__(self, vehicle, offset=1, K_P=1.0, K_I=0.0, K_D=0.0, dt=0.03):
         """
         Constructor method.
 
@@ -359,14 +403,13 @@ class PIDLateralController():
             # Displace the wp to the side
             w_tran = waypoint.transform
             r_vec = w_tran.get_right_vector()
-            w_loc = w_tran.location + carla.Location(x=self._offset*r_vec.x,
-                                                         y=self._offset*r_vec.y)
+            w_loc = w_tran.location + carla.Location(
+                x=self._offset * r_vec.x, y=self._offset * r_vec.y
+            )
         else:
             w_loc = waypoint.transform.location
 
-        w_vec = np.array([w_loc.x - ego_loc.x,
-                          w_loc.y - ego_loc.y,
-                          0.0])
+        w_vec = np.array([w_loc.x - ego_loc.x, w_loc.y - ego_loc.y, 0.0])
 
         wv_linalg = np.linalg.norm(w_vec) * np.linalg.norm(v_vec)
         if wv_linalg == 0:
@@ -385,7 +428,9 @@ class PIDLateralController():
             _de = 0.0
             _ie = 0.0
 
-        return np.clip((self._k_p * _dot) + (self._k_d * _de) + (self._k_i * _ie), -1.0, 1.0)
+        return np.clip(
+            (self._k_p * _dot) + (self._k_d * _de) + (self._k_i * _ie), -1.0, 1.0
+        )
 
     def change_parameters(self, K_P, K_I, K_D, dt):
         """Changes the PID parameters"""
