@@ -253,22 +253,7 @@ class BasicAgent(object):
             def dist(v): return v.get_location().distance(waypoint.transform.location)
             vehicle_list = [v for v in vehicle_list if dist(v) < 43 and v.id != self._vehicle.id]
             vehicle_list.sort(key=dist)
-
-        # junction = waypoint.get_junction()
-
-        '''def _print_vehicle_info(vehicle, is_ego=False):
-            print('||||| vehicle_type:' if not is_ego else '||||| ego:', end='')
-            print(vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
-
-        for vehicle in vehicle_list:
-            print('--------------- for ----------------')
-            ve_wpt = self._map.get_waypoint(vehicle.get_location())
-            if junction is not None and ve_wpt.get_junction().id == junction.id:
-                _print_vehicle_info(vehicle)
-                _print_vehicle_info(self._vehicle, True)
-                # print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
-                # print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
-        '''
+        
         if check_lane != 'left' or check_lane != 'right':
             return (False, None, -1)
         elif check_lane == 'left':
@@ -358,7 +343,7 @@ class BasicAgent(object):
                 return (True, traffic_light)
 
         return (False, None)
-    
+
     def _affected_by_stop_sign(self, vehicle=None, stops_list=None, max_distance=None):
         if self._ignore_stop_signs:
             return (False, None) # False = non cosideriamo il segnale, None = nessun oggetto segnale, -1 = distanza dall'oggetto
@@ -382,7 +367,7 @@ class BasicAgent(object):
             
             if not l_vehicle_state and not r_vehicle_state:
                 self._last_stop_sign = None
-            elif (l_vehicle_state and not r_vehicle_state) or (l_vehicle_state and r_vehicle_state):
+            elif (l_vehicle_state or not r_vehicle_state): # or (l_vehicle_state and r_vehicle_state):
                 return (True, self._last_stop_sign)
             elif (r_vehicle_state and not l_vehicle_state):
                 # avanaza fino al waypoint prima della collisione
@@ -407,7 +392,7 @@ class BasicAgent(object):
             wp_dir = trigger_wp.transform.get_forward_vector() # valuriamo anche l'orientamento del veicolo
             dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z # dove dobbiamo andare
 
-            if dot_ve_wp < 0: continue
+            if dot_ve_wp < -2: continue
 
             if self._last_stop_sign is not None:
                 if trigger_wp == self._stops_map[self._last_stop_sign.id]: continue
@@ -480,6 +465,7 @@ class BasicAgent(object):
 
             # Waypoints aren't reliable, check the proximity of the vehicle to the route
             else:
+                print('------------ in junction -------------------')
                 # cotruisco un poligono sulla mia posizione
                 route_bb = [] # creo una lista vuota, dove ci saranno i miei punti estremi e poi creo il poligono
                 ego_location = ego_transform.location
