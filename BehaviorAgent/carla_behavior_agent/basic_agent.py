@@ -298,8 +298,7 @@ class BasicAgent(object):
             if not next_wp:
                 print("\nSTAY ON THE RIGHT ERROR 1: non c'è il waypoint\n")
                 return []
-            distance += next_wps[0].transform.location.distance(
-                plan[-1][0].transform.location)
+            distance += next_wps[0].transform.location.distance(plan[-1][0].transform.location)
             plan.append((next_wp, RoadOption.RIGHT))
 
         self.set_global_plan(plan, clean_queue=True)
@@ -626,11 +625,9 @@ class BasicAgent(object):
                 target_extent = target_vehicle.bounding_box.extent.x
                 target_end_transform = target_transform
                 if check_rear:
-                    target_end_transform.location -= carla.Location(
-                        x=target_extent * target_forward_vector.x, y=target_extent * target_forward_vector.y)
+                    target_end_transform.location -= carla.Location(x=target_extent * target_forward_vector.x, y=target_extent * target_forward_vector.y)
                 else:
-                    target_end_transform.location += carla.Location(
-                        x=target_extent * target_forward_vector.x, y=target_extent * target_forward_vector.y)
+                    target_end_transform.location += carla.Location(x=target_extent * target_forward_vector.x, y=target_extent * target_forward_vector.y)
                 if is_within_distance(target_end_transform, ego_front_transform, max_distance, [low_angle_th, up_angle_th]):
                     self._near_vehicle_list.append((True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)))
 
