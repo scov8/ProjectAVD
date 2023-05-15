@@ -414,7 +414,7 @@ class BehaviorAgent(BasicAgent):
                 return control
         elif self._shrinkage:
             print('LANE INVASION: FALSE')
-            self._local_planner.set_lat_offset(0.0)
+            #self._local_planner.set_lat_offset(0.0)
             route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
             self._local_planner.set_global_plan(route_trace,  clean_queue=True)
             self._shrinkage = False
