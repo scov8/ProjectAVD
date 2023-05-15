@@ -396,6 +396,8 @@ class BehaviorAgent(BasicAgent):
         # 1: Red lights and stops behavior
         if self.traffic_light_manager():
             return self.emergency_stop()
+        
+        self._local_planner.set_lat_offset(3)
 
         # 2.3: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30)
