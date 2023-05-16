@@ -202,7 +202,6 @@ class BehaviorAgent(BasicAgent):
                     vehicle_list.remove(vehicle_list[i+1])
                 else:
                     distance = v2_location.get_location().distance(self._vehicle.get_location())
-                    break
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ", distance)
             return True, len(vehicle_list), distance
 
