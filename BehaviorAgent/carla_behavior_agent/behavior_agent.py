@@ -564,6 +564,7 @@ class BehaviorAgent(BasicAgent):
 
             :param speed (carl.VehicleControl): control to be modified
         """
+        print("emergency stop")
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = self._max_brake
