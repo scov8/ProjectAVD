@@ -53,7 +53,6 @@ class BasicAgent(object):
         self._last_stop_sign = None
         self._last_traffic_light = None
 
-        self._junction_counter = 0
 
         # Base parameters
         self._ignore_traffic_lights = True  # CHANGE TO FALSEEE!!!!
@@ -67,6 +66,8 @@ class BasicAgent(object):
         self._speed_ratio = 1
         self._max_brake = 0.5
         self._offset = 0
+        self._near_vehicle_list = []
+        self._junction_counter = 0
 
         # Change parameters according to the dictionary
         if 'target_speed' in opt_dict:
@@ -403,7 +404,7 @@ class BasicAgent(object):
 
         return (False, None)
 
-    def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
+    def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0, check_overtake_list=False):
         """
         Method to check if there is a vehicle in front of the agent blocking its path.
 
@@ -414,9 +415,13 @@ class BasicAgent(object):
         """
         if self._ignore_vehicles:
             return (False, None, -1)
+        
+        self._near_vehicle_list.clear()
 
         if not vehicle_list:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
+            if len(vehicle_list) == 0:
+                return (False, None, -1)
 
         if not max_distance:
             max_distance = self._base_vehicle_threshold
@@ -461,11 +466,10 @@ class BasicAgent(object):
                 )
 
                 if is_within_distance(target_rear_transform, ego_front_transform, max_distance, [low_angle_th, up_angle_th]): # vedo la distanza tra la mia punta e il culo dell'altro veicolo
-                    return (True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)) # è una possivile colluisione con quel veiclo 
+                    self._near_vehicle_list.append((True, target_vehicle, compute_distance(target_transform.location, ego_transform.location))) # è una possivile colluisione con quel veiclo 
 
             # Waypoints aren't reliable, check the proximity of the vehicle to the route
             else:
-                print('------------ in junction -------------------')
                 # cotruisco un poligono sulla mia posizione
                 route_bb = [] # creo una lista vuota, dove ci saranno i miei punti estremi e poi creo il poligono
                 ego_location = ego_transform.location
@@ -506,10 +510,17 @@ class BasicAgent(object):
                     target_list = [[v.x, v.y, v.z] for v in target_vertices]
                     target_polygon = Polygon(target_list)
 
-                    if ego_polygon.intersects(target_polygon): # se si intersecano allora è una possibile collisione e mi da fastidio
-                        return (True, target_vehicle, compute_distance(target_vehicle.get_location(), ego_location)) # dato che impatta voglio sapere le info del veicolo che mi ha impattato
+                    if ego_polygon.intersects(target_polygon):
+                        self._near_vehicle_list.append((True, target_vehicle, compute_distance(target_transform.location, ego_transform.location)))
 
+        if len(self._near_vehicle_list) > 0:
+            self._near_vehicle_list = sorted(self._near_vehicle_list, key=lambda t: t[2])
+            print(self._near_vehicle_list[0][1].type_id)
+            if check_overtake_list and self._near_vehicle_list[0][1].type_id not in self._overtake_list:
                 return (False, None, -1)
+            return self._near_vehicle_list[0]
+        elif lane_offset == 0:
+            return self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=180, lane_offset=1, check_overtake_list=True)
 
         return (False, None, -1)
 

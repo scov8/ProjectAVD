@@ -474,5 +474,5 @@ class BehaviorAgent(BasicAgent):
         control.throttle = 0.0
         control.hand_brake = False
         speed = get_speed(self._vehicle)
-        control.brake = abs(speed / 2 - speed)/0.65 % self._max_brake
+        control.brake = abs(speed / 2 - speed) / 0.3 % self._max_brake
         return control
