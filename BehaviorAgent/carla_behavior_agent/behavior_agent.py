@@ -187,16 +187,20 @@ class BehaviorAgent(BasicAgent):
             v_direction = math.atan2(v_location.y - ego_location.y, v_location.x - ego_location.x)
             relative_direction = abs(math.degrees(vehicle_yaw - v_direction))
             if relative_direction >= 90:
-                #print("ELIMINO VEICOLO: ", v, "DIREZIONE: ", relative_direction)
                 vehicle_list.remove(v)
 
         if len(vehicle_list) == 0:
             return False, 0, 0
         else:
             distance = 0
-            for v in vehicle_list:
-                distance += v.get_location().distance(self._vehicle.get_location())
-                print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
+            for i in range (len(vehicle_list)-1):
+                v1_location = vehicle_list[i].get_transform().location
+                v2_location = vehicle_list[i+1].get_transform().location
+                v_distance = math.sqrt((v2_location.x - v1_location.x)**2 + (v2_location.y - v1_location.y)**2)
+                #distance += v.get_location().distance(self._vehicle.get_location())
+                #print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
+                if v_distance > 12:
+                    vehicle_list.remove(vehicle_list[i+1])
 
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ", distance)
             return True, len(vehicle_list), distance
