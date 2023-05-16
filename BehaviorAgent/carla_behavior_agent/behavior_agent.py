@@ -423,7 +423,6 @@ class BehaviorAgent(BasicAgent):
             # we use bounding boxes to calculate the actual distance
             distance = w_distance - max(walker.bounding_box.extent.y, walker.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
-            # Emergency brake if the car is very close al pedone.
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
