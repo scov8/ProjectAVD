@@ -296,7 +296,7 @@ class BehaviorAgent(BasicAgent):
 
         walker_list = self._world.get_actors().filter("*walker.pedestrian*") # get all the walkers in the world
         def dist(w): return w.get_location().distance(waypoint.transform.location) # distance between the waypoint and the location of the walker
-        walker_list = [w for w in walker_list if dist(w) < 10] # get all the walkers in the world that are within 10 meters from the waypoint
+        walker_list = [w for w in walker_list if dist(w) < 30] # get all the walkers in the world that are within 10 meters from the waypoint
         walker_list.sort(key=dist) # sort the list of walkers by distance
 
         if walker_list == []: # if there are no walkers in the world
@@ -387,8 +387,6 @@ class BehaviorAgent(BasicAgent):
 
         control = None
 
-        print("ego location: ", self._vehicle.get_location())
-
         if self._behavior.tailgate_counter > 0:
             self._behavior.tailgate_counter -= 1
 
@@ -428,6 +426,12 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close al pedone.
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
+            elif distance < 13 and self._speed > 0.01 and not self._overtaking_obj:
+                print("sto frenando per ostacolo: SOFT STOP")
+                return self.soft_stop()
+            elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
+                print("sto frenando per ostacolo: NO THROTTLE")
+                return self.no_throttle()
 
         # 2.1.2: Obstacle avoidance behaviors
         obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
