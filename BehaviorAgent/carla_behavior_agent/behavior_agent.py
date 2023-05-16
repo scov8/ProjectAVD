@@ -174,9 +174,11 @@ class BehaviorAgent(BasicAgent):
         funzione che prende una lista di veicoli e vede quanti veicoli ci davanti a me nella stessa lane.id. ritorna il numero di veicoli
         e la distanza totale fino all'ultimo la distanza tra un veicolo e l'altro deve essere massimo di 7 metri.
         """
+        ego_location = waypoint.location
+        ego_wpt = self._map.get_waypoint(ego_location)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
         def dist(v): return v.get_location().distance(waypoint.transform.location)
-        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id and (v.lane_id == self._vehicle.lane_id or (abs(v.lane_id) == abs(self._vehicle.lane_id) + 1))]
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id and (self._map.get_waypoint(v.get_transform().location).lane_id == ego_wpt.lane_id or (abs(self._map.get_waypoint(v.get_transform().location).lane_id) == abs(ego_wpt.lane_id) + 1))]
         vehicle_list.sort(key=dist)
         if len(vehicle_list) == 0:
             return False, 0, 0
