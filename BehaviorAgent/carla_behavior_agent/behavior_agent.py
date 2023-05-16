@@ -168,6 +168,26 @@ class BehaviorAgent(BasicAgent):
         acc = vehicle.get_acceleration().length() # get the acceleration of the vehicle
         print("VELOCITA VEICOLO: ", vel, "ACCELERAZIONE: ", acc)
         return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
+    
+    def _iam_stuck(self):
+        """
+        funzione che prende una lista di veicoli e vede quanti veicoli ci davanti a me nella stessa lane.id. ritorna il numero di veicoli
+        e la distanza totale fino all'ultimo la distanza tra un veicolo e l'altro deve essere massimo di 7 metri.
+        """
+        vehicle_list = self._world.get_actors().filter("*vehicle*")
+        def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
+        vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 40 and v.id != self._vehicle.id]
+        vehicle_list = [v for v in vehicle_list if v.get_location().y == self._vehicle.get_location().y] # prendo solo i veicoli nella mia lane
+        vehicle_list = [v for v in vehicle_list if v.get_location().x > self._vehicle.get_location().x] # prendo solo i veicoli davanti a me
+        vehicle_list = sorted(vehicle_list, key=lambda v: v.get_location().x)
+        if len(vehicle_list) == 0:
+            return False, 0, 0
+        else:
+            distance = 0
+            for v in vehicle_list:
+                distance += v.get_location().distance(self._vehicle.get_location())
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ", distance)
+            return True, len(vehicle_list), distance
 
     def traffic_light_manager(self):
         """
@@ -307,7 +327,7 @@ class BehaviorAgent(BasicAgent):
         elif self._direction == RoadOption.CHANGELANERIGHT:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1) # check if there is a walker in the right lane
         else:
-            walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)  # check if there is a walker in the current lane
+            walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=60)  # check if there is a walker in the current lane
 
         print("walker_state: ", walker_state, "walker: ", walker, "distance: ", distance)
         return walker_state, walker, distance
@@ -426,9 +446,7 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             elif distance < 30:
-                print("BIMBOOOOOOOOOO")
-                con = carla.VehicleControl()
-                print("FRENO", con.brake)
+                print("BIMBO ", self._speed)
                 return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
@@ -505,6 +523,7 @@ class BehaviorAgent(BasicAgent):
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
+                        self._iam_stuck()
                         vehicle_list = self._world.get_actors().filter("*vehicle*")
                         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
                         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id]
@@ -564,7 +583,6 @@ class BehaviorAgent(BasicAgent):
 
             :param speed (carl.VehicleControl): control to be modified
         """
-        print("emergency stop")
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = self._max_brake
