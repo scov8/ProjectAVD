@@ -190,7 +190,7 @@ class BehaviorAgent(BasicAgent):
         if len(vehicle_list) == 0:
             return False, 0, 75, 8
         elif len(vehicle_list) == 1:
-            return True, 1, 45, 8
+            return True, 1, 75, 8
         else:
             distance = 0
             d_max=7
