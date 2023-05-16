@@ -406,7 +406,7 @@ class BehaviorAgent(BasicAgent):
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
                 #self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
-                self._local_planner.set_lat_offset(-(offset_invasion+0.5)) # mio
+                self._local_planner.set_lat_offset(-(offset_invasion+0.8))
                 self._shrinkage = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 2)
                 self._local_planner.set_speed(target_speed)
@@ -415,8 +415,6 @@ class BehaviorAgent(BasicAgent):
         elif self._shrinkage:
             print('LANE INVASION: FALSE')
             self._local_planner.set_lat_offset(0.0)
-            route_trace = self.trace_route(ego_vehicle_wp, self._destination_waypoint)
-            self._local_planner.set_global_plan(route_trace,  clean_queue=True)
             self._shrinkage = False
 
         # 2.1: Pedestrian avoidance behaviors
