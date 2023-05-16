@@ -186,6 +186,8 @@ class BehaviorAgent(BasicAgent):
             distance = 0
             for v in vehicle_list:
                 distance += v.get_location().distance(self._vehicle.get_location())
+                print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
+
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ", distance)
             return True, len(vehicle_list), distance
 
