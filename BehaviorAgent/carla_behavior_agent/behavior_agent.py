@@ -427,7 +427,8 @@ class BehaviorAgent(BasicAgent):
                 return self.emergency_stop()
             elif distance < 30:
                 print("BIMBOOOOOOOOOO")
-                print("FRENO", control.brake)
+                con = carla.VehicleControl()
+                print("FRENO", con.brake)
                 return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
