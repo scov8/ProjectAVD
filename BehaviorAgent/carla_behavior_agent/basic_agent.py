@@ -291,12 +291,8 @@ class BasicAgent(object):
         while distance < on_the_right_distance:
             next_wps = plan[-1][0].next(step_distance)
 
-            right_vector = next_wps[0].transform.rotation.get_right_vector()
-            offset_vector = right_vector * offset
-            next_wp = next_wps[0].transform.location + offset_vector
-
-            #offset_vector = carla.Vector3D(offset, 0.0, 0.0)  # mio
-            #next_wp = self._map.get_waypoint(next_wps[0].transform.location + offset_vector, project_to_road=False)  # mio
+            offset_vector = carla.Vector3D(offset, 0.0, 0.0)  # mio
+            next_wp = self._map.get_waypoint(next_wps[0].transform.location + offset_vector, project_to_road=False)  # mio
             #next_wp = self._map.get_waypoint(next_wps[0].transform.location + carla.Location(y=offset), project_to_road=False)
 
             if not next_wp:
