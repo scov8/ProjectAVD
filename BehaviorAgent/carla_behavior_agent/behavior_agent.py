@@ -193,7 +193,7 @@ class BehaviorAgent(BasicAgent):
             return True, 1, 75, 8
         else:
             distance = 0
-            d_max=7
+            d_max=10
             v_list =[]
             for i in range (len(vehicle_list)-1):
                 print("i: ", i, "len: ", len(vehicle_list))
