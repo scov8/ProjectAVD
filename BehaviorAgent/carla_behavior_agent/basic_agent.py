@@ -291,12 +291,10 @@ class BasicAgent(object):
         while distance < on_the_right_distance:
             next_wps = plan[-1][0].next(step_distance)
 
-            if offset > 0:
-                target_lane = next_wps[0].get_right_lane()
-            else:
-                target_lane = next_wps[0].get_left_lane()
+            offset_location = next_wps[0].transform.location + offset * next_wps[0].transform.get_right_vector()
 
-            next_wp = target_lane.transform.location
+
+            next_wp = offset_location.transform.location
 
 
 

@@ -394,7 +394,7 @@ class BehaviorAgent(BasicAgent):
 
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-        # self.stay_on_the_right(ego_vehicle_wp, 3, 2)
+        self.stay_on_the_right(ego_vehicle_wp, 0.1, 2)
         # 1: Red lights and stops behavior
         if self.traffic_light_manager():
             return self.emergency_stop()
