@@ -169,17 +169,15 @@ class BehaviorAgent(BasicAgent):
         print("VELOCITA VEICOLO: ", vel, "ACCELERAZIONE: ", acc)
         return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
     
-    def _iam_stuck(self):
+    def _iam_stuck(self, waypoint):
         """
         funzione che prende una lista di veicoli e vede quanti veicoli ci davanti a me nella stessa lane.id. ritorna il numero di veicoli
         e la distanza totale fino all'ultimo la distanza tra un veicolo e l'altro deve essere massimo di 7 metri.
         """
         vehicle_list = self._world.get_actors().filter("*vehicle*")
-        def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
-        vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 40 and v.id != self._vehicle.id]
-        vehicle_list = [v for v in vehicle_list if v.get_location().y == self._vehicle.get_location().y] # prendo solo i veicoli nella mia lane
-        vehicle_list = [v for v in vehicle_list if v.get_location().x > self._vehicle.get_location().x] # prendo solo i veicoli davanti a me
-        vehicle_list = sorted(vehicle_list, key=lambda v: v.get_location().x)
+        def dist(v): return v.get_location().distance(waypoint.transform.location)
+        vehicle_list = [v for v in vehicle_list if dist(v) < 45 and v.id != self._vehicle.id and (v.lane_id == self._vehicle.lane_id or (abs(v.lane_id) == abs(self._vehicle.lane_id) + 1))]
+        vehicle_list.sort(key=dist)
         if len(vehicle_list) == 0:
             return False, 0, 0
         else:
@@ -523,7 +521,7 @@ class BehaviorAgent(BasicAgent):
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
-                        self._iam_stuck()
+                        self._iam_stuck(ego_vehicle_wp)
                         vehicle_list = self._world.get_actors().filter("*vehicle*")
                         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
                         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id]
