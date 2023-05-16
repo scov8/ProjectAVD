@@ -425,7 +425,7 @@ class BehaviorAgent(BasicAgent):
 
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
-            elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
+            elif distance < 30:
                 print("BIMBOOOOOOOOOO")
                 return self.emergency_stop()
 
