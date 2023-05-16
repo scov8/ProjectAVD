@@ -186,7 +186,7 @@ class BehaviorAgent(BasicAgent):
             v_location = v.get_transform().location
             v_direction = math.atan2(v_location.y - ego_location.y, v_location.x - ego_location.x)
             relative_direction = abs(math.degrees(vehicle_yaw - v_direction))
-            if relative_direction <= 90:
+            if relative_direction >= 90:
                 print("ELIMINO VEICOLO: ", v, "DIREZIONE: ", relative_direction)
                 vehicle_list.remove(v)
 
