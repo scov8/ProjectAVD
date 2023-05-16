@@ -181,15 +181,13 @@ class BehaviorAgent(BasicAgent):
         vehicle_list = [v for v in vehicle_list if dist(v) < 30 and v.id != self._vehicle.id and (self._map.get_waypoint(v.get_transform().location).lane_id == ego_wpt.lane_id or (abs(self._map.get_waypoint(v.get_transform().location).lane_id) == abs(ego_wpt.lane_id) + 1))]
         vehicle_list.sort(key=dist)
 
-        vehicle_location = self._vehicle.get_location()
         vehicle_yaw = math.radians(self._vehicle.get_transform().rotation.yaw)
-        closest_distance = float('inf')
         for v in vehicle_list:
             v_location = v.get_transform().location
-            v_direction = math.atan2(v_location.y - vehicle_location.y, v_location.x - vehicle_location.x)
-            intersection_distance = math.sqrt((v_location.x - vehicle_location.x)**2 + (v_location.y - vehicle_location.y)**2)
+            v_direction = math.atan2(v_location.y - ego_location.y, v_location.x - ego_location.x)
             relative_direction = abs(math.degrees(vehicle_yaw - v_direction))
             if relative_direction <= 90:
+                print("ELIMINO VEICOLO: ", v, "DIREZIONE: ", relative_direction)
                 vehicle_list.remove(v)
 
         if len(vehicle_list) == 0:
