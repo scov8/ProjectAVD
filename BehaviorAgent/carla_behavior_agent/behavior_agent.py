@@ -62,6 +62,7 @@ class BehaviorAgent(BasicAgent):
         self._shrinkage = False           # shrinkage flag
         self._waypoints_queue_copy = None # copy of the waypoints queue
         self._d_max = 8                   # maximum distance to check for overtaking
+        self._distance_to_over = 75       # distance to overtake
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -207,7 +208,7 @@ class BehaviorAgent(BasicAgent):
                     if v_distance > d_max:
                         d_max = v_distance
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ", distance, "DISTANZA MASSIMA: ", d_max+1)
-            return True, len(vehicle_list), distance, d_max
+            return True, len(vehicle_list), distance, d_max+1
 
     def traffic_light_manager(self):
         """
@@ -520,7 +521,7 @@ class BehaviorAgent(BasicAgent):
         elif self._overtaking_vehicle or self._overtaking_obj:
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied(self._d_max , check_behind=True): #era 15 ora 7
+                if not self._other_lane_occupied(self._d_max , check_behind=True): #era 15
                     print("RIENTRO")
                     if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 ora 1.5
                         self._ending_overtake = True
@@ -543,7 +544,7 @@ class BehaviorAgent(BasicAgent):
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
-                        stuck, n_vehicle, distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
+                        stuck, n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
                         vehicle_list = self._world.get_actors().filter("*vehicle*")
                         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
                         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id]
