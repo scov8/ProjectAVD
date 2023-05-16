@@ -426,12 +426,9 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close al pedone.
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
-            elif distance < 13 and self._speed > 0.01 and not self._overtaking_obj:
-                print("sto frenando per ostacolo: SOFT STOP")
-                return self.soft_stop()
             elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
-                print("sto frenando per ostacolo: NO THROTTLE")
-                return self.no_throttle()
+                print("BIMBOOOOOOOOOO")
+                return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
         obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
