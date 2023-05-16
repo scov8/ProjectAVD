@@ -185,7 +185,7 @@ class BehaviorAgent(BasicAgent):
         vehicle_yaw = math.radians(self._vehicle.get_transform().rotation.yaw)
         closest_distance = float('inf')
         for v in vehicle_list:
-            v_location = v.transform.location
+            v_location = v.get_transform().location
             v_direction = math.atan2(v_location.y - vehicle_location.y, v_location.x - vehicle_location.x)
             intersection_distance = math.sqrt((v_location.x - vehicle_location.x)**2 + (v_location.y - vehicle_location.y)**2)
             relative_direction = abs(math.degrees(vehicle_yaw - v_direction))
