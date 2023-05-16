@@ -201,9 +201,8 @@ class BehaviorAgent(BasicAgent):
                 #print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
                 if v_distance > 12:
                     vehicle_list.remove(vehicle_list[i+1])
-
-            for v in vehicle_list:
-                print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
+                else:
+                    distance = v_distance
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ", distance)
             return True, len(vehicle_list), distance
 
