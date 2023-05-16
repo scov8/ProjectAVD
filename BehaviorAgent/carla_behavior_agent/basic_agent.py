@@ -292,8 +292,10 @@ class BasicAgent(object):
             next_wps = plan[-1][0].next(step_distance)
 
             lane_width = next_wps[0].lane_width
-            offset_vector = next_wps[0].right_vector * offset * lane_width
+            lane_normal = next_wps[0].lane_normal
+            offset_vector = lane_normal * offset * lane_width
             next_wp = next_wps[0].transform.location + offset_vector
+
 
 
             #offset_vector = carla.Vector3D(offset, 0.0, 0.0)  # mio

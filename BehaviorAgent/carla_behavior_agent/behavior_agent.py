@@ -387,6 +387,8 @@ class BehaviorAgent(BasicAgent):
 
         control = None
 
+        self.stay_on_the_right(ego_vehicle_wp, 3, 2)
+
         if self._behavior.tailgate_counter > 0:
             self._behavior.tailgate_counter -= 1
 
