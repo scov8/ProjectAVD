@@ -168,6 +168,19 @@ class BehaviorAgent(BasicAgent):
         acc = vehicle.get_acceleration().length() # get the acceleration of the vehicle
         print("VELOCITA VEICOLO: ", vel, "ACCELERAZIONE: ", acc)
         return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
+    
+    def _iam_stuck(self, vehicle_list):
+        """
+        funzione che prende una lista di veicoli e vede quanti veicoli ci davanti a me. ritorna il numero di veicoli
+        e la distanza totale 
+        """
+        vehicle_list = [v for v in vehicle_list if v.id != self._vehicle.id]
+        def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
+        vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30]
+        if len(vehicle_list) > 0:
+            return True
+        return False
+
 
     def traffic_light_manager(self):
         """
@@ -307,7 +320,7 @@ class BehaviorAgent(BasicAgent):
         elif self._direction == RoadOption.CHANGELANERIGHT:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1) # check if there is a walker in the right lane
         else:
-            walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=60)  # check if there is a walker in the current lane
+            walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=60)  # check if there is a walker in the current lane
 
         print("walker_state: ", walker_state, "walker: ", walker, "distance: ", distance)
         return walker_state, walker, distance
@@ -426,9 +439,7 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             elif distance < 30:
-                print("BIMBOOOOOOOOOO")
-                con = carla.VehicleControl()
-                print("FRENO", con.brake)
+                print("BIMBO ", self._speed)
                 return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
@@ -564,7 +575,6 @@ class BehaviorAgent(BasicAgent):
 
             :param speed (carl.VehicleControl): control to be modified
         """
-        print("emergency stop")
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = self._max_brake
