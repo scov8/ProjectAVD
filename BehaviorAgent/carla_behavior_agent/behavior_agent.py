@@ -192,10 +192,10 @@ class BehaviorAgent(BasicAgent):
                 vehicle_list.remove(v)
 
         if len(vehicle_list) == 0:
-            return False, 0, 0, 0
+            return False, 0, 75, 8
         else:
             distance = 0
-            d_max=0
+            d_max=7
             for i in range (len(vehicle_list)-1):
                 v1_location = vehicle_list[i].get_transform().location
                 v2_location = vehicle_list[i+1].get_transform().location
