@@ -387,7 +387,7 @@ class BehaviorAgent(BasicAgent):
 
         control = None
 
-        
+        print("ego location: ", self._vehicle.get_location())
 
         if self._behavior.tailgate_counter > 0:
             self._behavior.tailgate_counter -= 1
