@@ -172,10 +172,6 @@ class BehaviorAgent(BasicAgent):
         return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
     
     def _iam_stuck(self, waypoint):
-        """
-        funzione che prende una lista di veicoli e vede quanti veicoli ci davanti a me nella stessa lane.id. ritorna il numero di veicoli
-        e la distanza totale fino all'ultimo la distanza tra un veicolo e l'altro deve essere massimo di 7 metri.
-        """
         ego_location = waypoint.transform.location
         ego_wpt = self._map.get_waypoint(ego_location)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
@@ -193,6 +189,8 @@ class BehaviorAgent(BasicAgent):
 
         if len(vehicle_list) == 0:
             return False, 0, 75, 8
+        elif len(vehicle_list) == 1:
+            return False, 0, 40, 8
         else:
             distance = 0
             d_max=7
