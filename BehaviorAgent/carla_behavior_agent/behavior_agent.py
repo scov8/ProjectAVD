@@ -553,7 +553,7 @@ class BehaviorAgent(BasicAgent):
                         new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th=90, up_angle_th=180, lane_offset=-1)
 
                         if not new_vehicle_state and not new_vehicle_state2:
-                            if not self._other_lane_occupied(distance=75) and not self._overtaking_vehicle and self.closest_intersection() > 200:
+                            if not self._other_lane_occupied(distance=self._distance_to_over*2.2) and not self._overtaking_vehicle and self.closest_intersection() > 200:
                                 self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 1.5 al posto di 2
                                     self._overtaking_vehicle = True
