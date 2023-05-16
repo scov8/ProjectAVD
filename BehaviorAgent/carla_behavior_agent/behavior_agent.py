@@ -172,7 +172,7 @@ class BehaviorAgent(BasicAgent):
     def _iam_stuck(self):
         """
         funzione che prende una lista di veicoli e vede quanti veicoli ci davanti a me nella stessa lane.id. ritorna il numero di veicoli
-        e la distanza totale fino all'ultimo.
+        e la distanza totale fino all'ultimo la distanza tra un veicolo e l'altro deve essere massimo di 7 metri.
         """
         vehicle_list = self._world.get_actors().filter("*vehicle*")
         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
@@ -188,7 +188,6 @@ class BehaviorAgent(BasicAgent):
                 distance += v.get_location().distance(self._vehicle.get_location())
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ", distance)
             return True, len(vehicle_list), distance
-
 
     def traffic_light_manager(self):
         """
