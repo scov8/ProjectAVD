@@ -189,8 +189,7 @@ class BehaviorAgent(BasicAgent):
             v_direction = math.atan2(v_location.y - vehicle_location.y, v_location.x - vehicle_location.x)
             intersection_distance = math.sqrt((v_location.x - vehicle_location.x)**2 + (v_location.y - vehicle_location.y)**2)
             relative_direction = abs(math.degrees(vehicle_yaw - v_direction))
-            if relative_direction <= 90 and intersection_distance < closest_distance:
-                closest_distance = intersection_distance
+            if relative_direction <= 90:
                 vehicle_list.remove(v)
 
         if len(vehicle_list) == 0:
