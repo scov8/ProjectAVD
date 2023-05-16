@@ -180,6 +180,10 @@ class BehaviorAgent(BasicAgent):
         def dist(v): return v.get_location().distance(waypoint.transform.location)
         vehicle_list = [v for v in vehicle_list if dist(v) < 30 and v.id != self._vehicle.id and (self._map.get_waypoint(v.get_transform().location).lane_id == ego_wpt.lane_id or (abs(self._map.get_waypoint(v.get_transform().location).lane_id) == abs(ego_wpt.lane_id) + 1))]
         vehicle_list.sort(key=dist)
+        # nel for elimino i veicoli che stanno dietro a me come per le junction
+        for v in vehicle_list:
+            if self._map.get_waypoint(v.get_transform().location).transform.location.distance(waypoint.transform.location) < 0:
+                vehicle_list.remove(v)
         if len(vehicle_list) == 0:
             return False, 0, 0
         else:
