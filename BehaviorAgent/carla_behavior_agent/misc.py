@@ -39,28 +39,9 @@ def get_speed(vehicle):
 
     return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
 
-
-def is_within_trigger_volume(vehicle, object, object_trigger_volume=2.0):
-    """
-    Check if the vehicle is within the trigger volume of the object
-
-    :param vehicle: vehicle
-    :param object: object (traffic_light/stop_sign)
-    :param object_trigger_volume: Trigger volume of the object
-    :return: Boolean
-    """
-    vehicle_transform = vehicle.get_transform()
-    object_transform = object.get_transform()
-
-    # Get the location of the trigger volume
-    trigger_loc = object_transform.transform(object_trigger_volume.location)
-
-    # Calculate the distance between the vehicle and the trigger volume location
-    distance = compute_distance(vehicle_transform.location, trigger_loc)
-
-    # Check if the vehicle is within the trigger volume
-    return is_within_distance(vehicle_transform, object_transform, object_trigger_volume.extent.x) and distance <= object_trigger_volume.extent.z
-
+def get_steering(vehicle):
+    vel = vehicle.get_angular_velocity()
+    return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
 
 def get_trafficlight_trigger_location(traffic_light):
     """
@@ -84,7 +65,6 @@ def get_trafficlight_trigger_location(traffic_light):
     point_location = area_loc + carla.Location(x=point.x, y=point.y)
 
     return carla.Location(point_location.x, point_location.y, point_location.z)
-
 
 def is_within_distance(target_transform, reference_transform, max_distance, angle_interval=None):
     """
@@ -146,30 +126,6 @@ def compute_magnitude_angle(target_location, current_location, orientation):
     return (norm_target, d_angle)
 
 
-def time_to_collision(ego_vehicle_waypoint, current_location, vehicle, target_waypoint, target, waypoint_list):
-    vehicle_transform = vehicle.get_transform()
-    target_transform = target.get_transform()
-    
-    ego_dir = ego_vehicle_waypoint.transform.get_forward_vector()
-    tar_dir = target_waypoint.get_forward_vector()
-
-    dot_prod_ego_tar = ego_dir.x * tar_dir.x + ego_dir.y * tar_dir.y + ego_dir.z * tar_dir.z
-
-    if dot_prod_ego_tar < 0:
-        return -1
-    
-    tar_speed = get_speed(target)
-    hyp = distance_vehicle(ego_vehicle_waypoint, target_transform)
-
-    norm_target, d_angle = compute_magnitude_angle(target.get_location(), current_location, target_transform.rotation.yaw)
-
-    if d_angle > 180:
-        return -1
-    
-
-
-
-
 def distance_vehicle(waypoint, vehicle_transform):
     """
     Returns the 2D distance from a waypoint to a vehicle
@@ -218,29 +174,3 @@ def positive(num):
         :param num: value to check
     """
     return num if num > 0.0 else 0.0
-
-
-def get_location_in_distance_from_wp(waypoint, distance, stop_at_junction=True):
-    """
-    Returns the location at a given distance along a given waypoint, and the traveled distance.
-    
-    Args:
-        waypoint (carla.Waypoint): The starting waypoint.
-        distance (float): The desired distance to travel along the waypoint.
-        stop_at_junction (bool): Whether to stop the search if an intersection is encountered.
-        
-    Returns:
-        Tuple containing the location at the desired distance along the waypoint, and the traveled distance.
-    """
-    traveled_distance = 0
-    while not (waypoint.is_junction and stop_at_junction) and traveled_distance < distance:
-        wp_next = waypoint.next(1.0)
-        if wp_next:
-            waypoint_new = wp_next[-1]
-            traveled_distance += waypoint_new.transform.location.distance(waypoint.transform.location)
-            waypoint = waypoint_new
-        else:
-            break
-
-    return waypoint.transform.location, traveled_distance
-
