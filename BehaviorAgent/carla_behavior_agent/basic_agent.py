@@ -280,29 +280,6 @@ class BasicAgent(object):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
 
-    def stay_on_the_right(self, waypoint, offset, on_the_right_time=1, step_distance=1):
-        speed = self._vehicle.get_velocity().length()
-        on_the_right_distance = on_the_right_time * speed
-
-        plan = []
-        plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
-
-        distance = 0
-        while distance < on_the_right_distance:
-            next_wps = plan[-1][0].next(step_distance)
-
-            offset_vector = carla.Vector3D(offset, 0.0, 0.0)  # mio
-            next_wp = self._map.get_waypoint(next_wps[0].transform.location + offset_vector, project_to_road=False)  # mio
-            #next_wp = self._map.get_waypoint(next_wps[0].transform.location + carla.Location(y=offset), project_to_road=False)
-
-            if not next_wp:
-                print("\nSTAY ON THE RIGHT ERROR 1: non c'è il waypoint\n")
-                return []
-            distance += next_wps[0].transform.location.distance(plan[-1][0].transform.location)
-            plan.append((next_wp, RoadOption.RIGHT))
-
-        self.set_global_plan(plan, clean_queue=True)
-
     def lane_change(self, direction, heading, same_lane_time=0, other_lane_time=0, lane_change_time=2):
         """
         Changes the path so that the vehicle performs a lane change.
