@@ -473,7 +473,6 @@ class BehaviorAgent(BasicAgent):
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             elif distance < 15:
-                print("BIMBO ", self._speed)
                 return self.emergency_stop()
 
         # 2.1.2: Obstacle avoidance behaviors
@@ -575,7 +574,7 @@ class BehaviorAgent(BasicAgent):
                                     return control
 
             # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance-3:
+            if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
             else:
                 # se il veicolo non è molto vicino posso pensare di seguirlo
