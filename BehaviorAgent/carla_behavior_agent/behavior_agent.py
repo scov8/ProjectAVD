@@ -483,7 +483,7 @@ class BehaviorAgent(BasicAgent):
             if self._speed < 0.01:
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
-                        if not self._other_lane_occupied(distance=70):
+                        if not self._other_lane_occupied(distance=40):
                             self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 print("cambio corsia a sinistra per ostacolo")
@@ -566,7 +566,7 @@ class BehaviorAgent(BasicAgent):
                                     return control
 
             # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance-3:
+            if distance < self._behavior.braking_distance-2:
                 return self.emergency_stop()
             else:
                 # se il veicolo non è molto vicino posso pensare di seguirlo
