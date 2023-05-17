@@ -191,8 +191,10 @@ class BehaviorAgent(BasicAgent):
         if len(vehicle_list) == 0:
             return False, 0, 75, 8
         elif len(vehicle_list) == 1:
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 1, "DISTANZA TOTALE: ",75, "DISTANZA MASSIMA: ", 8)
             return True, 1, 75, 8
         elif len(vehicle_list) == 2:
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 2, "DISTANZA TOTALE: ",75, "DISTANZA MASSIMA: ", 8)
             return True, 2, 75, 8
         else:
             distance = 0
@@ -211,7 +213,7 @@ class BehaviorAgent(BasicAgent):
                         d_max = v_distance
                 else:
                     break
-            print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max-2)
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
             return True, len(v_list), max(80, distance*3), d_max+1
     
     def traffic_light_manager(self):
@@ -574,6 +576,9 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance-2:
                 return self.emergency_stop()
+            elif distance < self._behavior.braking_distance+5:
+                print("sto frenando per VEICOLO: SOFT STOP")
+                return self.soft_stop()
             else:
                 # se il veicolo non è molto vicino posso pensare di seguirlo
                 control = self.car_following_manager(vehicle, distance)
