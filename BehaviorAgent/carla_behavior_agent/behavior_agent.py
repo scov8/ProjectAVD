@@ -61,6 +61,9 @@ class BehaviorAgent(BasicAgent):
         self._destination_waypoint = None # final destination waypoint
         self._shrinkage = False           # shrinkage flag
         self._waypoints_queue_copy = None # copy of the waypoints queue
+        self._d_max = 8                   # maximum distance to check for overtaking
+        self._distance_to_over = 75       # distance to overtake
+        self._distance_to_overtake_obj = 80    # distance to overtake
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -170,10 +173,6 @@ class BehaviorAgent(BasicAgent):
         return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
     
     def _iam_stuck(self, waypoint):
-        """
-        funzione che prende una lista di veicoli e vede quanti veicoli ci davanti a me nella stessa lane.id. ritorna il numero di veicoli
-        e la distanza totale fino all'ultimo la distanza tra un veicolo e l'altro deve essere massimo di 7 metri.
-        """
         ego_location = waypoint.transform.location
         ego_wpt = self._map.get_waypoint(ego_location)
         vehicle_list = self._world.get_actors().filter("*vehicle*")
@@ -190,22 +189,33 @@ class BehaviorAgent(BasicAgent):
                 vehicle_list.remove(v)
 
         if len(vehicle_list) == 0:
-            return False, 0, 0
+            return False, 0, 75, 8
+        elif len(vehicle_list) == 1:
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 1, "DISTANZA TOTALE: ",75, "DISTANZA MASSIMA: ", 8)
+            return True, 1, 75, 8
+        elif len(vehicle_list) == 2:
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 2, "DISTANZA TOTALE: ",75, "DISTANZA MASSIMA: ", 8)
+            return True, 2, 75, 8
         else:
             distance = 0
+            d_max=10
+            v_list =[]
             for i in range (len(vehicle_list)-1):
+                print("i: ", i, "len: ", len(vehicle_list))
                 v1_location = vehicle_list[i].get_transform().location
                 v2_location = vehicle_list[i+1].get_transform().location
                 v_distance = math.sqrt((v2_location.x - v1_location.x)**2 + (v2_location.y - v1_location.y)**2)
-                #distance += v.get_location().distance(self._vehicle.get_location())
                 #print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
-                if v_distance > 12:
-                    vehicle_list.remove(vehicle_list[i+1])
+                if v_distance < 12:
+                    v_list.append(vehicle_list[i])
+                    distance = v2_location.distance(self._vehicle.get_location())
+                    if v_distance > d_max:
+                        d_max = v_distance
                 else:
-                    distance = v_distance
-            print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ", distance)
-            return True, len(vehicle_list), distance
-
+                    break
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
+            return True, len(v_list), max(80, distance*3), d_max+1
+    
     def traffic_light_manager(self):
         """
         This method is in charge of behaviors for red lights.
@@ -281,7 +291,7 @@ class BehaviorAgent(BasicAgent):
         other_loc = other_vehicle.get_location() # get the location of the other vehicle
         other_lane_wp = self._map.get_waypoint(other_loc) # get the waypoint of the other vehicle
 
-        other_offset = other_lane_wp.transform.location.distance(other_loc) # distance between the waypoint of the other vehicle and effective location of the other vehicle
+        other_offset = other_lane_wp.transform.location.distance(other_vehicle.get_location()) # distance between the waypoint of the other vehicle and effective location of the other vehicle
         other_extent = other_vehicle.bounding_box.extent.y # get the extent of the other vehicle
         lane_width = other_lane_wp.lane_width # get the width of the lane
         free_space_on_one_side = lane_width / 2 - other_extent # free space on one side of the lane
@@ -333,7 +343,7 @@ class BehaviorAgent(BasicAgent):
 
         walker_list = self._world.get_actors().filter("*walker.pedestrian*") # get all the walkers in the world
         def dist(w): return w.get_location().distance(waypoint.transform.location) # distance between the waypoint and the location of the walker
-        walker_list = [w for w in walker_list if dist(w) < 30] # get all the walkers in the world that are within 10 meters from the waypoint
+        walker_list = [w for w in walker_list if dist(w) < 20] # get all the walkers in the world that are within 10 meters from the waypoint
         walker_list.sort(key=dist) # sort the list of walkers by distance
 
         if walker_list == []: # if there are no walkers in the world
@@ -376,7 +386,7 @@ class BehaviorAgent(BasicAgent):
         else:
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40)  # check if there is a obstacle in the current lane
 
-        # print("obstacle_state", obstacle_state, "obstacle", obstacle, "distance", distance)
+        print("obstacle_state", obstacle_state, "obstacle", obstacle, "distance", distance)
         return obstacle_state, obstacle, distance # return True if there is a obstacle nearby, False if not, the nearby obstacle, and the distance to the nearby obstacle
 
     def car_following_manager(self, vehicle, distance, debug=False):
@@ -429,7 +439,6 @@ class BehaviorAgent(BasicAgent):
 
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-        
         #self.stay_on_the_right(ego_vehicle_wp, 0.1, 2)
         # 1: Red lights and stops behavior
         if self.traffic_light_manager():
@@ -437,13 +446,12 @@ class BehaviorAgent(BasicAgent):
         
         # 2.3: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30)
-
         if vehicle_state_invasion and not self._overtaking_vehicle and not self._overtaking_obj:
             invasion_state, offset_invasion = self._lane_invasion(vehicle_invasion)
             if invasion_state:
                 print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
-                # self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
-                self._local_planner.set_lat_offset(-(offset_invasion + 0.8))
+                #self.stay_on_the_right(ego_vehicle_wp, offset_invasion, 2)
+                self._local_planner.set_lat_offset(-(offset_invasion+0.8))
                 self._shrinkage = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 2)
                 self._local_planner.set_speed(target_speed)
@@ -464,7 +472,7 @@ class BehaviorAgent(BasicAgent):
 
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
-            elif distance < 30:
+            elif distance < 15:
                 print("BIMBO ", self._speed)
                 return self.emergency_stop()
 
@@ -472,15 +480,13 @@ class BehaviorAgent(BasicAgent):
         obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
 
         if obstacle_state:
-            distance = distance - max(
-                obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(
-                    self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+            distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
             if self._speed < 0.01:
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
-                        if not self._other_lane_occupied(distance=70):
+                        if not self._other_lane_occupied(distance=self._distance_to_overtake_obj):
                             self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 print("cambio corsia a sinistra per ostacolo")
@@ -498,6 +504,12 @@ class BehaviorAgent(BasicAgent):
             elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
                 print("sto frenando per ostacolo: NO THROTTLE")
                 return self.no_throttle()
+            
+            if self._distance_to_overtake_obj == 80 :
+                print("self._distance_to_overtake_obj", self._distance_to_overtake_obj)
+                self._distance_to_overtake_obj -= 1
+            elif self._distance_to_overtake_obj == 40:
+                self._distance_to_overtake_obj = 80
 
         # 2.2.1: overtake behavior
         if self._ending_overtake:
@@ -506,7 +518,9 @@ class BehaviorAgent(BasicAgent):
                 self._ending_overtake = False
                 self._overtaking_vehicle = False
                 self._overtaking_obj = False
-                route_trace_p = list(map(lambda t: t[0], self._waypoints_queue_copy))
+                def primo_elemento(t):
+                    return t[0]
+                route_trace_p = list(map(primo_elemento, self._waypoints_queue_copy))
                 route_trace = []
                 for i in range ((self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0], len(self._waypoints_queue_copy)):
                     route_trace.append(self._waypoints_queue_copy[i])
@@ -519,12 +533,12 @@ class BehaviorAgent(BasicAgent):
         elif self._overtaking_vehicle or self._overtaking_obj:
             print("sorpasso in corso...")
             if not self._local_planner.has_incoming_waypoint():
-                if not self._other_lane_occupied(8, check_behind=True): #era 15 ora 7
+                if not self._other_lane_occupied(self._d_max , check_behind=True): #era 15
                     print("RIENTRO")
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 ora 1.5
+                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1):
                         self._ending_overtake = True
                 else:
-                    self.lane_change("left", self._vehicle_heading, 1, 0, 0)
+                    self.lane_change("left", self._vehicle_heading, 0.7, 0, 0)
 
             target_speed = max([self._behavior.max_speed, self._speed_limit]) #max al posto di min
             self._local_planner.set_speed(target_speed)
@@ -537,25 +551,21 @@ class BehaviorAgent(BasicAgent):
         if vehicle_state:
             # Distance is computed from the center of the two cars,
             # we use bounding boxes to calculate the actual distance
-            distance = distance - max(
-                vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(
-                    self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+            distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
-                        self._iam_stuck(ego_vehicle_wp)
+                        stuck, n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
                         vehicle_list = self._world.get_actors().filter("*vehicle*")
                         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
                         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id]
 
-                        new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit),
-                                                                                   up_angle_th=180, lane_offset=-1)
-                        new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), 
-                                                                                   low_angle_th=90, up_angle_th=180, lane_offset=-1)
+                        new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=180, lane_offset=-1)
+                        new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th=90, up_angle_th=180, lane_offset=-1)
 
                         if not new_vehicle_state and not new_vehicle_state2:
-                            if not self._other_lane_occupied(distance=75) and not self._overtaking_vehicle and self.closest_intersection() > 200:
+                            if not self._other_lane_occupied(distance=self._distance_to_over) and not self._overtaking_vehicle and self.closest_intersection() > 200:
                                 self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # 1.5 al posto di 2
                                     self._overtaking_vehicle = True
@@ -565,7 +575,7 @@ class BehaviorAgent(BasicAgent):
                                     return control
 
             # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance:
+            if distance < self._behavior.braking_distance-3:
                 return self.emergency_stop()
             else:
                 # se il veicolo non è molto vicino posso pensare di seguirlo

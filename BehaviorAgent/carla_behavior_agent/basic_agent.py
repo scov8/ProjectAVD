@@ -64,7 +64,7 @@ class BasicAgent(object):
         self._max_brake = 0.5
         self._offset = 0
         self._near_vehicle_list = []
-        self._overtake_list = ["vehicle.dodge.charger_police_2020", "vehicle.diamondback.century"]
+        self._overtake_list = ["vehicle.dodge.charger_police_2020", "vehicle.diamondback.century", "vehicle.ford.crown"]
         self._junction_counter = 0
 
         # Change parameters according to the dictionary
@@ -310,9 +310,8 @@ class BasicAgent(object):
         and the other 3 fine tune the maneuver
         """
         speed = self._vehicle.get_velocity().length()
-        # if speed < 3:
-        #     speed = 3
-        speed = 3 if speed < 3 else speed
+        if speed < 3:
+            speed = 3
 
         path = self._generate_lane_change_path(
             self._map.get_waypoint(self._vehicle.get_location()),
@@ -456,7 +455,8 @@ class BasicAgent(object):
             if is_within_distance(trigger_wp.transform, self._vehicle.get_transform(), max_distance, [0, 90]):
                 self._last_stop_sign = stop_sing
                 return (True, stop_sing)
-            return (False, None)
+
+        return (False, None)
         """
         Method to check if there is a vehicle in front of the agent blocking its path.
 
@@ -595,9 +595,9 @@ class BasicAgent(object):
 
         if check_second_lane:
             if ego_wpt.lane_id > 0:
-                lane_id = -(ego_wpt.lane_id + 1)
+                lane_id = -(ego_wpt.lane_id+1)
             else:
-                lane_id = -(ego_wpt.lane_id - 1)
+                lane_id = -(ego_wpt.lane_id-1)
 
         # Calcolo location che identifica il fronte del mio ego vehicle.
         ego_forward_vector = ego_transform.get_forward_vector()
@@ -770,8 +770,9 @@ class BasicAgent(object):
         plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
 
         distance = 0
+
         while distance < distance_same_lane:
-            if not(0 <= abs(plan[-1][0].transform.rotation.yaw - heading) <= 90):
+            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90 and abs(plan[-1][0].transform.rotation.yaw - heading) < 270:
                 next_wps = plan[-1][0].previous(step_distance)
             else:
                 next_wps = plan[-1][0].next(step_distance)
@@ -793,13 +794,12 @@ class BasicAgent(object):
             return []
 
         lane_changes_done = 0
-        lane_change_distance /= lane_changes
+        lane_change_distance = lane_change_distance / lane_changes
         while lane_changes_done < lane_changes:
-            # Questo controllo è utilizzato per determinare se il veicolo sta eseguendo un cambio di corsia verso sinistra o verso destra.
-            if not(0 <= abs(plan[-1][0].transform.rotation.yaw - heading) <= 90):
-                next_wps = plan[-1][0].previous(lane_change_distance) # per proseguire il percorso lungo la corsia adiacente a sinistra.
+            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90 and abs(plan[-1][0].transform.rotation.yaw - heading) < 270:
+                next_wps = plan[-1][0].previous(lane_change_distance)
             else:
-                next_wps = plan[-1][0].next(lane_change_distance) # per proseguire il percorso lungo la corsia adiacente a destra.
+                next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
                 print("\nLANE CHANGE ERROR 2\n")
                 return []
@@ -815,18 +815,16 @@ class BasicAgent(object):
                     print("\nLANE CHANGE ERROR 4\n")
                     return []
                 side_wp = next_wp.get_right_lane()
-
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
                 print("\nLANE CHANGE ERROR 5\n")
                 return []
-            # Update the plan
             plan.append((side_wp, option))
             lane_changes_done += 1
 
         # Percorri l'altra corsia.
         distance = 0
         while distance < distance_other_lane:
-            if not(0 <= abs(plan[-1][0].transform.rotation.yaw - heading) <= 90):
+            if abs(plan[-1][0].transform.rotation.yaw - heading) > 90 and abs(plan[-1][0].transform.rotation.yaw - heading) < 270:
                 next_wps = plan[-1][0].previous(step_distance)
             else:
                 next_wps = plan[-1][0].next(step_distance)
