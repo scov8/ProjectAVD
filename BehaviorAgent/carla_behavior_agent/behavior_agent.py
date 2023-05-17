@@ -340,7 +340,7 @@ class BehaviorAgent(BasicAgent):
 
         walker_list = self._world.get_actors().filter("*walker.pedestrian*") # get all the walkers in the world
         def dist(w): return w.get_location().distance(waypoint.transform.location) # distance between the waypoint and the location of the walker
-        walker_list = [w for w in walker_list if dist(w) < 30] # get all the walkers in the world that are within 10 meters from the waypoint
+        walker_list = [w for w in walker_list if dist(w) < 20] # get all the walkers in the world that are within 10 meters from the waypoint
         walker_list.sort(key=dist) # sort the list of walkers by distance
 
         if walker_list == []: # if there are no walkers in the world
@@ -469,7 +469,7 @@ class BehaviorAgent(BasicAgent):
 
             if distance < self._behavior.braking_distance:
                 return self.emergency_stop()
-            elif distance < 30:
+            elif distance < 15:
                 print("BIMBO ", self._speed)
                 return self.emergency_stop()
 
