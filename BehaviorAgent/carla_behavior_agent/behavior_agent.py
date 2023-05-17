@@ -63,6 +63,7 @@ class BehaviorAgent(BasicAgent):
         self._waypoints_queue_copy = None # copy of the waypoints queue
         self._d_max = 8                   # maximum distance to check for overtaking
         self._distance_to_over = 75       # distance to overtake
+        self._distance_to_overtake_obj = 80    # distance to overtake
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -483,7 +484,7 @@ class BehaviorAgent(BasicAgent):
             if self._speed < 0.01:
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
-                        if not self._other_lane_occupied(distance=40):
+                        if not self._other_lane_occupied(distance=self._distance_to_overtake_obj):
                             self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 print("cambio corsia a sinistra per ostacolo")
@@ -501,6 +502,11 @@ class BehaviorAgent(BasicAgent):
             elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
                 print("sto frenando per ostacolo: NO THROTTLE")
                 return self.no_throttle()
+            
+            if self._distance_to_overtake_obj == 80 :
+                self._distance_to_overtake_obj -= 1
+            elif self._distance_to_overtake_obj == 40:
+                self._distance_to_overtake_obj = 80
 
         # 2.2.1: overtake behavior
         if self._ending_overtake:
@@ -566,7 +572,7 @@ class BehaviorAgent(BasicAgent):
                                     return control
 
             # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance-3:
+            if distance < self._behavior.braking_distance-2:
                 return self.emergency_stop()
             else:
                 # se il veicolo non è molto vicino posso pensare di seguirlo
