@@ -487,7 +487,7 @@ class BehaviorAgent(BasicAgent):
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW:
                         if not self._other_lane_occupied(distance=self._distance_to_overtake_obj):
                             self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
-                            if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
+                            if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5):
                                 print("cambio corsia a sinistra per ostacolo")
                                 self._overtaking_obj = True
                                 self._distance_to_overtake_obj = 80
