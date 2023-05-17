@@ -50,7 +50,7 @@ class VehicleController():
         self._world = self._vehicle.get_world()
         self.past_steering = self._vehicle.get_control().steer
         self._lon_controller = PIDLongitudinalController(self._vehicle, **args_longitudinal)
-        self._lat_controller = StanleyLateralController(self._vehicle, offset, **args_lateral)
+        self._lat_controller = StanleyLateralController(self._vehicle, **args_lateral)
 
 
     def run_step(self, target_speed, waypoint):
@@ -103,6 +103,9 @@ class VehicleController():
     
     def setWaypoints(self, waypoints):
         self._lat_controller.setWaypoints(waypoints)
+
+    def set_lat_offset(self, offset):
+        self._lat_controller._offset = offset
 
 
 class PIDLongitudinalController():
@@ -264,14 +267,16 @@ class StanleyLateralController():
         # Crosstrack error
         lateral_error = \
               ((observed_x-desired_x)*desired_heading_y -
-              (observed_y-desired_y)*desired_heading_x) / (dd + sys.float_info.epsilon)
+              (observed_y-desired_y)*desired_heading_x) / (dd + sys.float_info.epsilon) - self._offset #con offset positivo va a sinistra
         
         # Heading error
         steering = (desired_heading-observed_heading)
         
         # Normalization to [-pi, pi]
-        while steering < -np.pi: steering += 2 * np.pi
-        while steering > np.pi:  steering -= 2 * np.pi
+        while (steering<-np.pi):
+            steering += 2*np.pi
+        while (steering>np.pi):
+            steering -= 2*np.pi
             
         steering_error = steering
         
@@ -285,14 +290,11 @@ class StanleyLateralController():
         
         return np.clip(steering, -1.0, 1.0)
 
-    def change_parameters(self, Kv=None, Ks=None, dt=None):
-        """
-        Changes the Stanley parameters. If the parameter is not specified it 
-        will be used the default value (i.e. the value specified when initialized).
-        """
-        self._kv = Kv if Kv is not None else self._kv
-        self._ks = Ks if Ks is not None else self._ks
-        self._dt = dt if dt is not None else self._dt
+    def change_parameters(self, Kv, Ks, dt):
+        """Changes the Stanley parameters"""
+        self._kv = Kv
+        self._ks = Ks
+        self._dt = dt
     
     def setWaypoints(self, wps):
         """Sets trajectory to follow and filters spurious points"""
