@@ -507,7 +507,7 @@ class BehaviorAgent(BasicAgent):
             
             if 40 <= self._distance_to_overtake_obj <= 80:
                 print("self._distance_to_overtake_obj", self._distance_to_overtake_obj)
-                self._distance_to_overtake_obj -= 1
+                self._distance_to_overtake_obj -= 0.5
                 
 
         # 2.2.1: overtake behavior
