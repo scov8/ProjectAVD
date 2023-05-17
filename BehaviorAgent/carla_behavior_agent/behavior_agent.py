@@ -442,7 +442,7 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()
         
-        # 2.3: Lane Invasion (degli altri)
+        # 2.0: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30)
         if vehicle_state_invasion and not self._overtaking_vehicle and not self._overtaking_obj:
             invasion_state, offset_invasion = self._lane_invasion(vehicle_invasion)
@@ -472,7 +472,7 @@ class BehaviorAgent(BasicAgent):
             elif distance < 15:
                 return self.emergency_stop()
 
-        # 2.1.2: Obstacle avoidance behaviors
+        # 2.2: Obstacle avoidance behaviors
         obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
 
         if obstacle_state:
@@ -507,7 +507,7 @@ class BehaviorAgent(BasicAgent):
                 self._distance_to_overtake_obj -= 0.3
                 
 
-        # 2.2.1: overtake behavior
+        # 2.x.x: overtake behavior
         if self._ending_overtake:
             print("sto terminando sorpasso")
             if not self._local_planner.has_incoming_waypoint():
@@ -541,7 +541,7 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug)
             return control
 
-        # 2.2: Car following behaviors
+        # 2.3: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
 
         if vehicle_state:
@@ -587,7 +587,7 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
-        # se sto andando molto veloce e con lo sterzo ho un valore sopra al 0.5, allora rallento
+        # 3.1: Normal behavior - controllo se la velocità è troppo alta mentre sto sterzando
         elif self._speed > 45 and self._steer > 90 or self.closest_intersection() < 30:
             """
             TO DO: rallenara anche se ci sta un incorvio tra poco  -  or self.closest_intersection() < 150:'
@@ -625,6 +625,9 @@ class BehaviorAgent(BasicAgent):
         return control
 
     def soft_stop(self):
+        """_summary_
+        questa funzione ritorna un controllo con throttle a 0 e brake a 0.2, ci permette di fermarci dolcemente
+        """
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = 0.2
@@ -632,6 +635,9 @@ class BehaviorAgent(BasicAgent):
         return control
 
     def no_throttle(self):
+        """_summary_
+        questa funzione ritorna un controllo con throttle a 0, ci permette di iniziare a farmarci
+        """
         control = carla.VehicleControl()
         control.throttle = 0.0
         control.brake = 0.0
