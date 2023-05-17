@@ -506,6 +506,7 @@ class BehaviorAgent(BasicAgent):
                 return self.no_throttle()
             
             if self._distance_to_overtake_obj == 80 :
+                print("self._distance_to_overtake_obj", self._distance_to_overtake_obj)
                 self._distance_to_overtake_obj -= 1
             elif self._distance_to_overtake_obj == 40:
                 self._distance_to_overtake_obj = 80
