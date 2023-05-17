@@ -526,7 +526,7 @@ class BehaviorAgent(BasicAgent):
             if not self._local_planner.has_incoming_waypoint():
                 if not self._other_lane_occupied(self._d_max , check_behind=True): #era 15
                     print("RIENTRO")
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1.2):
+                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1):
                         self._ending_overtake = True
                 else:
                     self.lane_change("left", self._vehicle_heading, 1, 0, 0)
@@ -566,7 +566,7 @@ class BehaviorAgent(BasicAgent):
                                     return control
 
             # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance:
+            if distance < self._behavior.braking_distance-3:
                 return self.emergency_stop()
             else:
                 # se il veicolo non è molto vicino posso pensare di seguirlo
