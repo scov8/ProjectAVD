@@ -505,7 +505,7 @@ class BehaviorAgent(BasicAgent):
                 print("sto frenando per ostacolo: NO THROTTLE")
                 return self.no_throttle()
             
-            if self._distance_to_overtake_obj == 80 :
+            if self._distance_to_overtake_obj <= 80 :
                 print("self._distance_to_overtake_obj", self._distance_to_overtake_obj)
                 self._distance_to_overtake_obj -= 1
             elif self._distance_to_overtake_obj == 40:
