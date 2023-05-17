@@ -491,6 +491,7 @@ class BehaviorAgent(BasicAgent):
                             if self.lane_change("left", self._vehicle_heading, 0, 2, 2):
                                 print("cambio corsia a sinistra per ostacolo")
                                 self._overtaking_obj = True
+                                self._distance_to_overtake_obj = 80
                                 target_speed = max([self._behavior.max_speed, self._speed_limit])
                                 self._local_planner.set_speed(target_speed)
                                 control = self._local_planner.run_step(debug=debug)
@@ -505,11 +506,10 @@ class BehaviorAgent(BasicAgent):
                 print("sto frenando per ostacolo: NO THROTTLE")
                 return self.no_throttle()
             
-            if self._distance_to_overtake_obj <= 80 :
+            if 40 <= self._distance_to_overtake_obj <= 80:
                 print("self._distance_to_overtake_obj", self._distance_to_overtake_obj)
                 self._distance_to_overtake_obj -= 1
-            elif self._distance_to_overtake_obj == 40:
-                self._distance_to_overtake_obj = 80
+                
 
         # 2.2.1: overtake behavior
         if self._ending_overtake:
