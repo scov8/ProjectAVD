@@ -187,13 +187,13 @@ class BehaviorAgent(BasicAgent):
                 vehicle_list.remove(v)
 
         if len(vehicle_list) == 0:
-            return False, 0, 75, 8
+            return False, 0, 65, 8
         elif len(vehicle_list) == 1:
-            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 1, "DISTANZA TOTALE: ",75, "DISTANZA MASSIMA: ", 8)
-            return True, 1, 75, 8
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 1, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
+            return True, 1, 65, 8
         elif len(vehicle_list) == 2:
-            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 2, "DISTANZA TOTALE: ",75, "DISTANZA MASSIMA: ", 8)
-            return True, 2, 75, 8
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 2, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
+            return True, 2, 65, 8
         else:
             distance = 0
             d_max=10
@@ -212,7 +212,7 @@ class BehaviorAgent(BasicAgent):
                 else:
                     break
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
-            return True, len(v_list), max(80, distance*3), d_max+1
+            return True, len(v_list), max(75, distance*2.2), d_max+1
     
     def traffic_light_manager(self):
         """
