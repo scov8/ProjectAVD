@@ -534,7 +534,7 @@ class BehaviorAgent(BasicAgent):
                     if self.lane_change("left", self._vehicle_heading, 0, 2, 1.1):
                         self._ending_overtake = True
                 else:
-                    self.lane_change("left", self._vehicle_heading, 0.9, 0, 0)
+                    self.lane_change("left", self._vehicle_heading, 0.8, 0, 0)
 
             target_speed = max([self._behavior.max_speed, self._speed_limit]) #max al posto di min
             self._local_planner.set_speed(target_speed)
@@ -563,7 +563,7 @@ class BehaviorAgent(BasicAgent):
                         if not new_vehicle_state and not new_vehicle_state2:
                             if not self._other_lane_occupied(distance=self._distance_to_over) and not self._overtaking_vehicle and self.closest_intersection() > 200:
                                 self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
-                                if self.lane_change("left", self._vehicle_heading, 0,2, 1.5): # era 2 e 2
+                                if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 e 2
                                     self._overtaking_vehicle = True
                                     target_speed = max([self._behavior.max_speed, self._speed_limit])
                                     self._local_planner.set_speed(target_speed)
