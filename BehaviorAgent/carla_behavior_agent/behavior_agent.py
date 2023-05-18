@@ -212,7 +212,7 @@ class BehaviorAgent(BasicAgent):
                 else:
                     break
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
-            return True, len(v_list), max(80, distance*2.2), d_max+1
+            return True, len(v_list), max(80, distance*3), d_max+1
     
     def traffic_light_manager(self):
         """
