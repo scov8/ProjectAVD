@@ -190,6 +190,7 @@ class BehaviorAgent(BasicAgent):
         distance = 0
         d_max=10
         v_list =[]
+        i=0
         for i in range (len(vehicle_list)-1):
             print("i: ", i, "len: ", len(vehicle_list))
             v1_location = vehicle_list[i].get_transform().location
