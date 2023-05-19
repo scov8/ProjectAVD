@@ -405,12 +405,12 @@ class BehaviorAgent(BasicAgent):
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision
 
         print("VEICOLO DAVANTI. Distance: ", distance, "Velocità ego: ",self._speed, "Velocità veicolo davanti: ", vehicle_speed)
-        if self._behavior.safety_time * 0.5 > ttc > 0.0: # if the time to collision is less than the safety time
+        if self._behavior.safety_time * 0.3 > ttc > 0.0: # if the time to collision is less than the safety time
             target_speed = min([positive(vehicle_speed - self._behavior.speed_decrease), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist]) # decrease the speed
             self._local_planner.set_speed(target_speed) # set the speed
             control = self._local_planner.run_step(debug=debug) # run the local planner
 
-        elif self._behavior.safety_time > ttc >= self._behavior.safety_time * 0.5: # if the time to collision is between the safety time and twice the safety time
+        elif self._behavior.safety_time*0.5 > ttc >= self._behavior.safety_time * 0.3: # if the time to collision is between the safety time and twice the safety time
             target_speed = min([max(self._min_speed, vehicle_speed), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist]) # keep the speed
             self._local_planner.set_speed(target_speed) # set the speed
             control = self._local_planner.run_step(debug=debug) # run the local planner
@@ -565,7 +565,7 @@ class BehaviorAgent(BasicAgent):
             # we use bounding boxes to calculate the actual distance
             distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
-            if (ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken) and self._behavior.overtake_counter == 0 and distance < 7:
+            if (ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken) and self._behavior.overtake_counter == 0 and distance < 6:
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
                         stuck, self._n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
