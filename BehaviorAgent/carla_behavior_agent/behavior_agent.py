@@ -169,7 +169,7 @@ class BehaviorAgent(BasicAgent):
         vel = vehicle.get_velocity().length() # get the velocity of the vehicle
         acc = vehicle.get_acceleration().length() # get the acceleration of the vehicle
         print("VELOCITA VEICOLO: ", vel, "ACCELERAZIONE: ", acc)
-        return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
+        return acc <= 1.0 and vel < 1 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
     
     def _iam_stuck(self, waypoint):
         ego_location = waypoint.transform.location
