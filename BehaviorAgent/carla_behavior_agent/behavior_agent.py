@@ -196,7 +196,7 @@ class BehaviorAgent(BasicAgent):
             v2_location = vehicle_list[i+1].get_transform().location
             v_distance = math.sqrt((v2_location.x - v1_location.x)**2 + (v2_location.y - v1_location.y)**2)
             #print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
-            if v_distance < 12:
+            if v_distance < 15:
                 v_list.append(vehicle_list[i])
                 distance = v2_location.distance(self._vehicle.get_location())
                 if v_distance > d_max:
