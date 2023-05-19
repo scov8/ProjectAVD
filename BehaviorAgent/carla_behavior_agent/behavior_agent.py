@@ -543,7 +543,7 @@ class BehaviorAgent(BasicAgent):
                             self._ending_overtake = True
                             self._n_vehicle == 0
                     else:
-                        if self.lane_change("left", self._vehicle_heading, 0, 2, 0.7):
+                        if self.lane_change("left", self._vehicle_heading, 0, 1.9, 0.7):
                             print("FACCIO IL RIENTRO AGGRESSIVO")
                             self._ending_overtake = True
                             self._n_vehicle == 0
