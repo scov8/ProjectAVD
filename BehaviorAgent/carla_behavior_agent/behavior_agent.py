@@ -542,10 +542,12 @@ class BehaviorAgent(BasicAgent):
                     print("RIENTRO")
                     if self._n_vehicle == 1:
                         if self.lane_change("left", self._vehicle_heading, 0, 2, 1.2):
+                            print("FACCIO IL RIENTRO MODERATO")
                             self._ending_overtake = True
                             self._n_vehicle == 0
                     else:
                         if self.lane_change("left", self._vehicle_heading, 0, 2, 0.5):
+                            print("FACCIO IL RIENTRO AGGRESSIVO")
                             self._ending_overtake = True
                             self._n_vehicle == 0
                 else:
