@@ -565,7 +565,13 @@ class BehaviorAgent(BasicAgent):
             # we use bounding boxes to calculate the actual distance
             distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
-            if (ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken) and self._behavior.overtake_counter == 0:
+            # Emergency brake if the car is very close.
+            if distance < self._behavior.braking_distance:
+                return self.emergency_stop()
+            elif distance > self._behavior.braking_distance + 1:
+                # se il veicolo non è molto vicino posso pensare di seguirlo
+                control = self.car_following_manager(vehicle, distance)
+            elif (ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken) and self._behavior.overtake_counter == 0:
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
                         stuck, self._n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
@@ -577,7 +583,7 @@ class BehaviorAgent(BasicAgent):
                         new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th=90, up_angle_th=180, lane_offset=-1)
 
                         if not new_vehicle_state and not new_vehicle_state2:
-                            if not self._other_lane_occupied(distance=self._distance_to_over) and not self._overtaking_vehicle and self.closest_intersection() > 200 and distance < 5.2:
+                            if not self._other_lane_occupied(distance=self._distance_to_over) and not self._overtaking_vehicle and self.closest_intersection() > 200:
                                 self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                                 print("AVVIO IL SORPASSO DI UN VEICOLO")
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 e 2
@@ -586,13 +592,6 @@ class BehaviorAgent(BasicAgent):
                                     self._local_planner.set_speed(target_speed)
                                     control = self._local_planner.run_step(debug=debug)
                                     return control
-
-            # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance:
-                return self.emergency_stop()
-            else:
-                # se il veicolo non è molto vicino posso pensare di seguirlo
-                control = self.car_following_manager(vehicle, distance)
 
         # 3: Intersection behavior
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
