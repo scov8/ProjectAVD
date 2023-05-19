@@ -526,7 +526,7 @@ class BehaviorAgent(BasicAgent):
                 for i in range ((self._global_planner._find_closest_in_list(ego_vehicle_wp, route_trace_p) ,self._direction)[0], len(self._waypoints_queue_copy)):
                     route_trace.append(self._waypoints_queue_copy[i])
                 self._local_planner.set_global_plan(route_trace, True)
-                self._behavior.overtake_counter = 200
+                self._behavior.overtake_counter = 50
                 print(f"SORPASSO TERMINATO, deque len: {len(self._local_planner._waypoints_queue)}")
             target_speed = min([self._behavior.max_speed, self._speed_limit])
             self._local_planner.set_speed(target_speed)
