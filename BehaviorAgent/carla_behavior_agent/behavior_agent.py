@@ -211,7 +211,7 @@ class BehaviorAgent(BasicAgent):
             return True, 1, 65, 8
         elif len(v_list) == 2:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", 2, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
-            return True, 2, 65, 8
+            return True, 2, 80, 8
         else:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(v_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
             return True, len(v_list), max(80, distance*3), d_max+1
@@ -539,7 +539,7 @@ class BehaviorAgent(BasicAgent):
                             self._ending_overtake = True
                             self._n_vehicle == 0
                     else:
-                        if self.lane_change("left", self._vehicle_heading, 0, 2, 0.5):
+                        if self.lane_change("left", self._vehicle_heading, 0, 2, 0.7):
                             print("FACCIO IL RIENTRO AGGRESSIVO")
                             self._ending_overtake = True
                             self._n_vehicle == 0
