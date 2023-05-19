@@ -203,11 +203,9 @@ class BehaviorAgent(BasicAgent):
                 distance = v2_location.distance(self._vehicle.get_location())
                 if v_distance > d_max:
                     d_max = v_distance
-                if i == len(vehicle_list)-2:
-                    v_list.append(vehicle_list[i+1])
             else:
                 break
-        
+        v_list.append(vehicle_list[i])
         if len(v_list) == 1 or len(v_list) == 0:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", 1, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
             return True, 1, 65, 8
