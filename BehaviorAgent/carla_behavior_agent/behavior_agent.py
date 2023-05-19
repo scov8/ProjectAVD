@@ -187,32 +187,33 @@ class BehaviorAgent(BasicAgent):
             if relative_direction >= 90:
                 vehicle_list.remove(v)
 
-        if len(vehicle_list) == 0:
+        distance = 0
+        d_max=10
+        v_list =[]
+        for i in range (len(vehicle_list)-1):
+            print("i: ", i, "len: ", len(vehicle_list))
+            v1_location = vehicle_list[i].get_transform().location
+            v2_location = vehicle_list[i+1].get_transform().location
+            v_distance = math.sqrt((v2_location.x - v1_location.x)**2 + (v2_location.y - v1_location.y)**2)
+            #print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
+            if v_distance < 12:
+                v_list.append(vehicle_list[i])
+                distance = v2_location.distance(self._vehicle.get_location())
+                if v_distance > d_max:
+                    d_max = v_distance
+            else:
+                break
+
+        if len(v_list) == 0:
             return False, 0, 65, 8
-        elif len(vehicle_list) == 1:
+        elif len(v_list) == 1:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", 1, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
             return True, 1, 65, 8
-        elif len(vehicle_list) == 2:
+        elif len(v_list) == 2:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", 2, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
             return True, 2, 65, 8
         else:
-            distance = 0
-            d_max=10
-            v_list =[]
-            for i in range (len(vehicle_list)-1):
-                print("i: ", i, "len: ", len(vehicle_list))
-                v1_location = vehicle_list[i].get_transform().location
-                v2_location = vehicle_list[i+1].get_transform().location
-                v_distance = math.sqrt((v2_location.x - v1_location.x)**2 + (v2_location.y - v1_location.y)**2)
-                #print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
-                if v_distance < 12:
-                    v_list.append(vehicle_list[i])
-                    distance = v2_location.distance(self._vehicle.get_location())
-                    if v_distance > d_max:
-                        d_max = v_distance
-                else:
-                    break
-            print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(vehicle_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
+            print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(v_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
             return True, len(v_list), max(80, distance*3), d_max+1
     
     def traffic_light_manager(self):
