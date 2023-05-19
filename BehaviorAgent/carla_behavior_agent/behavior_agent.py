@@ -211,7 +211,7 @@ class BehaviorAgent(BasicAgent):
             return True, 1, 65, 8
         elif len(v_list) == 2:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", 2, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
-            return True, 2, 80, 8
+            return True, 2, 65, 8
         else:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(v_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
             return True, len(v_list), max(80, distance*3), d_max+1
