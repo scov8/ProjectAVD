@@ -64,6 +64,7 @@ class BehaviorAgent(BasicAgent):
         self._d_max = 8                   # maximum distance to check for overtaking
         self._distance_to_over = 75       # distance to overtake
         self._distance_to_overtake_obj = 80    # distance to overtake
+        self._n_vehicle = 0
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -531,8 +532,14 @@ class BehaviorAgent(BasicAgent):
             if not self._local_planner.has_incoming_waypoint():
                 if not self._other_lane_occupied(self._d_max , check_behind=True): #era 15
                     print("RIENTRO")
-                    if self.lane_change("left", self._vehicle_heading, 0, 2, 0.5):
-                        self._ending_overtake = True
+                    if self._n_vehicle == 1:
+                        if self.lane_change("left", self._vehicle_heading, 0, 2, 1.2):
+                            self._ending_overtake = True
+                            self._n_vehicle == 0
+                    else:
+                        if self.lane_change("left", self._vehicle_heading, 0, 2, 0.5):
+                            self._ending_overtake = True
+                            self._n_vehicle == 0
                 else:
                     self.lane_change("left", self._vehicle_heading, 0.85, 0, 0)
 
@@ -552,7 +559,7 @@ class BehaviorAgent(BasicAgent):
             if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken:
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
-                        stuck, n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
+                        stuck, self._n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
                         vehicle_list = self._world.get_actors().filter("*vehicle*")
                         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
                         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id]
