@@ -438,6 +438,7 @@ class BehaviorAgent(BasicAgent):
             self._behavior.tailgate_counter -= 1
 
         if self._behavior.overtake_counter > 0:
+            print("OVERTAKE COUNTER: ", self._behavior.overtake_counter)
             self._behavior.overtake_counter -= 1
 
         ego_vehicle_loc = self._vehicle.get_location()
