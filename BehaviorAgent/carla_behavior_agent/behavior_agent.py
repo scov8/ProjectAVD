@@ -169,7 +169,7 @@ class BehaviorAgent(BasicAgent):
         vel = vehicle.get_velocity().length() # get the velocity of the vehicle
         acc = vehicle.get_acceleration().length() # get the acceleration of the vehicle
         print("VELOCITA VEICOLO: ", vel, "ACCELERAZIONE: ", acc)
-        return acc <= 1.0 and vel < 1 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
+        return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
     
     def _iam_stuck(self, waypoint):
         ego_location = waypoint.transform.location
@@ -577,7 +577,7 @@ class BehaviorAgent(BasicAgent):
                         new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th=90, up_angle_th=180, lane_offset=-1)
 
                         if not new_vehicle_state and not new_vehicle_state2:
-                            if not self._other_lane_occupied(distance=self._distance_to_over) and not self._overtaking_vehicle and self.closest_intersection() > 200:
+                            if not self._other_lane_occupied(distance=self._distance_to_over) and not self._overtaking_vehicle and self.closest_intersection() > 200 and distance < 7:
                                 self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
                                 print("AVVIO IL SORPASSO DI UN VEICOLO")
                                 if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 e 2
