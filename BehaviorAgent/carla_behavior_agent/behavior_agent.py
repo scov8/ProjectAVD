@@ -186,7 +186,10 @@ class BehaviorAgent(BasicAgent):
             relative_direction = abs(math.degrees(vehicle_yaw - v_direction))
             if relative_direction >= 90:
                 vehicle_list.remove(v)
-
+        
+        if len(vehicle_list) == 0:
+            return False, 0, 65, 8
+        
         distance = 0
         d_max=10
         v_list =[]
