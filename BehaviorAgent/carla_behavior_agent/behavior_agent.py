@@ -187,9 +187,6 @@ class BehaviorAgent(BasicAgent):
             if relative_direction >= 90:
                 vehicle_list.remove(v)
         
-        if len(vehicle_list) == 0:
-            return False, 0, 65, 8
-        
         distance = 0
         d_max=10
         v_list =[]
@@ -209,11 +206,7 @@ class BehaviorAgent(BasicAgent):
             else:
                 break
         
-        
-
-        if len(v_list) == 0:
-            return False, 0, 65, 8
-        elif len(v_list) == 1:
+        if len(v_list) == 1 or len(v_list) == 0:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", 1, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
             return True, 1, 65, 8
         elif len(v_list) == 2:
