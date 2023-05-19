@@ -410,7 +410,7 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed) # set the speed
             control = self._local_planner.run_step(debug=debug) # run the local planner
 
-        elif self._behavior.safety_time*0.5 > ttc >= self._behavior.safety_time * 0.3: # if the time to collision is between the safety time and twice the safety time
+        elif self._behavior.safety_time*0.5 > ttc >= self._behavior.safety_time * 0.3: # if the time to collision is between the safety time and twice the safety time # mio era 2* safety time e l'altro normale
             target_speed = min([max(self._min_speed, vehicle_speed), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist]) # keep the speed
             self._local_planner.set_speed(target_speed) # set the speed
             control = self._local_planner.run_step(debug=debug) # run the local planner
