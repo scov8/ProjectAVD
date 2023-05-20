@@ -130,7 +130,7 @@ class BehaviorAgent(BasicAgent):
                 return True
             return False
         else:
-            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True) # CONTROLLARE CHECK REAR
+            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True)
             vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)
 
             if vehicle_state_ahead and vehicle_state_behind:
@@ -555,7 +555,7 @@ class BehaviorAgent(BasicAgent):
                             self._ending_overtake = True
                             self._n_vehicle == 0
                 else:
-                    self.lane_change("left", self._vehicle_heading, 1, 0, 0)
+                    self.lane_change("left", self._vehicle_heading, 0.87, 0, 0)
 
             target_speed = max([self._behavior.max_speed, self._speed_limit]) #max al posto di min
             self._local_planner.set_speed(target_speed)
