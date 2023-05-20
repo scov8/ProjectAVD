@@ -449,9 +449,6 @@ class BehaviorAgent(BasicAgent):
         if self._stay_at_stop_counter == 0:
             self._stay_at_stop = False
 
-        if self._stay_at_stop:
-            return self.emergency_stop()
-
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
@@ -464,11 +461,14 @@ class BehaviorAgent(BasicAgent):
                 print('--------------- [stop] ------------------')
                 self._stay_at_stop = True
                 self._stay_at_stop_counter=20
-                return self.emergency_stop()
+                #return self.emergency_stop()
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
             target_speed = min([self._behavior.max_speed, self._speed_limit-5])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
+        
+        if self._stay_at_stop:
+            return self.emergency_stop()
         
         # 2.0: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30)
