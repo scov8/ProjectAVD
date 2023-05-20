@@ -449,7 +449,7 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()
         
-        # 1.1: Stop signs behavior
+        # 1.1: Stop Signs
         if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
                 print('--------------- [stop] ------------------')
                 return self.emergency_stop()
@@ -555,7 +555,7 @@ class BehaviorAgent(BasicAgent):
                             self._ending_overtake = True
                             self._n_vehicle == 0
                 else:
-                    self.lane_change("left", self._vehicle_heading, 0.9, 0, 0)
+                    self.lane_change("left", self._vehicle_heading, 0.88, 0, 0)
 
             target_speed = max([self._behavior.max_speed, self._speed_limit]) #max al posto di min
             self._local_planner.set_speed(target_speed)
@@ -600,7 +600,7 @@ class BehaviorAgent(BasicAgent):
                 control = self.car_following_manager(vehicle, distance)
 
         # 3: Intersection behavior
-        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):           
+        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
             target_speed = min([self._behavior.max_speed, self._speed_limit-5])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
