@@ -449,6 +449,9 @@ class BehaviorAgent(BasicAgent):
         if self._stay_at_stop_counter == 0:
             self._stay_at_stop = False
 
+        if self._stay_at_stop:
+            return self.emergency_stop()
+
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
 
