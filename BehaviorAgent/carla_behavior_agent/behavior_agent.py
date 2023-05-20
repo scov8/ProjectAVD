@@ -549,7 +549,7 @@ class BehaviorAgent(BasicAgent):
                 if not self._other_lane_occupied(self._d_max , check_behind=True): #era 15
                     print("RIENTRO")
                     if self._n_vehicle == 1:
-                        if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5):
+                        if self.lane_change("left", self._vehicle_heading, 0, 2, 1.2):
                             print("FACCIO IL RIENTRO MODERATO")
                             self._ending_overtake = True
                             self._n_vehicle == 0
