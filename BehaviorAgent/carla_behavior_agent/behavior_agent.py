@@ -66,7 +66,7 @@ class BehaviorAgent(BasicAgent):
         self._distance_to_overtake_obj = 80    # distance to overtake
         self._n_vehicle = 0
         self._stay_at_stop = False
-        self._stay_at_stop_counter = 20
+        self._stay_at_stop_counter = 5
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -460,7 +460,7 @@ class BehaviorAgent(BasicAgent):
         if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
                 print('--------------- [stop] ------------------')
                 self._stay_at_stop = True
-                self._stay_at_stop_counter=20
+                self._stay_at_stop_counter=5
                 #return self.emergency_stop()
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
             target_speed = min([self._behavior.max_speed, self._speed_limit-5])
