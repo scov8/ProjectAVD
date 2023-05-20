@@ -65,6 +65,8 @@ class BehaviorAgent(BasicAgent):
         self._distance_to_over = 75       # distance to overtake
         self._distance_to_overtake_obj = 80    # distance to overtake
         self._n_vehicle = 0
+        self._stay_at_stop = False
+        self._stay_at_stop_counter = 20
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -441,6 +443,11 @@ class BehaviorAgent(BasicAgent):
         if self._behavior.overtake_counter > 0:
             print("OVERTAKE COUNTER: ", self._behavior.overtake_counter)
             self._behavior.overtake_counter -= 1
+        
+        if self._stay_at_stop_counter> 0:
+            self._stay_at_stop_counter -= 1
+        if self._stay_at_stop_counter == 0:
+            self._stay_at_stop = False
 
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
@@ -452,6 +459,7 @@ class BehaviorAgent(BasicAgent):
         # 1.1: Stop Signs
         if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
                 print('--------------- [stop] ------------------')
+                self._stay_at_stop = True
                 return self.emergency_stop()
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
             target_speed = min([self._behavior.max_speed, self._speed_limit-5])
@@ -491,7 +499,7 @@ class BehaviorAgent(BasicAgent):
         # 2.2: Obstacle avoidance behaviors
         obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp)
 
-        if obstacle_state:
+        if obstacle_state and not self._stay_at_stop:
             distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
             # Emergency brake if the car is very close.
@@ -572,61 +580,62 @@ class BehaviorAgent(BasicAgent):
         # 2.3: Car following behaviors
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp)
 
-        if vehicle_state:
-            # Distance is computed from the center of the two cars,
-            # we use bounding boxes to calculate the actual distance
-            distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
+        if not self._stay_at_stop:
+            if vehicle_state:
+                # Distance is computed from the center of the two cars,
+                # we use bounding boxes to calculate the actual distance
+                distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
-            if (ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken) and self._behavior.overtake_counter == 0 and distance < 6:
-                if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
-                    if self._is_slow(vehicle):
-                        stuck, self._n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
-                        vehicle_list = self._world.get_actors().filter("*vehicle*")
-                        def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
-                        vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id]
+                if (ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken) and self._behavior.overtake_counter == 0 and distance < 6:
+                    if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
+                        if self._is_slow(vehicle):
+                            stuck, self._n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp)
+                            vehicle_list = self._world.get_actors().filter("*vehicle*")
+                            def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x
+                            vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id]
 
-                        new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=180, lane_offset=-1)
-                        new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th=90, up_angle_th=180, lane_offset=-1)
+                            new_vehicle_state, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=180, lane_offset=-1)
+                            new_vehicle_state2, _, _ = self._vehicle_obstacle_detected(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit), low_angle_th=90, up_angle_th=180, lane_offset=-1)
 
-                        if not new_vehicle_state and not new_vehicle_state2:
-                            if not self._other_lane_occupied(distance=self._distance_to_over) and not self._overtaking_vehicle and self.closest_intersection() > 100:
-                                self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
-                                print("AVVIO IL SORPASSO DI UN VEICOLO")
-                                if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 e 2
-                                    self._overtaking_vehicle = True
-                                    target_speed = max([self._behavior.max_speed, self._speed_limit])
-                                    self._local_planner.set_speed(target_speed)
-                                    control = self._local_planner.run_step(debug=debug)
-                                    return control
+                            if not new_vehicle_state and not new_vehicle_state2:
+                                if not self._other_lane_occupied(distance=self._distance_to_over) and not self._overtaking_vehicle and self.closest_intersection() > 100:
+                                    self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy()
+                                    print("AVVIO IL SORPASSO DI UN VEICOLO")
+                                    if self.lane_change("left", self._vehicle_heading, 0, 2, 1.5): # era 2 e 2
+                                        self._overtaking_vehicle = True
+                                        target_speed = max([self._behavior.max_speed, self._speed_limit])
+                                        self._local_planner.set_speed(target_speed)
+                                        control = self._local_planner.run_step(debug=debug)
+                                        return control
 
-            # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance:
-                return self.emergency_stop()
+                # Emergency brake if the car is very close.
+                if distance < self._behavior.braking_distance:
+                    return self.emergency_stop()
+                else:
+                    # se il veicolo non è molto vicino posso pensare di seguirlo
+                    control = self.car_following_manager(vehicle, distance)
+
+            # 3: Intersection behavior
+            elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
+                target_speed = min([self._behavior.max_speed, self._speed_limit-5])
+                self._local_planner.set_speed(target_speed)
+                control = self._local_planner.run_step(debug=debug)
+
+            # 3.1: Normal behavior - controllo se la velocità è troppo alta mentre sto sterzando
+            elif self._speed > 45 and self._steer > 90 or self.closest_intersection() < 30:
+                """
+                TO DO: rallenara anche se ci sta un incorvio tra poco  -  or self.closest_intersection() < 150:'
+                """
+                print("velocità troppo alta, rallento")
+                return self.decelerate()
+
+            # 4: Normal behavior
             else:
-                # se il veicolo non è molto vicino posso pensare di seguirlo
-                control = self.car_following_manager(vehicle, distance)
-
-        # 3: Intersection behavior
-        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
-            target_speed = min([self._behavior.max_speed, self._speed_limit-5])
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
-
-        # 3.1: Normal behavior - controllo se la velocità è troppo alta mentre sto sterzando
-        elif self._speed > 45 and self._steer > 90 or self.closest_intersection() < 30:
-            """
-            TO DO: rallenara anche se ci sta un incorvio tra poco  -  or self.closest_intersection() < 150:'
-            """
-            print("velocità troppo alta, rallento")
-            return self.decelerate()
-
-        # 4: Normal behavior
-        else:
-            # se non ci sono pedoni, nemmeno macchine che ci stanno davanti, allora procediamo normalmente
-            target_speed = min([self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
-            # adattiamo il local planner a seguire la nostra velocità, dentro al local ci sono i controllori e cambia la vel
-            self._local_planner.set_speed(target_speed)
-            control = self._local_planner.run_step(debug=debug)
+                # se non ci sono pedoni, nemmeno macchine che ci stanno davanti, allora procediamo normalmente
+                target_speed = min([self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist])
+                # adattiamo il local planner a seguire la nostra velocità, dentro al local ci sono i controllori e cambia la vel
+                self._local_planner.set_speed(target_speed)
+                control = self._local_planner.run_step(debug=debug)
 
         return control  # una volta che abbiamo il controllo, lo ritornaimo
 
