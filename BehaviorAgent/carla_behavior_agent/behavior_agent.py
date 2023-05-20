@@ -236,7 +236,7 @@ class BehaviorAgent(BasicAgent):
 
         stops_list = self._world.get_actors().filter('*stop*') if not self._stops_list else self._stops_list # get all the stop signs in the world
         def dist(v): return v.get_location().distance(waypoint.transform.location) # distance between the waypoint of the stop sign and the ego vehicle
-        stops_list = [v for v in stops_list if dist(v) < 15] # filter stop signs within 15 meters from the ego vehicle
+        stops_list = [v for v in stops_list if dist(v) < 5] # filter stop signs within 15 meters from the ego vehicle
         # print(stop_list[0].trigger_volume) # BoundingBox(Location(x=-3.510037, y=5.304008, z=-0.025508), Extent(x=0.685752, y=1.491250, z=1.014414), Rotation(pitch=0.000000, yaw=0.067261, roll=0.000000))
         print(str(len(stops_list)) + '\n' if len(stops_list) > 0 else '', end='')
         if len(stops_list) > 1: # if there are more than one stop signs, we sort them by distance
@@ -449,6 +449,11 @@ class BehaviorAgent(BasicAgent):
         if self.traffic_light_manager():
             return self.emergency_stop()
         
+        # 1.1: Stop signs behavior
+        if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
+                print('--------------- [stop] ------------------')
+                return self.emergency_stop()
+        
         # 2.0: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30)
         if vehicle_state_invasion and not self._overtaking_vehicle and not self._overtaking_obj:
@@ -595,11 +600,7 @@ class BehaviorAgent(BasicAgent):
                 control = self.car_following_manager(vehicle, distance)
 
         # 3: Intersection behavior
-        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
-            # controllo comportamento in caso di incrocio con segnale di stop e controllo se il veicolo non è già fermo
-            if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
-                print('--------------- [stop] ------------------')
-                return self.emergency_stop()
+        elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):           
             target_speed = min([self._behavior.max_speed, self._speed_limit-5])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
