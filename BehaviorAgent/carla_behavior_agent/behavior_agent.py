@@ -241,6 +241,8 @@ class BehaviorAgent(BasicAgent):
         print(str(len(stops_list)) + '\n' if len(stops_list) > 0 else '', end='')
         if len(stops_list) > 1: # if there are more than one stop signs, we sort them by distance
             stops_list.sort(key=dist)
+        
+        print("STOP SIGN: ", stops_list)
 
         return self._affected_by_stop_sign(self._vehicle, stops_list)[0] # return True if the ego vehicle is affected by a stop sign, otherwise return False
 
@@ -555,7 +557,7 @@ class BehaviorAgent(BasicAgent):
                             self._ending_overtake = True
                             self._n_vehicle == 0
                 else:
-                    if self._n_vehicle == 2:
+                    if self._n_vehicle >= 2:
                         self.lane_change("left", self._vehicle_heading, 0.85, 0, 0)
                     else:
                         self.lane_change("left", self._vehicle_heading, 0.89, 0, 0)
