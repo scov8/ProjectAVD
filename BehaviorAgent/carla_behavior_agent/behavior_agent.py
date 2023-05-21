@@ -441,6 +441,10 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed) # set the speed
             control = self._local_planner.run_step(debug=debug) # run the local planner
 
+        if vehicle_speed <=0.5:
+            self._local_planner.set_speed(self._behavior.speed_decrease)
+            control = self._local_planner.run_step(debug=debug)
+
         return control
 
     def run_step(self, debug=True):  # il debug era false
@@ -607,13 +611,6 @@ class BehaviorAgent(BasicAgent):
             # we use bounding boxes to calculate the actual distance
             distance = distance - max(vehicle.bounding_box.extent.y, vehicle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x)
 
-            # Emergency brake if the car is very close.
-            if distance < self._behavior.braking_distance:
-                return self.emergency_stop()
-            else:
-                # se il veicolo non è molto vicino posso pensare di seguirlo
-                control = self.car_following_manager(vehicle, distance)
-
             if (ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken) and self._behavior.overtake_counter == 0 and distance < 6:
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
                     if self._is_slow(vehicle):
@@ -635,6 +632,13 @@ class BehaviorAgent(BasicAgent):
                                     self._local_planner.set_speed(target_speed)
                                     control = self._local_planner.run_step(debug=debug)
                                     return control
+
+            # Emergency brake if the car is very close.
+            if distance < self._behavior.braking_distance:
+                return self.emergency_stop()
+            else:
+                # se il veicolo non è molto vicino posso pensare di seguirlo
+                control = self.car_following_manager(vehicle, distance)
 
         # 3: Intersection behavior
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
