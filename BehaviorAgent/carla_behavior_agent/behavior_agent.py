@@ -441,6 +441,11 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed) # set the speed
             control = self._local_planner.run_step(debug=debug) # run the local planner
 
+        if vehicle_speed < 0.5:
+            target_speed = min([self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist]) # increase the speed
+            self._local_planner.set_speed(target_speed) # set the speed
+            control = self._local_planner.run_step(debug=debug) # run the local planner
+
         return control
 
     def run_step(self, debug=True):  # il debug era false
