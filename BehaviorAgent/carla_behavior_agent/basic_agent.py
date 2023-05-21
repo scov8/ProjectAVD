@@ -136,9 +136,6 @@ class BasicAgent(object):
             if junction is not None and ve_wpt.get_junction().id == junction.id:
                 _print_vehicle_info(vehicle)
                 _print_vehicle_info(self._vehicle)
-                # print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
-                # print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
-
         
         if check_lane != 'left' or check_lane != 'right':
             return (False, None, -1)
@@ -386,7 +383,6 @@ class BasicAgent(object):
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
         if self._last_stop_sign is not None:
-            print('-------- last_stop_sign if --------------')
             l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='left')
             r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='right')
 
@@ -740,10 +736,6 @@ class BasicAgent(object):
         If the lane change is impossible, the returned path will be empty.
         """
 
-        print("DISTANCE SAME LANE:  ", distance_same_lane)
-        print("DISTANCE OTHER LANE: ", distance_other_lane)
-        print("DISTANCE LANE CHANGE:", lane_change_distance)
-
         # Lista dei waypoint che tracciano il cambio di corsia.
         plan = []
         plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
@@ -756,7 +748,6 @@ class BasicAgent(object):
             else:
                 next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                print("\nLANE CHANGE ERROR 1\n")
                 return []
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)
@@ -780,22 +771,18 @@ class BasicAgent(object):
             else:
                 next_wps = plan[-1][0].next(lane_change_distance)
             if not next_wps:
-                print("\nLANE CHANGE ERROR 2\n")
                 return []
             next_wp = next_wps[0]
             # Traslo quel next_wp sull'altra corsia.
             if direction == 'left':
                 if check and str(next_wp.lane_change) not in ['Left', 'Both']:
-                    print("\nLANE CHANGE ERROR 3\n")
                     return []
                 side_wp = next_wp.get_left_lane()
             else:
                 if check and str(next_wp.lane_change) not in ['Right', 'Both']:
-                    print("\nLANE CHANGE ERROR 4\n")
                     return []
                 side_wp = next_wp.get_right_lane()
             if not side_wp or side_wp.lane_type != carla.LaneType.Driving:
-                print("\nLANE CHANGE ERROR 5\n")
                 return []
             plan.append((side_wp, option))
             lane_changes_done += 1
@@ -808,7 +795,6 @@ class BasicAgent(object):
             else:
                 next_wps = plan[-1][0].next(step_distance)
             if not next_wps:
-                print("\nLANE CHANGE ERROR 6\n")
                 return []
             next_wp = next_wps[0]
             distance += next_wp.transform.location.distance(plan[-1][0].transform.location)

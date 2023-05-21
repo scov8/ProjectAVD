@@ -100,16 +100,16 @@ class BehaviorAgent(BasicAgent):
             self._incoming_direction = RoadOption.LANEFOLLOW
 
         # if the final destination waypoint is None and we are not doing an overtake maneuver, we set it to the final waypoint of the waypoints queue
-        if self._destination_waypoint is None: 
-            if not self._overtaking_vehicle or not self._overtaking_obj:
-                self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
+        #if self._destination_waypoint is None: 
+        #    if not self._overtaking_vehicle or not self._overtaking_obj:
+        #        self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
 
     def _other_lane_occupied(self, distance, check_behind=False):
         """
         This method returns True if the other lane is occupied by a vehicle.
 
             :param distance: distance to look ahead for other vehicles
-            :param check_behind: if True, we check the behind of the ahead vehicle, otherwise we check the ahead of the ahead vehicle
+            :param check_behind: if True, we check the front of the behind vehicle, otherwise we check the rear of the ahead vehicle
         """
 
         # Get all the actors present in the world, in case the overtake is on a static object we get all the static actors, otherwise we get all the vehicles.
@@ -118,10 +118,10 @@ class BehaviorAgent(BasicAgent):
         else:
             vehicle_list = self._world.get_actors().filter("*vehicle*")
 
-        def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x # distance between two vehicles
+        def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x # return distance between two vehicles
         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < distance and v.id != self._vehicle.id] # filter vehicles within distance and not the ego vehicle
 
-        # If the flag check_behind is False, we check ONLY for vehicles ahead of the ego vehicle.
+        # If the flag check_behind is False, we check the ahead of vehicles ahead of the ego vehicle.
         if check_behind is False:
             vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(vehicle_list, distance, up_angle_th=90) # check for vehicles in the other lane
             # If a vehicle is detected in the other lane, we return True, otherwise we return False.
@@ -130,9 +130,10 @@ class BehaviorAgent(BasicAgent):
                 return True
             return False
         else:
-            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True)
-            vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)
+            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True)     # check for vehicles in the other lane ahead of the ego vehicle, considering the behind of the front vehicle
+            vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135) # check for vehicles in the other lane ahead of the ego vehicle, considering the ahead of the front vehicle
 
+            # If a vehicle is detected in the other lane on ahead and behind,
             if vehicle_state_ahead and vehicle_state_behind:
                 print(f"OTHER LANE OCCUPATA AHEAD: {vehicle_ahead} e BEHIND: {vehicle_behind} distanti {dist(vehicle_ahead, vehicle_behind)}")
                 return dist(vehicle_ahead, vehicle_behind) <= self._vehicle.bounding_box.extent.x * 2 + 5
