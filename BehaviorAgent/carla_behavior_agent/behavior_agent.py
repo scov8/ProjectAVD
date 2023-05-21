@@ -445,6 +445,7 @@ class BehaviorAgent(BasicAgent):
             self._behavior.overtake_counter -= 1
         
         if self._stay_at_stop_counter> 0:
+            print("STAY AT STOP COUNTER: ", self._stay_at_stop_counter)
             self._stay_at_stop_counter -= 1
         if self._stay_at_stop_counter == 0:
             self._stay_at_stop = False
