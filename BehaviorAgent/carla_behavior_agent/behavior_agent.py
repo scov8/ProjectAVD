@@ -65,8 +65,7 @@ class BehaviorAgent(BasicAgent):
         self._distance_to_over = 75       # distance to overtake
         self._distance_to_overtake_obj = 80    # distance to overtake
         self._n_vehicle = 0
-        self._stay_at_stop = False
-        self._stay_at_stop_counter = 5
+        self._stay_at_stop_counter = 30
 
         # Parameters for agent behavior
         if behavior == 'cautious':
@@ -444,10 +443,8 @@ class BehaviorAgent(BasicAgent):
             print("OVERTAKE COUNTER: ", self._behavior.overtake_counter)
             self._behavior.overtake_counter -= 1
         
-        if self._stay_at_stop_counter> 0:
+        if self._stay_at_stop_counter > 0:
             self._stay_at_stop_counter -= 1
-        if self._stay_at_stop_counter == 0:
-            self._stay_at_stop = False
 
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
@@ -459,15 +456,14 @@ class BehaviorAgent(BasicAgent):
         # 1.1: Stop Signs
         if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
                 print('--------------- [stop] ------------------')
-                self._stay_at_stop = True
-                self._stay_at_stop_counter=5
+                self._stay_at_stop_counter=30
                 #return self.emergency_stop()
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]):
             target_speed = min([self._behavior.max_speed, self._speed_limit-5])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
         
-        if self._stay_at_stop:
+        if self._stay_at_stop_counter > 0:
             return self.emergency_stop()
         
         # 2.0: Lane Invasion (degli altri)
