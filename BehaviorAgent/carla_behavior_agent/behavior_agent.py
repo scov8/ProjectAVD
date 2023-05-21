@@ -8,7 +8,6 @@
 waypoints and avoiding other vehicles. The agent also responds to traffic lights,
 traffic signs, and has different possible configurations. """
 
-import random
 import numpy as np
 import math
 import carla
@@ -16,7 +15,7 @@ from basic_agent import BasicAgent
 from local_planner import RoadOption
 from behavior_types import Cautious, Aggressive, Normal
 
-from misc import get_speed, positive, is_within_distance, compute_distance, get_steering
+from misc import get_speed, positive, get_steering
 
 
 class BehaviorAgent(BasicAgent):
@@ -44,17 +43,17 @@ class BehaviorAgent(BasicAgent):
         self._look_ahead_steps = 0
 
         # Vehicle information
-        self._speed = 0
-        self._steer = 0
-        self._speed_limit = 0
-        self._direction = None
-        self._vehicle_heading = None
-        self._incoming_direction = None
-        self._incoming_waypoint = None
-        self._min_speed = 5
-        self._behavior = None
-        self._sampling_resolution = 4.5
-        self._prev_direction = RoadOption.LANEFOLLOW
+        self._speed = 0             # speed of the ego vehicle
+        self._steer = 0             # steering wheel angle of the ego vehicle
+        self._speed_limit = 0       # speed limit of the road the ego vehicle is in
+        self._direction = None      # direction the ego vehicle is following
+        self._vehicle_heading = None      # heading of the ego vehicle
+        self._incoming_direction = None   # direction of the incoming waypoint
+        self._incoming_waypoint = None    # incoming waypoint
+        self._min_speed = 5               # minimum speed of the ego vehicle
+        self._behavior = None             # behavior of the ego vehicle
+        self._sampling_resolution = 4.5   # sampling resolution of the global router
+        self._prev_direction = RoadOption.LANEFOLLOW # previous direction of the ego vehicle
         self._overtaking_vehicle = False  # flag to indicate overtaking vehicle
         self._overtaking_obj = False      # flag to indicate overtaking object
         self._ending_overtake = False     # flag to indicate the end of overtaking
@@ -64,45 +63,45 @@ class BehaviorAgent(BasicAgent):
         self._d_max = 8                   # maximum distance to check for overtaking
         self._distance_to_over = 75       # distance to overtake
         self._distance_to_overtake_obj = 80    # distance to overtake
-        self._n_vehicle = 0
-        self._stay_at_stop_counter = 30
+        self._n_vehicle = 0              # number of vehicles in front of the ego vehicle
+        self._stay_at_stop_counter = 30  # counter to stay at stop
 
         # Parameters for agent behavior
         if behavior == 'cautious':
-            self._behavior = Cautious()
+            self._behavior = Cautious() # set the behavior to cautious
 
         elif behavior == 'normal':
-            self._behavior = Normal()
+            self._behavior = Normal() # set the behavior to normal
 
         elif behavior == 'aggressive':
-            self._behavior = Aggressive()
+            self._behavior = Aggressive() # set the behavior to aggressive
 
     def _update_information(self):
         """
         This method updates the information regarding the ego
         vehicle based on the surrounding world.
         """
-        self._speed = get_speed(self._vehicle)
-        self._steer = get_steering(self._vehicle)
-        self._speed_limit = self._vehicle.get_speed_limit()
-        self._local_planner.set_speed(self._speed_limit)
-        self._vehicle_heading = self._vehicle.get_transform().rotation.yaw
-        self._prev_direction = self._direction
-        self._direction = self._local_planner.target_road_option
-        if self._direction is None:
+        self._speed = get_speed(self._vehicle) # get the speed of the ego vehicle
+        self._steer = get_steering(self._vehicle) # get the steering wheel angle of the ego vehicle
+        self._speed_limit = self._vehicle.get_speed_limit() # get the speed limit of the road the ego vehicle is in
+        self._local_planner.set_speed(self._speed_limit) # set the speed of the ego vehicle
+        self._vehicle_heading = self._vehicle.get_transform().rotation.yaw # get the heading of the ego vehicle
+        self._prev_direction = self._direction # get the previous direction of the ego vehicle
+        self._direction = self._local_planner.target_road_option # get the direction the ego vehicle is following
+        if self._direction is None: # if the direction is None, we set it to LANEFOLLOW
             self._direction = RoadOption.LANEFOLLOW
 
-        self._look_ahead_steps = int((self._speed_limit) / 10)
+        self._look_ahead_steps = int((self._speed_limit) / 10) # set the look ahead steps based on the speed limit of the road the ego vehicle is in
 
-        self._incoming_waypoint, self._incoming_direction = self._local_planner.get_incoming_waypoint_and_direction(steps=self._look_ahead_steps)
-        if self._incoming_direction is None:
+        self._incoming_waypoint, self._incoming_direction = self._local_planner.get_incoming_waypoint_and_direction(steps=self._look_ahead_steps) # get the incoming waypoint and direction
+        
+        # if the incoming direction is None, we set it to LANEFOLLOW
+        if self._incoming_direction is None: 
             self._incoming_direction = RoadOption.LANEFOLLOW
 
-        # Save final destination waypoint.
-        if self._destination_waypoint is None:
-            if not self._overtaking_vehicle:
-                self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
-            if not self._overtaking_obj:
+        # if the final destination waypoint is None and we are not doing an overtake maneuver, we set it to the final waypoint of the waypoints queue
+        if self._destination_waypoint is None: 
+            if not self._overtaking_vehicle or not self._overtaking_obj:
                 self._destination_waypoint = self._local_planner._waypoints_queue[-1][0]
 
     def _other_lane_occupied(self, distance, check_behind=False):
@@ -110,7 +109,7 @@ class BehaviorAgent(BasicAgent):
         This method returns True if the other lane is occupied by a vehicle.
 
             :param distance: distance to look ahead for other vehicles
-            :param check_behind: if True, check for other vehicles behind the ego vehicle
+            :param check_behind: if True, we check the behind of the ahead vehicle, otherwise we check the ahead of the ahead vehicle
         """
 
         # Get all the actors present in the world, in case the overtake is on a static object we get all the static actors, otherwise we get all the vehicles.
@@ -169,9 +168,8 @@ class BehaviorAgent(BasicAgent):
         """
         vel = vehicle.get_velocity().length() # get the velocity of the vehicle
         acc = vehicle.get_acceleration().length() # get the acceleration of the vehicle
-        print("VELOCITA VEICOLO: ", vel, "ACCELERAZIONE: ", acc)
         return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
-    
+
     def _iam_stuck(self, waypoint):
         ego_location = waypoint.transform.location
         ego_wpt = self._map.get_waypoint(ego_location)
@@ -187,7 +185,7 @@ class BehaviorAgent(BasicAgent):
             relative_direction = abs(math.degrees(vehicle_yaw - v_direction))
             if relative_direction >= 90:
                 vehicle_list.remove(v)
-        
+
         distance = 0
         d_max=10
         v_list =[]
@@ -217,7 +215,7 @@ class BehaviorAgent(BasicAgent):
         else:
             print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(v_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
             return True, len(v_list), max(80, distance*3), d_max+1
-    
+
     def traffic_light_manager(self):
         """
         This method is in charge of behaviors for red lights.
@@ -242,7 +240,7 @@ class BehaviorAgent(BasicAgent):
         print(str(len(stops_list)) + '\n' if len(stops_list) > 0 else '', end='')
         if len(stops_list) > 1: # if there are more than one stop signs, we sort them by distance
             stops_list.sort(key=dist)
-        
+
         return self._affected_by_stop_sign(self._vehicle, stops_list)[0] # return True if the ego vehicle is affected by a stop sign, otherwise return False
 
     def _tailgating(self, waypoint, vehicle_list):
@@ -357,8 +355,8 @@ class BehaviorAgent(BasicAgent):
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1) # check if there is a walker in the right lane
         else:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=60)  # check if there is a walker in the current lane
-
         print("walker_state: ", walker_state, "walker: ", walker, "distance: ", distance)
+
         return walker_state, walker, distance
 
     def obstacle_avoid_manager(self, waypoint):
@@ -378,7 +376,7 @@ class BehaviorAgent(BasicAgent):
         obstacle_list = [w for w in obstacle_list if dist(w) < 45]  # get all the obstacles in the world that are within 45 meters from the waypoint
         obstacle_list.sort(key=dist) # sort the list of obstacles by distance
 
-        if obstacle_list == []: # if there are no obstacles in the world
+        if obstacle_list == []:
             return False, None, None
 
         if self._direction == RoadOption.CHANGELANELEFT:
@@ -387,9 +385,9 @@ class BehaviorAgent(BasicAgent):
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, lane_offset=1) # check if there is a obstacle in the right lane
         else:
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40)  # check if there is a obstacle in the current lane
-
         print("obstacle_state", obstacle_state, "obstacle", obstacle, "distance", distance)
-        return obstacle_state, obstacle, distance # return True if there is a obstacle nearby, False if not, the nearby obstacle, and the distance to the nearby obstacle
+
+        return obstacle_state, obstacle, distance
 
     def car_following_manager(self, vehicle, distance, debug=False):
         """
@@ -442,11 +440,11 @@ class BehaviorAgent(BasicAgent):
         if self._behavior.overtake_counter > 0:
             print("OVERTAKE COUNTER: ", self._behavior.overtake_counter)
             self._behavior.overtake_counter -= 1
-        
+
         if self._stay_at_stop_counter> 0:
             print("STAY AT STOP COUNTER: ", self._stay_at_stop_counter)
             self._stay_at_stop_counter -= 1
- 
+
 
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
@@ -464,10 +462,10 @@ class BehaviorAgent(BasicAgent):
             target_speed = min([self._behavior.max_speed, self._speed_limit-5])
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
-        
+
         if self._stay_at_stop_counter> 0:
             return self.emergency_stop()
-        
+
         # 2.0: Lane Invasion (degli altri)
         vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30)
         if vehicle_state_invasion and not self._overtaking_vehicle and not self._overtaking_obj:
@@ -527,11 +525,11 @@ class BehaviorAgent(BasicAgent):
             elif distance < 30 and self._speed > 0.01 and not self._overtaking_obj:
                 print("sto frenando per ostacolo: NO THROTTLE")
                 return self.no_throttle()
-            
+
             if 40 <= self._distance_to_overtake_obj <= 80:
                 print("self._distance_to_overtake_obj", self._distance_to_overtake_obj)
                 self._distance_to_overtake_obj -= 0.3
-                
+
 
         # 2.x.x: overtake behavior
         if self._ending_overtake:
