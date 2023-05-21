@@ -57,7 +57,7 @@ class BehaviorAgent(BasicAgent):
         self._overtaking_vehicle = False  # flag to indicate overtaking vehicle
         self._overtaking_obj = False      # flag to indicate overtaking object
         self._ending_overtake = False     # flag to indicate the end of overtaking
-        self._destination_waypoint = None # final destination waypoint #ELIMINARE
+        #self._destination_waypoint = None # final destination waypoint #ELIMINARE
         self._shrinkage = False           # shrinkage flag
         self._waypoints_queue_copy = None # copy of the waypoints queue
         self._d_max = 8                   # maximum distance to check for overtaking
@@ -100,9 +100,9 @@ class BehaviorAgent(BasicAgent):
             self._incoming_direction = RoadOption.LANEFOLLOW
 
         # if the final destination waypoint is None and we are not doing an overtake maneuver, we set it to the final waypoint of the waypoints queue
-        if self._destination_waypoint is None:  #ELIMINARE
-            if not self._overtaking_vehicle or not self._overtaking_obj: #ELIMINARE
-                self._destination_waypoint = self._local_planner._waypoints_queue[-1][0] #ELIMINARE
+        #if self._destination_waypoint is None:  #ELIMINARE
+        #    if not self._overtaking_vehicle or not self._overtaking_obj: #ELIMINARE
+        #        self._destination_waypoint = self._local_planner._waypoints_queue[-1][0] #ELIMINARE
 
     def _other_lane_occupied(self, distance, check_behind=False):
         """
@@ -632,8 +632,6 @@ class BehaviorAgent(BasicAgent):
             # Emergency brake if the car is very close.
             if distance < self._behavior.braking_distance-4:
                 return self.emergency_stop()
-            elif distance < self._behavior.braking_distance:
-                return self.no_throttle()
             else:
                 control = self.car_following_manager(vehicle, distance)
 
