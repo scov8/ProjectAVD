@@ -1,3 +1,11 @@
+# Autonomous Vehicle Driving Project.
+# Copyright (C) 2023 - All Rights Reserved
+# Group:
+#   Faiella Ciro              0622701816  c.faiella8@studenti.unisa.it
+#   Giannino Pio Roberto      0622701713	p.giannino@studenti.unisa.it
+#   Scovotto Luigi            0622701702  l.scovotto1@studenti.unisa.it
+#   Tortora Francesco         0622701700  f.tortora21@studenti.unisa.it
+
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
