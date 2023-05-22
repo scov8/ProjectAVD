@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.7.1)  22 MAY 2023 16:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.7.1)  22 MAY 2023 18:22
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -671,183 +671,157 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <9> not available
  [1
 
 {/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-<img/TR01.png, id=174, 899.36pt x 450.68375pt>
+<img/TR01.png, id=182, 899.36pt x 450.68375pt>
 File: img/TR01.png Graphic file (type png)
 <use img/TR01.png>
-Package pdftex.def Info: img/TR01.png  used on input line 79.
+Package pdftex.def Info: img/TR01.png  used on input line 92.
 (pdftex.def)             Requested size: 172.5pt x 86.44226pt.
-<img/TR09.png, id=176, 1017.8025pt x 508.90125pt>
+ [2]
+<img/TR09.png, id=190, 1017.8025pt x 508.90125pt>
 File: img/TR09.png Graphic file (type png)
 <use img/TR09.png>
-Package pdftex.def Info: img/TR09.png  used on input line 88.
+Package pdftex.def Info: img/TR09.png  used on input line 101.
 (pdftex.def)             Requested size: 172.5pt x 86.24805pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<img/TR10.png, id=177, 1001.7425pt x 501.875pt>
+<img/TR10.png, id=191, 1001.7425pt x 501.875pt>
 File: img/TR10.png Graphic file (type png)
 <use img/TR10.png>
-Package pdftex.def Info: img/TR10.png  used on input line 97.
+Package pdftex.def Info: img/TR10.png  used on input line 110.
 (pdftex.def)             Requested size: 172.5pt x 86.42036pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<img/TR14a.png, id=178, 896.34875pt x 472.76625pt>
+<img/TR14a.png, id=192, 896.34875pt x 472.76625pt>
 File: img/TR14a.png Graphic file (type png)
 <use img/TR14a.png>
-Package pdftex.def Info: img/TR14a.png  used on input line 107.
+Package pdftex.def Info: img/TR14a.png  used on input line 120.
 (pdftex.def)             Requested size: 172.5pt x 90.98073pt.
-[2 <./img/TR01.png>]
-<img/TR16a.png, id=188, 894.34125pt x 477.785pt>
+ [3 <./img/TR01.png> <./img/TR09.png> <./img/TR10.png>]
+<img/TR16a.png, id=205, 894.34125pt x 477.785pt>
 File: img/TR16a.png Graphic file (type png)
 <use img/TR16a.png>
-Package pdftex.def Info: img/TR16a.png  used on input line 116.
+Package pdftex.def Info: img/TR16a.png  used on input line 129.
 (pdftex.def)             Requested size: 172.5pt x 92.15068pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<img/TR22.png, id=189, 1155.31625pt x 578.16pt>
+<img/TR22.png, id=206, 1155.31625pt x 578.16pt>
 File: img/TR22.png Graphic file (type png)
 <use img/TR22.png>
-Package pdftex.def Info: img/TR22.png  used on input line 125.
+Package pdftex.def Info: img/TR22.png  used on input line 138.
 (pdftex.def)             Requested size: 172.5pt x 86.32326pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<img/TR02.png, id=190, 899.36pt x 450.68375pt>
+<img/TR02.png, id=207, 899.36pt x 450.68375pt>
 File: img/TR02.png Graphic file (type png)
 <use img/TR02.png>
-Package pdftex.def Info: img/TR02.png  used on input line 134.
+Package pdftex.def Info: img/TR02.png  used on input line 147.
 (pdftex.def)             Requested size: 172.5pt x 86.44226pt.
-[3 <./img/TR09.png> <./img/TR10.png> <./img/TR14a.png>]
-<img/TR03.png, id=202, 944.52875pt x 502.87875pt>
+ [4 <./img/TR14a.png> <./img/TR16a.png> <./img/TR22.png>]
+<img/TR03.png, id=218, 944.52875pt x 502.87875pt>
 File: img/TR03.png Graphic file (type png)
 <use img/TR03.png>
-Package pdftex.def Info: img/TR03.png  used on input line 142.
+Package pdftex.def Info: img/TR03.png  used on input line 155.
 (pdftex.def)             Requested size: 172.5pt x 91.84175pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<img/TR17.png, id=203, 1110.1475pt x 555.07375pt>
+<img/TR17.png, id=219, 1110.1475pt x 555.07375pt>
 File: img/TR17.png Graphic file (type png)
 <use img/TR17.png>
-Package pdftex.def Info: img/TR17.png  used on input line 150.
+Package pdftex.def Info: img/TR17.png  used on input line 163.
 (pdftex.def)             Requested size: 172.5pt x 86.24727pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<img/TR04.png, id=204, 976.64874pt x 488.82625pt>
+<img/TR04.png, id=220, 976.64874pt x 488.82625pt>
 File: img/TR04.png Graphic file (type png)
 <use img/TR04.png>
-Package pdftex.def Info: img/TR04.png  used on input line 159.
+Package pdftex.def Info: img/TR04.png  used on input line 172.
 (pdftex.def)             Requested size: 172.5pt x 86.3365pt.
-[4 <./img/TR16a.png> <./img/TR22.png> <./img/TR02.png>]
-<img/TR19a.png, id=215, 946.53625pt x 497.86pt>
+ [5 <./img/TR02.png> <./img/TR03.png> <./img/TR17.png>]
+<img/TR19a.png, id=231, 946.53625pt x 497.86pt>
 File: img/TR19a.png Graphic file (type png)
 <use img/TR19a.png>
-Package pdftex.def Info: img/TR19a.png  used on input line 167.
+Package pdftex.def Info: img/TR19a.png  used on input line 180.
 (pdftex.def)             Requested size: 172.5pt x 90.72765pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[5 <./img/TR03.png> <./img/TR17.png> <./img/TR04.png>]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 183.
+(Font)              <7> on input line 196.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 183.
+(Font)              <5> on input line 196.
+ [6 <./img/TR04.png> <./img/TR19a.png>]
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 200.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 187.
+LaTeX Font Warning: Command \small invalid in math mode on input line 200.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 187.
+LaTeX Font Warning: Command \small invalid in math mode on input line 200.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 187.
-
-
-Overfull \hbox (79.35184pt too wide) in paragraph at lines 187--190
+Overfull \hbox (79.35184pt too wide) in paragraph at lines 200--203
 []\OT1/cmr/bx/n/10 Infraction penalty\OT1/cmr/m/n/10 : Pro-duc-tory of the in-frac-tions com-mit-ted, $[][](\OML/cmm/m/it/10 a[]\OT1/cmr/m/n/10 )[]$.
  []
 
-[6 <./img/TR19a.png>]
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 198.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 198.
+LaTeX Font Warning: Command \small invalid in math mode on input line 211.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 199.
+LaTeX Font Warning: Command \small invalid in math mode on input line 211.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 199.
+LaTeX Font Warning: Command \small invalid in math mode on input line 212.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 200.
+LaTeX Font Warning: Command \small invalid in math mode on input line 212.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 200.
+LaTeX Font Warning: Command \small invalid in math mode on input line 213.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 201.
+LaTeX Font Warning: Command \small invalid in math mode on input line 213.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 201.
+LaTeX Font Warning: Command \small invalid in math mode on input line 214.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 202.
+LaTeX Font Warning: Command \small invalid in math mode on input line 214.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 202.
+LaTeX Font Warning: Command \small invalid in math mode on input line 215.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 203.
+LaTeX Font Warning: Command \small invalid in math mode on input line 215.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 203.
+LaTeX Font Warning: Command \small invalid in math mode on input line 216.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 206.
+LaTeX Font Warning: Command \small invalid in math mode on input line 216.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 206.
+LaTeX Font Warning: Command \small invalid in math mode on input line 219.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 208.
+LaTeX Font Warning: Command \small invalid in math mode on input line 219.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 208.
+LaTeX Font Warning: Command \small invalid in math mode on input line 221.
 
 
-Overfull \hbox (9.36798pt too wide) detected at line 227
+LaTeX Font Warning: Command \small invalid in math mode on input line 221.
+
+[7]
+Overfull \hbox (9.36798pt too wide) detected at line 240
 \OT1/cmr/m/n/10 "\OML/cmm/m/it/10 longitudinal[]control[]dict\OT1/cmr/m/n/10 " : []
  []
 
-[7] [8] [9] [10] [11] (./main.aux)
+[8] [9] [10] [11] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: BFBF2F5B3A02EA84A1A1DE3403393200;7232.
+(rerunfilecheck)             Checksum: 4AD5BC9A9B39EF5BE504791F08C31465;7478.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 22815 strings out of 478268
- 414775 string characters out of 5846348
- 1234199 words of memory out of 5000000
- 40658 multiletter control sequences out of 15000+600000
+ 22819 strings out of 478268
+ 414835 string characters out of 5846348
+ 1234202 words of memory out of 5000000
+ 40660 multiletter control sequences out of 15000+600000
  475823 words of font info for 50 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 94i,12n,92p,787b,1765s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 94i,11n,92p,787b,1765s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on main.pdf (11 pages, 1248545 bytes).
+Output written on main.pdf (11 pages, 1250642 bytes).
 PDF statistics:
- 353 PDF objects out of 1000 (max. 8388607)
- 285 compressed objects within 3 object streams
- 69 named destinations out of 1000 (max. 500000)
- 372 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 361 PDF objects out of 1000 (max. 8388607)
+ 293 compressed objects within 3 object streams
+ 71 named destinations out of 1000 (max. 500000)
+ 388 words of extra memory for PDF output out of 10000 (max. 10000000)
 

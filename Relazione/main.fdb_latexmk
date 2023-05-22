@@ -1,17 +1,17 @@
 # Fdb version 3
-["biber main"] 1684763261 "main.bcf" "main.bbl" "main" 1684766826
-  "main.bcf" 1684766826 106226 efc1d030e9b6ec61cfd62d2d01924d17 "pdflatex"
+["biber main"] 1684770387 "main.bcf" "main.bbl" "main" 1684772547
+  "main.bcf" 1684772546 106226 efc1d030e9b6ec61cfd62d2d01924d17 "pdflatex"
   "sample.bib" 1684756313 794 cd6383536911890aeb9dd464ab09cc00 ""
   (generated)
   "main.bbl"
   "main.blg"
-["makeindex main.idx"] 1684763261 "main.idx" "main.ind" "main" 1684766826
+["makeindex main.idx"] 1684770387 "main.idx" "main.ind" "main" 1684772547
   "main.idx" 0 -1 0 "pdflatex"
   (generated)
   "main.ilg"
   "main.ind"
-["pdflatex"] 1684766823 "/Users/luigiscovotto/Desktop/ProjectAVD/Relazione/main.tex" "main.pdf" "main" 1684766826
-  "/Users/luigiscovotto/Desktop/ProjectAVD/Relazione/main.tex" 1684766823 16894 fff73a25c734d88c2da88b5abddac784 ""
+["pdflatex"] 1684772544 "/Users/luigiscovotto/Desktop/ProjectAVD/Relazione/main.tex" "main.pdf" "main" 1684772547
+  "/Users/luigiscovotto/Desktop/ProjectAVD/Relazione/main.tex" 1684772544 18145 f635407f7b7f72cae67212ba622ba02d ""
   "/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -162,12 +162,12 @@
   "img/TR17.png" 1684756318 130995 3487ebe99e0a988416ac4457f0767eb4 ""
   "img/TR19a.png" 1684756322 146006 d12273f0bd025fd25d8f8ded6027bc75 ""
   "img/TR22.png" 1684756295 131475 e4ae3fd10e3803608d8eaed15eb12622 ""
-  "main.aux" 1684766826 9529 c7dc7fd42308410d67251900a117e728 "pdflatex"
-  "main.bbl" 1684763262 3740 b24c2bf2fb2a3f4aeec08438c82c7304 "biber main"
+  "main.aux" 1684772546 9771 af8d866f8fa36c7c4fca132ca4832959 "pdflatex"
+  "main.bbl" 1684770390 3740 b24c2bf2fb2a3f4aeec08438c82c7304 "biber main"
   "main.ind" 0 -1 0 "makeindex main.idx"
-  "main.out" 1684766826 7232 bfbf2f5b3a02ea84a1a1de3403393200 "pdflatex"
-  "main.run.xml" 1684766826 2301 f06af3099c978185a0ac5347b2a69dfa "pdflatex"
-  "main.tex" 1684766823 16894 fff73a25c734d88c2da88b5abddac784 ""
+  "main.out" 1684772546 7478 4ad5bc9a9b39ef5be504791f08c31465 "pdflatex"
+  "main.run.xml" 1684772546 2301 f06af3099c978185a0ac5347b2a69dfa "pdflatex"
+  "main.tex" 1684772544 18145 f635407f7b7f72cae67212ba622ba02d ""
   (generated)
   "main.aux"
   "main.bcf"

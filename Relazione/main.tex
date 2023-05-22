@@ -43,13 +43,21 @@
 
 
 \section{Introduction}
-The project focuses on the creation of an autonomous driving system to be included in the Carla simulator 
+The project focuses on the creation of an autonomous driving system to be included in the CARLA simulator 
 environment. Unlike the task performed in the real world, in this case there is full knowledge of the world 
 in which the vehicle is located, nevertheless the system has to face several challenges in order to avoid 
 errors. 
 
-\section{Ambiente di svilippo}
-caratteristiche del dell e dire il fatto ceh nel file json abbiamo tolto i sensori per far adnare piu veloce il tutto
+\section{Development environment}
+\subsection{Hardware}
+We conducted the software testing on a Dell machine equipped with an NVIDIA Quadro P2000 graphics card, boasting 4GB of dedicated memory. 
+The system was powered by an Intel 8th generation i9 processor, delivering exceptional processing power. Furthermore, it was equipped with a 
+substantial 16GB of RAM, ensuring smooth and efficient operation throughout the testing phase.
+In order to optimize performance and enhance the execution speed, we opted to remove all unnecessary sensors from the machine, 
+as they were not utilized during the testing process. Leveraging our comprehensive global knowledge of the surrounding environment, 
+we were able to confidently eliminate these redundant components. As a result, the execution speed experienced a notable improvement, exhibiting an impressive 30\% increase.
+
+\subsection{CARLA Simulator}
 
 \section{Task}
 The CARLA AD Leaderboard challenges AD agents to drive through a series of predefined routes. For each route, 
@@ -58,7 +66,8 @@ Routes are defined in a variety of situations, including urban areas, residentia
 The classification evaluates AD agents in different weather conditions, including daytime scenes, sunset, rain, fog and night.
 
 \section{Operational Design Domain}
-The ODD provided by our implementation reaches the following operative domains: % dire che i dati con cui lavora sono dei dati puliti forniti dal simul e non dai sensori
+First of all, considering the fact that the data used by the ego-vehicle are directly provided by CARLA simulator and they are not took by any kind of sensor, we have 
+that the our ODD has reached the following operational domains:
 \begin{itemize}
     \item the vehicle is able to maintain the selected speed, thanks the longitudinal control;
     \item the vehicle is able to maintain the correct position between the lanes of a road thanks to the lateral control;
@@ -66,7 +75,11 @@ The ODD provided by our implementation reaches the following operative domains: 
     \item the vehicle is able to avoid collisions with the car ahead and adapts its speed in order to follow that one;
     \item the vehicle is capable of overtaking when possible and when necessary;
     \item the vehicle is capable to makes an emergency stop in critical situations;
-    \item 
+    \item the vehicle is able to operate in sunny, foggy, raining and poor lighting environments;
+    \item the vehicle can operate in urban and non-urban contexts;
+    \item the vehicle is capable of handling junctions;
+    \item the vehicle is able to avoid collisions with obstacles that can be find through the path (e.g. road cones, traffic sign, construction obstacle, etc.);
+    \item the vehicle is able to correctly pass the traffic light.
 \end{itemize}
 
 \subsection{Traffic Scenario}
@@ -270,7 +283,7 @@ testo con video
 \section{Future Improvements and Errors}
 dire cosa manca, gli errori e i possibili sviliuppi futuri
 ---erroei dovuto al simulatore
-non abbiamo gestito quando è bagnato a terra
+---non abbiamo gestito quando è bagnato a terra
 ---spawna pedoni troppo vicini
 
 
