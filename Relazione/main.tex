@@ -55,9 +55,12 @@ The system was powered by an Intel 8th generation i9 processor, delivering excep
 substantial 16GB of RAM, ensuring smooth and efficient operation throughout the testing phase.
 In order to optimize performance and enhance the execution speed, we opted to remove all unnecessary sensors from the machine, 
 as they were not utilized during the testing process. Leveraging our comprehensive global knowledge of the surrounding environment, 
-we were able to confidently eliminate these redundant components. As a result, the execution speed experienced a notable improvement, exhibiting an impressive 30\% increase.
+we were able to confidently eliminate these redundant components. 
+As a result, the execution speed experienced a notable improvement, exhibiting an impressive 30\% increase compared to the performance of
+the machine provided to us by the department.
 
 \subsection{CARLA Simulator}
+???
 
 \section{Task}
 The CARLA AD Leaderboard challenges AD agents to drive through a series of predefined routes. For each route, 
@@ -94,6 +97,14 @@ The ego-vehicle loses control due to bad conditions on the road and it must reco
 \end{figure}
 
 \subsubsection{Traffic negotiation}
+\textbf{Unprotected left turn at intersection with oncoming traffic}
+The ego-vehicle is performing an unprotected left turn at an intersection, yielding to oncoming traffic. This scenario occurs at both signalized and non-signalized junctions.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{img/TR08.png}
+    \caption{Right turn at an intersection with crossing traffic} \label{Scenario_trafficNegtiation}
+\end{figure}
+
 \textbf{Right turn at an intersection with crossing traffic} 
 The ego-vehicle is performing a right or left turn at an intersection, yielding to crossing traffic. This scenario occurs at both signalized and non-signalized junctions.
 \begin{figure}[h]
@@ -185,9 +196,6 @@ While performing a maneuver, the ego-vehicle encounters a stopped vehicle in the
 
 \subsection{Control system}
 
-
-\subsubsection{Titolo Sottosottocapitolo}
-
 \section{Evaluation and metrics}
 The driving proficiency of an agent can be characterized by multiple metrics. For the assigned leaderboard, we have a number of metrics that help 
 to understand different aspects of driving. Although all routes have the same type of metrics, the respective values are calculated separately. 
@@ -231,22 +239,91 @@ leaderboard will move onto the next one, triggering it normally.
     \item \textbf{Route timeout} — If the simulation of a route takes too long to finish.
 \end{itemize}
 
-\section{Sviluppo del progetto}
-parlare del progetto e delle sue fasi di sviluppo 
-\subsection{Controllori}
+\section{Project development and phases }
+The main problems were determined in order to define the problem domain (more on this in section x.xx). 
+From this, we moved on to the development of solutions, with the highest priority problems being developed first.
+\subsection{Controllers}
 settaggio dei Controllori
-\subsubsection{PID}
-controllore PID
+
+One of the first tasks was the configuration of the controller, in order to determine a driving behavior 
+that would seem as natural as possible. 
+\subsubsection{PID Controller}
+The PID controller was configured on the basis of several initial attempts. They led to the following values:
 $$"longitudinal\_control\_dict" : {"K_P": 0.888 , "K_I": 0.0768, "K_D": 0.05, "dt": 0.05}$$
-\subsubsection{Controllore di Stanley}
+\subsubsection{Stanley Controller}
 controllore di stanley
+
+COSA DIRE?????
+
 $$"lateral\_control\_dict" : {"K_V": 4, "K_S": 1, "dt": 0.05}$$
+
 \subsection{Obstacle avoidance}
 gesitone dell overtake
+
+The development of the overtaking manoeuvre was one of the most challenging tasks due to its importance 
+within such a system; its difficulty was such that it required constant development of this feature during 
+the course of the entire project. The solution found is optimal in the context in which the vehicle moves, 
+with no errors in the management of the various events.
+The steps to manage overtake are the following:
+\begin{enumerate}
+    \item 
+    \item 
+    \item 
+\end{enumerate}
+
+
+\subsection{Stop sign}
+Another phase concerned the management of stops; after trying countless solutions, we arrived at a solution that 
+uses the static textit{*stop}. What we do, is to take all the stops in the scenario and evaluate whether they 
+affect the ego-vehicle. 
+Management begins by taking all stop signals and putting them into a listings, then the system follows these steps:
+\begin{enumerate}
+    \item for each stop sign, evaluate the distance between the stop sign and the ego-vehicle and discarding all distant stops;
+    \item sort the remaining stops by the minimum distance;
+    \item check all vehicles coming from the right and left.
+\end{enumerate}
+Now we have all the informations that we needed, so the ego-vehicle follows this behavior:
+\begin{itemize}
+    \item if there is no vehicle in the left and right lane, the stop sign is not affecting the vehicle;
+    \item if there is a vehicle in the left lane, check if it is still affecting the vehicle;
+    \item if there is a vehicle in the right lane, check if it is still affecting the vehicle;
+    \item otherwise, the ego-vehicle can go.
+\end{itemize}
+ 
+
 \subsection{Invading lane}
 gestione dell'invasione della corsia
+There was also a phase where we handled lane invasion, since there are lane restrictions within the routes. 
+The solution to this problem is the following:
+\begin{enumerate}
+    \item 
+    \item 
+    \item 
+\end{enumerate}
+
+\subsection{Pedestrian}
+The management of vehicle behaviour in the presence of pedestrians was partly carried out, 
+although there was not enough time for full development of the solution (more on this in section x.xx). 
+
+
 \subsection{Traffic negotiation}
 gestione degli incroci
+
+
+
+
+\section*{Road Event Management}
+In this section we will explain how we handled certain situations that occurred in the routes, 
+in order to show the level of attention achieved by our system. The following subsections are 
+correlated with demonstration videos to prove the effective functioning of the system.
+\subsection*{Overtake}
+\subsection*{Junction}
+\subsection*{Lane invasion}
+
+
+
+
+
 
 
 \section{Analisi qualitativa dei risultati}
@@ -255,7 +332,7 @@ scrivere dove siamo arrivati mostrando i video (minuti) e fare il confronto tra 
 testo con video
 
 \subsection{Traffic negotiation}
-\subsubsection{Right turn at an intersection with crossing traffic}
+\subsubsection{Right or left turn at an intersection with crossing traffic}
 testo con video
 \subsubsection{Crossing negotiation at an unsignalized intersection}
 testo con video

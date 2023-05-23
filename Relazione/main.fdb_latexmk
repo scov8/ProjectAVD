@@ -1,17 +1,17 @@
 # Fdb version 3
-["biber main"] 1684770387 "main.bcf" "main.bbl" "main" 1684772547
-  "main.bcf" 1684772546 106226 efc1d030e9b6ec61cfd62d2d01924d17 "pdflatex"
+["biber main"] 1684856570 "main.bcf" "main.bbl" "main" 1684856862
+  "main.bcf" 1684856861 106226 efc1d030e9b6ec61cfd62d2d01924d17 "pdflatex"
   "sample.bib" 1684756313 794 cd6383536911890aeb9dd464ab09cc00 ""
   (generated)
   "main.bbl"
   "main.blg"
-["makeindex main.idx"] 1684770387 "main.idx" "main.ind" "main" 1684772547
+["makeindex main.idx"] 1684856570 "main.idx" "main.ind" "main" 1684856862
   "main.idx" 0 -1 0 "pdflatex"
   (generated)
   "main.ilg"
   "main.ind"
-["pdflatex"] 1684772544 "/Users/luigiscovotto/Desktop/ProjectAVD/Relazione/main.tex" "main.pdf" "main" 1684772547
-  "/Users/luigiscovotto/Desktop/ProjectAVD/Relazione/main.tex" 1684772544 18145 f635407f7b7f72cae67212ba622ba02d ""
+["pdflatex"] 1684856859 "/Users/luigiscovotto/Desktop/ProjectAVD/Relazione/main.tex" "main.pdf" "main" 1684856862
+  "/Users/luigiscovotto/Desktop/ProjectAVD/Relazione/main.tex" 1684856856 21554 4512efe1d24c9562cbcee132122deb54 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -155,6 +155,7 @@
   "img/TR02.png" 1684756303 51571 14fb7410c8d4f1ed9b925b4ece25e5be ""
   "img/TR03.png" 1684756306 37834 fc6ac9089d464bc2fa8831b2b1765601 ""
   "img/TR04.png" 1684756315 141102 dbf2795888be76c77f7229371c1d4212 ""
+  "img/TR08.png" 1684849475 194081 a7fabac52246290d038002f0031e5826 ""
   "img/TR09.png" 1684756248 192790 1ca38752f808934bad5e6c3db1b8e554 ""
   "img/TR10.png" 1684756242 191253 3a1bece9a64a0344544aa72574bafa7b ""
   "img/TR14a.png" 1684756266 95852 7932b67ae49a4b5635c53fe23e3de22f ""
@@ -162,12 +163,12 @@
   "img/TR17.png" 1684756318 130995 3487ebe99e0a988416ac4457f0767eb4 ""
   "img/TR19a.png" 1684756322 146006 d12273f0bd025fd25d8f8ded6027bc75 ""
   "img/TR22.png" 1684756295 131475 e4ae3fd10e3803608d8eaed15eb12622 ""
-  "main.aux" 1684772546 9771 af8d866f8fa36c7c4fca132ca4832959 "pdflatex"
-  "main.bbl" 1684770390 3740 b24c2bf2fb2a3f4aeec08438c82c7304 "biber main"
+  "main.aux" 1684856861 10211 f274da5db82c89a8dd8ad17972ec14a0 "pdflatex"
+  "main.bbl" 1684856572 3740 b24c2bf2fb2a3f4aeec08438c82c7304 "biber main"
   "main.ind" 0 -1 0 "makeindex main.idx"
-  "main.out" 1684772546 7478 4ad5bc9a9b39ef5be504791f08c31465 "pdflatex"
-  "main.run.xml" 1684772546 2301 f06af3099c978185a0ac5347b2a69dfa "pdflatex"
-  "main.tex" 1684772544 18145 f635407f7b7f72cae67212ba622ba02d ""
+  "main.out" 1684856861 7633 0352cfc3f193394a61058e0da60cae20 "pdflatex"
+  "main.run.xml" 1684856861 2301 f06af3099c978185a0ac5347b2a69dfa "pdflatex"
+  "main.tex" 1684856856 21554 4512efe1d24c9562cbcee132122deb54 ""
   (generated)
   "main.aux"
   "main.bcf"
