@@ -254,7 +254,7 @@ class BehaviorAgent(BasicAgent):
 
         return affected # return True if the ego vehicle is affected by a traffic light, otherwise return False
 
-    #COPIATE FIN QUI
+    
     def stop_signs_manager(self, waypoint):
         """
         This method is in charge of behaviors for stop signs.
