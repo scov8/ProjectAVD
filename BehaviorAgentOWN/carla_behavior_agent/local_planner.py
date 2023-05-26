@@ -1,5 +1,11 @@
-# Copyright (c) # Copyright (c) 2018-2020 CVC.
-#
+# Autonomous Vehicle Driving Project.
+# Copyright (C) 2023 - All Rights Reserved
+# Group:
+#   Faiella Ciro              0622701816  c.faiella8@studenti.unisa.it
+#   Giannino Pio Roberto      0622701713	p.giannino@studenti.unisa.it
+#   Scovotto Luigi            0622701702  l.scovotto1@studenti.unisa.it
+#   Tortora Francesco         0622701700  f.tortora21@studenti.unisa.it
+
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
@@ -137,6 +143,10 @@ class LocalPlanner(object):
         self.target_waypoint, self.target_road_option = (current_waypoint, RoadOption.LANEFOLLOW)
         self._waypoints_queue.append((self.target_waypoint, self.target_road_option))
 
+    def set_lat_offset(self, offset):
+        self._offset = offset
+        self._vehicle_controller.set_lat_offset(offset)
+
     def set_speed(self, speed):
         """
         Changes the target speed
@@ -267,11 +277,16 @@ class LocalPlanner(object):
             self.target_waypoint, self.target_road_option = self._waypoints_queue[0]
             control = self._vehicle_controller.run_step(self._target_speed, self.target_waypoint)
 
-        # decommentare le 2 di sotto per visualizzare i waypoints
-        #if debug:
-        #    draw_waypoints(self._vehicle.get_world(), [self.target_waypoint], 1.0)
+        if debug:
+            draw_waypoints(self._vehicle.get_world(), [self.target_waypoint], 1.0)
 
         return control
+
+    def has_incoming_waypoint(self):
+        """
+        Returns whether the list of waypoints has more than 1 element.
+        """
+        return len(self._waypoints_queue) > 1
 
     def get_incoming_waypoint_and_direction(self, steps=3):
         """

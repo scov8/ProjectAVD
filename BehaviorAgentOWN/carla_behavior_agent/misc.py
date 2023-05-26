@@ -39,6 +39,10 @@ def get_speed(vehicle):
 
     return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
 
+def get_steering(vehicle):
+    vel = vehicle.get_angular_velocity()
+    return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
+
 def get_trafficlight_trigger_location(traffic_light):
     """
     Calculates the yaw of the waypoint that represents the trigger volume of the traffic light
@@ -62,7 +66,6 @@ def get_trafficlight_trigger_location(traffic_light):
 
     return carla.Location(point_location.x, point_location.y, point_location.z)
 
-
 def is_within_distance(target_transform, reference_transform, max_distance, angle_interval=None):
     """
     Check if a location is both within a certain distance from a reference object.
@@ -82,15 +85,15 @@ def is_within_distance(target_transform, reference_transform, max_distance, angl
     norm_target = np.linalg.norm(target_vector) # calcolo la norma del vettore e mi da la distanza tra i due veicoli
 
     # If the vector is too short, we can simply stop here
-    if norm_target < 0.001: # se la distanza è minore di 0.001 allora sono in collisione, hanno fatto ndozzaNdozza
+    if norm_target < 0.001:
         return True
 
     # Further than the max distance -  lo ignoro semplicemente
-    if norm_target > max_distance: # se la distanza è maggiore della distanza massima allora non sono in collisione
+    if norm_target > max_distance: 
         return False
 
     # We don't care about the angle, nothing else to check
-    if not angle_interval: # se non ho un intervallo di angoli allora non devo controllare l'angolo, e se non valuto gli angoli sto sempre in collisione
+    if not angle_interval: # se non valuto gli angoli sto sempre in collisione
         return True
 
     min_angle = angle_interval[0]
@@ -102,7 +105,7 @@ def is_within_distance(target_transform, reference_transform, max_distance, angl
 
     # ho l'angolo tra i 2 veicoli e la loro distanza  
 
-    return min_angle < angle < max_angle # se l'angolo è compreso tra i due angoli allora sono in collisione
+    return min_angle < angle < max_angle
 
 
 def compute_magnitude_angle(target_location, current_location, orientation):

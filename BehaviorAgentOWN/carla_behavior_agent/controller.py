@@ -1,5 +1,11 @@
-# Copyright (c) # Copyright (c) 2018-2020 CVC.
-#
+# Autonomous Vehicle Driving Project.
+# Copyright (C) 2023 - All Rights Reserved
+# Group:
+#   Faiella Ciro              0622701816  c.faiella8@studenti.unisa.it
+#   Giannino Pio Roberto      0622701713	p.giannino@studenti.unisa.it
+#   Scovotto Luigi            0622701702  l.scovotto1@studenti.unisa.it
+#   Tortora Francesco         0622701700  f.tortora21@studenti.unisa.it
+
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
@@ -50,7 +56,7 @@ class VehicleController():
         self._world = self._vehicle.get_world()
         self.past_steering = self._vehicle.get_control().steer
         self._lon_controller = PIDLongitudinalController(self._vehicle, **args_longitudinal)
-        self._lat_controller = StanleyLateralController(self._vehicle, offset, **args_lateral)
+        self._lat_controller = StanleyLateralController(self._vehicle, **args_lateral)
 
 
     def run_step(self, target_speed, waypoint):
@@ -103,6 +109,9 @@ class VehicleController():
     
     def setWaypoints(self, waypoints):
         self._lat_controller.setWaypoints(waypoints)
+
+    def set_lat_offset(self, offset):
+        self._lat_controller._offset = offset
 
 
 class PIDLongitudinalController():
@@ -264,7 +273,7 @@ class StanleyLateralController():
         # Crosstrack error
         lateral_error = \
               ((observed_x-desired_x)*desired_heading_y -
-              (observed_y-desired_y)*desired_heading_x) / (dd + sys.float_info.epsilon)
+              (observed_y-desired_y)*desired_heading_x) / (dd + sys.float_info.epsilon) - self._offset #con offset positivo va a sinistra
         
         # Heading error
         steering = (desired_heading-observed_heading)

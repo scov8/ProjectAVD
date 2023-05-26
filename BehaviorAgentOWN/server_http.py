@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 class ServerData:
     def __init__(self) -> None:
-        self.__rgb_image = np.zeros((720,1080,3), np.uint8)
+        self.__rgb_image = np.zeros((360,640,3), np.uint8)
         self.__depth_image = np.zeros((360,640,3), np.uint8)
         self.__bev_image = np.zeros((360,640,3), np.uint8)
 
