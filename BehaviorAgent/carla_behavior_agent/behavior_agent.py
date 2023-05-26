@@ -472,7 +472,10 @@ class BehaviorAgent(BasicAgent):
         vehicle_list = self._world.get_actors().filter("*vehicle*")
         for actor in vehicle_list:
             if not('role_name' in actor.attributes and actor.attributes['role_name'] == 'hero'):
-                actor.destroy()
+                try:
+                    actor.destroy()
+                except:
+                    pass
 
         # 1: Red lights and stops behavior
         if self.traffic_light_manager():
