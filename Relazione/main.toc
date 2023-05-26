@@ -26,19 +26,19 @@
 \contentsline {section}{\numberline {6}Qualitative analysis of results}{14}{section.6}%
 \contentsline {subsection}{\numberline {6.1}Control loss}{14}{subsection.6.1}%
 \contentsline {subsection}{\numberline {6.2}Traffic negotiation}{14}{subsection.6.2}%
-\contentsline {subsubsection}{\numberline {6.2.1}Right or left turn at an intersection with crossing traffic}{14}{subsubsection.6.2.1}%
-\contentsline {subsubsection}{\numberline {6.2.2}Crossing negotiation at an unsignalized intersection}{14}{subsubsection.6.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.1}Right turn at an intersection with crossing traffic}{14}{subsubsection.6.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2}Unprotected left turn at intersection with oncoming traffic}{15}{subsubsection.6.2.2}%
 \contentsline {subsection}{\numberline {6.3}Obstacle avoidance}{15}{subsection.6.3}%
 \contentsline {subsubsection}{\numberline {6.3.1}Obstacle in lane}{15}{subsubsection.6.3.1}%
 \contentsline {subsubsection}{\numberline {6.3.2}Slow moving hazard at lane edge}{15}{subsubsection.6.3.2}%
 \contentsline {subsubsection}{\numberline {6.3.3}Vehicle invading lane on bend}{15}{subsubsection.6.3.3}%
 \contentsline {subsection}{\numberline {6.4}Braking and lane changing}{15}{subsection.6.4}%
 \contentsline {subsubsection}{\numberline {6.4.1}Longitudinal control after leading vehicle’s brake}{15}{subsubsection.6.4.1}%
-\contentsline {subsubsection}{\numberline {6.4.2}Obstacle avoidance without prior action}{15}{subsubsection.6.4.2}%
-\contentsline {subsubsection}{\numberline {6.4.3}Pedestrian emerging from behind parked vehicle}{15}{subsubsection.6.4.3}%
-\contentsline {subsubsection}{\numberline {6.4.4}Obstacle avoidance with prior action - pedestrian or bicycle}{15}{subsubsection.6.4.4}%
-\contentsline {subsubsection}{\numberline {6.4.5}Obstacle avoidance with prior action - vehicle}{15}{subsubsection.6.4.5}%
-\contentsline {section}{\numberline {7}Future Improvements and Errors}{15}{section.7}%
+\contentsline {subsubsection}{\numberline {6.4.2}Obstacle avoidance without prior action}{16}{subsubsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.3}Pedestrian emerging from behind parked vehicle}{16}{subsubsection.6.4.3}%
+\contentsline {subsubsection}{\numberline {6.4.4}Obstacle avoidance with prior action - pedestrian or bicycle}{16}{subsubsection.6.4.4}%
+\contentsline {subsubsection}{\numberline {6.4.5}Obstacle avoidance with prior action - vehicle}{16}{subsubsection.6.4.5}%
+\contentsline {section}{\numberline {7}Future Improvements and Errors}{16}{section.7}%
 \contentsline {subsection}{\numberline {7.1}Errors or missing feature}{16}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Errors caused by the simulator}{16}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.2}Errors caused by the simulator}{17}{subsection.7.2}%
 \contentsline {subsection}{\numberline {7.3}Possible improvements and advantages that could they bring}{17}{subsection.7.3}%
