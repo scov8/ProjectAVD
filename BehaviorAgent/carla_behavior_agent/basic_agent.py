@@ -246,10 +246,6 @@ class BasicAgent(object):
         vehicle_list = self._world.get_actors().filter("*vehicle*")
         ###
 
-        for actor in vehicle_list:
-            if not('role_name' in actor.attributes and actor.attributes['role_name'] == 'hero'):
-                actor.destroy()
-
         vehicle_speed = get_speed(self._vehicle) / 3.6 
 
         max_vehicle_distance = self._base_vehicle_threshold + self._speed_ratio * vehicle_speed
@@ -849,8 +845,3 @@ class BasicAgent(object):
             plan.append((next_wp, RoadOption.LANEFOLLOW))
 
         return plan
-
-    def destroy(self):
-        print("DESTROY")
-        if self._agent:
-            self._agent.reset()
