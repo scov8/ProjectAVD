@@ -1,0 +1,44 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}Introduction}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Development environment}{4}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1}Hardware}{4}{subsubsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.2}How we optimized the performance?}{4}{subsubsection.1.1.2}%
+\contentsline {subsubsection}{\numberline {1.1.3}CARLA Simulator}{4}{subsubsection.1.1.3}%
+\contentsline {subsection}{\numberline {1.2}Task}{4}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Operational Design Domain}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Traffic Scenario}{5}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Control loss}{5}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}Traffic negotiation}{6}{subsubsection.2.1.2}%
+\contentsline {subsubsection}{\numberline {2.1.3}Obstacle avoidance}{6}{subsubsection.2.1.3}%
+\contentsline {subsubsection}{\numberline {2.1.4}Braking and lane changing}{7}{subsubsection.2.1.4}%
+\contentsline {section}{\numberline {3}Vehicle configuration}{9}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Control system}{9}{subsection.3.1}%
+\contentsline {section}{\numberline {4}Evaluation and metrics}{9}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Infractions and shutdown events}{10}{subsection.4.1}%
+\contentsline {section}{\numberline {5}Project development and phases }{11}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Controllers}{11}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}PID Controller}{11}{subsubsection.5.1.1}%
+\contentsline {subsubsection}{\numberline {5.1.2}Stanley Controller}{11}{subsubsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.2}Obstacle avoidance and overtake}{11}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Stop sign and Traffic negotiation}{13}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Other vehicles invading the ego lane}{13}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Pedestrian avoidance behaviors}{14}{subsection.5.5}%
+\contentsline {section}{\numberline {6}Qualitative analysis of results}{14}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Control loss}{14}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Traffic negotiation}{14}{subsection.6.2}%
+\contentsline {subsubsection}{\numberline {6.2.1}Right or left turn at an intersection with crossing traffic}{14}{subsubsection.6.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2}Crossing negotiation at an unsignalized intersection}{14}{subsubsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.3}Obstacle avoidance}{15}{subsection.6.3}%
+\contentsline {subsubsection}{\numberline {6.3.1}Obstacle in lane}{15}{subsubsection.6.3.1}%
+\contentsline {subsubsection}{\numberline {6.3.2}Slow moving hazard at lane edge}{15}{subsubsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.3}Vehicle invading lane on bend}{15}{subsubsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.4}Braking and lane changing}{15}{subsection.6.4}%
+\contentsline {subsubsection}{\numberline {6.4.1}Longitudinal control after leading vehicle’s brake}{15}{subsubsection.6.4.1}%
+\contentsline {subsubsection}{\numberline {6.4.2}Obstacle avoidance without prior action}{15}{subsubsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.3}Pedestrian emerging from behind parked vehicle}{15}{subsubsection.6.4.3}%
+\contentsline {subsubsection}{\numberline {6.4.4}Obstacle avoidance with prior action - pedestrian or bicycle}{15}{subsubsection.6.4.4}%
+\contentsline {subsubsection}{\numberline {6.4.5}Obstacle avoidance with prior action - vehicle}{15}{subsubsection.6.4.5}%
+\contentsline {section}{\numberline {7}Future Improvements and Errors}{15}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Errors or missing feature}{16}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Errors caused by the simulator}{16}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Possible improvements and advantages that could they bring}{17}{subsection.7.3}%

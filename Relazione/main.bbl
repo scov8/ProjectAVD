@@ -19,31 +19,6 @@
 
 \refsection{0}
   \datalist[entry]{none/global//global/global}
-    \entry{NHTSA}{online}{}
-      \name{author}{1}{}{%
-        {{hash=305435f6420f85001db868d5f4ecdea4}{%
-           family={{e U.S. Department of Transportation, National Highway Traffic Safety Administration}},
-           familyi={e\bibinitperiod}}}%
-      }
-      \strng{namehash}{305435f6420f85001db868d5f4ecdea4}
-      \strng{fullhash}{305435f6420f85001db868d5f4ecdea4}
-      \strng{bibnamehash}{305435f6420f85001db868d5f4ecdea4}
-      \strng{authorbibnamehash}{305435f6420f85001db868d5f4ecdea4}
-      \strng{authornamehash}{305435f6420f85001db868d5f4ecdea4}
-      \strng{authorfullhash}{305435f6420f85001db868d5f4ecdea4}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{{NHTSA pre-crash typology}}
-      \field{year}{2007}
-      \verb{urlraw}
-      \verb https://rosap.ntl.bts.gov/view/dot/6281/dot_6281_DS1.pdf?
-      \endverb
-      \verb{url}
-      \verb https://rosap.ntl.bts.gov/view/dot/6281/dot_6281_DS1.pdf?
-      \endverb
-    \endentry
     \entry{vggface}{online}{}
       \name{author}{1}{}{%
         {{hash=7966f44f8e167935b99442c396a8bced}{%
@@ -66,32 +41,6 @@
       \true{nocite}
       \field{pages}{67\bibrangedash 74}
       \range{pages}{8}
-    \endentry
-    \entry{kerasvgg}{online}{}
-      \name{author}{1}{}{%
-        {{hash=ef71433daa3e7976fc4d2c58f63b0904}{%
-           family={{Refik Can Malli}},
-           familyi={R\bibinitperiod}}}%
-      }
-      \strng{namehash}{ef71433daa3e7976fc4d2c58f63b0904}
-      \strng{fullhash}{ef71433daa3e7976fc4d2c58f63b0904}
-      \strng{bibnamehash}{ef71433daa3e7976fc4d2c58f63b0904}
-      \strng{authorbibnamehash}{ef71433daa3e7976fc4d2c58f63b0904}
-      \strng{authornamehash}{ef71433daa3e7976fc4d2c58f63b0904}
-      \strng{authorfullhash}{ef71433daa3e7976fc4d2c58f63b0904}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{{VGGFace implementation with Keras Framework}}
-      \field{year}{2017}
-      \true{nocite}
-      \verb{urlraw}
-      \verb https://github.com/rcmalli/keras-vggface
-      \endverb
-      \verb{url}
-      \verb https://github.com/rcmalli/keras-vggface
-      \endverb
     \endentry
   \enddatalist
 \endrefsection

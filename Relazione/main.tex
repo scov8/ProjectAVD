@@ -40,29 +40,39 @@
 \centerline{\small{Jun, 2023}}
 \centerline{Department of Computer Engineering, Electrical Engineering and Applied}
 \centerline{Mathematics (DIEM), University of Salerno, Fisciano, Italy}
-
-
+\newpage
+\tableofcontents
+\newpage
 \section{Introduction}
 The project focuses on the creation of an autonomous driving system to be included in the CARLA simulator 
 environment. Unlike the task performed in the real world, in this case there is full knowledge of the world 
 in which the vehicle is located, nevertheless the system has to face several challenges in order to avoid 
 errors. 
 
-\section{Development environment}
-\subsection{Hardware}
+\subsection{Development environment}
+\subsubsection{Hardware}
 We conducted the software testing on a Dell machine equipped with an NVIDIA Quadro P2000 graphics card, boasting 4GB of dedicated memory. 
 The system was powered by an Intel 8th generation i9 processor, delivering exceptional processing power. Furthermore, it was equipped with a 
 substantial 16GB of RAM, ensuring smooth and efficient operation throughout the testing phase.
+
+\subsubsection{How we optimized the performance?}
 In order to optimize performance and enhance the execution speed, we opted to remove all unnecessary sensors from the machine, 
 as they were not utilized during the testing process. Leveraging our comprehensive global knowledge of the surrounding environment, 
 we were able to confidently eliminate these redundant components. 
 As a result, the execution speed experienced a notable improvement, exhibiting an impressive 30\% increase compared to the performance of
-the machine provided to us by the department.
+the machine with all the sensors on.
 
-\subsection{CARLA Simulator}
-???
+\subsubsection{CARLA Simulator}
+The version of Carla used for this project is 0.9.13, which is launched via the carla simulator leaderboard 2.0.
+The simulator is launched with the following command: 
+\begin{lstlisting}[language=Bash]
+    ./CarlaUE4.sh -quality-level=Low -prefernvidia
+\end{lstlisting}
+The parameter \textit{-quality-level=Low} is used to reduce the quality of the graphics, in order to increase the 
+performance of the simulator. \textit{-prefernvidia} is used to force the use of the NVIDIA graphics card, if present, so we ensure the usage of our NVIDIA Quadro P2000.
 
-\section{Task}
+
+\subsection{Task}
 The CARLA AD Leaderboard challenges AD agents to drive through a series of predefined routes. For each route, 
 agents are initialized at a starting point and directed to a destination point with a route description. 
 Routes are defined in a variety of situations, including urban areas, residential neighborhoods and rural environments. 
@@ -75,18 +85,19 @@ that the our ODD has reached the following operational domains:
     \item the vehicle is able to maintain the selected speed, thanks the longitudinal control;
     \item the vehicle is able to maintain the correct position between the lanes of a road thanks to the lateral control;
     \item the vehicle is able to manage its speed in according to the variable traffic conditions;
-    \item the vehicle is able to avoid collisions with the car ahead and adapts its speed in order to follow that one;
+    \item the vehicle is able to avoid collisions with the car ahead if asphalt conditions are optimal and adapts its speed in order to follow that one;
     \item the vehicle is capable of overtaking when possible and when necessary;
-    \item the vehicle is capable to makes an emergency stop in critical situations;
-    \item the vehicle is able to operate in sunny, foggy, raining and poor lighting environments;
+    \item the vehicle is capable to makes an emergency stop when a pedestrian or a cyclist is detected in front of it in time;
+    \item the vehicle is able to operate in sunny, foggy and poor lighting environments, but in presence of rain it is not always able to operate correctly;
     \item the vehicle can operate in urban and non-urban contexts;
     \item the vehicle is capable of handling junctions;
     \item the vehicle is able to avoid collisions with obstacles that can be find through the path (e.g. road cones, traffic sign, construction obstacle, etc.);
-    \item the vehicle is able to correctly pass the traffic light.
+    \item the vehicle is able to correctly pass the traffic light;
+    \item the vehicle is able to elude vehicles that invade its lane;
 \end{itemize}
 
 \subsection{Traffic Scenario}
-Agents will experience multiple instances of 10 traffic scenarios selected from the NHTSA pre-crash typology \cite{NHTSA}. 
+Agents will experience multiple instances of traffic scenarios selected from the NHTSA pre-crash typology \cite{NHTSA}. 
 
 \subsubsection{Control loss}
 The ego-vehicle loses control due to bad conditions on the road and it must recover, coming back to its original lane.
@@ -111,15 +122,6 @@ The ego-vehicle is performing a right or left turn at an intersection, yielding 
     \centering
     \includegraphics[width=0.5\textwidth]{img/TR09.png}
     \caption{Right turn at an intersection with crossing traffic} \label{Scenario_trafficNegtiation}
-\end{figure}
-
-\textbf{Crossing negotiation at an unsignalized intersection} 
-The ego-vehicle needs to negotiate with other vehicles to cross an unsignalized intersection. In this situation it is assumed that the first to enter 
-the intersection has priority.
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{img/TR10.png}
-    \caption{Crossing negotiation at an unsignalized intersection} \label{Scenario_crossingNegotiation}
 \end{figure}
 
 \subsubsection{Obstacle avoidance}
@@ -205,8 +207,11 @@ The specific metrics are as follows:
   serving as the product between the route completion and the infractions penalty. Here Ri is the percentage of completion of the \textit{i-th} route, and \textit{Pi}, 
   the infraction penalty of the \textit{i-th} route.
   \item \textbf{Route completion}: Percentage of the route completed by the agent. The route completion is calculated as the percentage of the route
-  \item \textbf{Infraction penalty}: Productory of the infractions committed, $\prod_{j}^{ped., ..., stop} (a_{\small{i}}^{\small{j}})^{\small{\#infractions}_j}$. — The leaderboard 
-  tracks several types of infractions and this metric aggregates all of these infractions triggered by an agent as a geometric series. Agents start with an ideal 1.0 
+  \item \textbf{Infraction penalty}: Productory of the infractions committed, 
+
+  
+  $\prod_{j}^{ped., ..., stop} (a_{\small{i}}^{\small{j}})^{\small{\#infractions}_j}$. — 
+  The leaderboard tracks several types of infractions and this metric aggregates all of these infractions triggered by an agent as a geometric series. Agents start with an ideal 1.0 
   base score, which is reduced each type an infraction is committed.
 \end{itemize}
 When all routes have been completed, a global metric for each of the previous three types is also generated, being the arithmetic mean of all the individual routes combined. 
@@ -214,7 +219,7 @@ The global driving score is the main metric on which you will be classified with
 
 \subsection{Infractions and shutdown events}
 The CARLA leaderboard offers individual metrics for a series of infractions. Each of these has a penalty coefficient that will be applied everytime it happens. 
-Ordered by severity, the infractions are the following.
+Ordered by severity, the infractions are the following:
 \begin{itemize}
     \item \textbf{Collisions with pedestrians} - $a_{\small{i}}^{\small{ped.}} = 0.60$
     \item \textbf{Collisions with vehicles} - $a_{\small{i}}^{\small{veh.}} = 0.50$
@@ -240,93 +245,120 @@ leaderboard will move onto the next one, triggering it normally.
 \end{itemize}
 
 \section{Project development and phases }
-The main problems were determined in order to define the problem domain (more on this in section x.xx). 
+In this section we will explain how we handled certain situations that occurred in the routes, 
+in order to show the level of attention achieved by our system.
+
+The main problems were determined in order to define the problem domain. 
 From this, we moved on to the development of solutions, with the highest priority problems being developed first.
 \subsection{Controllers}
-settaggio dei Controllori
-
-One of the first tasks was the configuration of the controller, in order to determine a driving behavior 
-that would seem as natural as possible. 
+One of the first tasks was the configuration of the controller, in order to determine a driving behavior that 
+would seem as natural as possible. 
 \subsubsection{PID Controller}
 The PID controller was configured on the basis of several initial attempts. They led to the following values:
 $$"longitudinal\_control\_dict" : {"K_P": 0.888 , "K_I": 0.0768, "K_D": 0.05, "dt": 0.05}$$
+
 \subsubsection{Stanley Controller}
-controllore di stanley
-
-COSA DIRE?????
-
+The Stanley controller was configured on the basis of several initial attempts. They led to the following values:
 $$"lateral\_control\_dict" : {"K_V": 4, "K_S": 1, "dt": 0.05}$$
 
-\subsection{Obstacle avoidance}
-gesitone dell overtake
-
-The development of the overtaking manoeuvre was one of the most challenging tasks due to its importance 
+\subsection{Obstacle avoidance and overtake}
+The development of the overtaking manoeuver was one of the most challenging tasks due to its importance 
 within such a system; its difficulty was such that it required constant development of this feature during 
-the course of the entire project. The solution found is optimal in the context in which the vehicle moves, 
-with no errors in the management of the various events.
-The steps to manage overtake are the following:
-\begin{enumerate}
-    \item 
-    \item 
-    \item 
-\end{enumerate}
+the course of the entire project. The solution found is optimal, with no errors in the management of the 
+various events.
 
+\subsubsection*{Previous checks}
+We do different checks for the overtake of a vehicle and of an obstacle.
 
-\subsection{Stop sign}
+If we have to overtake a vehicle, we check whether it is possible to overtake it in the following way:
+\begin{itemize}
+    \item check if the lane is broken or solid-broken;
+    \item check if we are not already overtaking;
+    \item check if we are near the following vehicle;
+    \item check if the direction is "LANEFOLLOW";
+    \item check if the vehicle in front of us is slow;
+    \item check if in the other lane there is a vehicle;
+    \item check if we are in proximity of a junction.
+\end{itemize}
+
+If we have to overtake an obstacle, we check whether it is possible to overtake it in the following way:
+\begin{itemize}
+    \item check if our speed is near to zero;
+    \item check if the lane is broken or solid-broken;
+    \item check if in the other lane there is a vehicle;
+\end{itemize}
+
+\subsubsection*{Calculate the total distance of the overtake}
+We developed a function that calculates the total distance of the overtake.
+It consists in counting the number of vehicles in front which have as their distance from each other max 15 meters. 
+So we know the total distance of the overtake, the number of vehicles in front of, the distance between each vehicle.
+This method is really important for the previous checks and for the lane change.
+
+\subsubsection*{Lane change}
+In order to create a path that allow the ego-vehicle to change lane, here's the logic we used:
+we generates a path to perform a lane change in a controlled manner. It uses the given parameters to 
+calculate the distance to the same lane, to the target lane and to the lane change. It then creates 
+the path that crosses these distances, taking into account the required directions and checking the 
+availability of lanes. 
+
+Finally, it returns the complete route. In the event of errors or inability to 
+perform the lane change, we returns an empty route. In short, this function facilitates safe and 
+controlled lane changes.
+
+\subsubsection*{A clarification} We save the path before overtaking and, once we have finished, we take the saved path, 
+delete the points that are not needed (so the points preceding the return of the overtaking) and use it
+ to follow the initial path.
+
+\subsubsection*{Overtaking manoeuver}
+The logic of the overtake is the following:
+first, if the agent is terminating an overtaking manoeuver, actions are performed to complete the overtaking and 
+re-enter the original lane. If the agent is in the process of overtaking, actions are performed to continue 
+overtaking and to check the possibility of re-entering the original lane. In both cases, the target speed 
+is set and the local planner is executed to obtain driving control.
+
+\subsection{Stop sign and Traffic negotiation}
 Another phase concerned the management of stops; after trying countless solutions, we arrived at a solution that 
-uses the static textit{*stop}. What we do, is to take all the stops in the scenario and evaluate whether they 
+uses the static \textit{*stop*}. What we do, is to take all the stops in the scenario and evaluate whether they 
 affect the ego-vehicle. 
 Management begins by taking all stop signals and putting them into a listings, then the system follows these steps:
 \begin{enumerate}
     \item for each stop sign, evaluate the distance between the stop sign and the ego-vehicle and discarding all distant stops;
-    \item sort the remaining stops by the minimum distance;
+    \item sort the remaining stops by the minimum distance and not consider those we have already passed;
     \item check all vehicles coming from the right and left.
 \end{enumerate}
-Now we have all the informations that we needed, so the ego-vehicle follows this behavior:
+Now we have all the information that we needed, so the ego-vehicle follows this behavior:
 \begin{itemize}
     \item if there is no vehicle in the left and right lane, the stop sign is not affecting the vehicle;
     \item if there is a vehicle in the left lane, check if it is still affecting the vehicle;
     \item if there is a vehicle in the right lane, check if it is still affecting the vehicle;
     \item otherwise, the ego-vehicle can go.
 \end{itemize}
- 
 
-\subsection{Invading lane}
-gestione dell'invasione della corsia
+\subsection{Other vehicles invading the ego lane}
 There was also a phase where we handled lane invasion, since there are lane restrictions within the routes. 
 The solution to this problem is the following:
 \begin{enumerate}
-    \item 
-    \item 
-    \item 
+    \item Check if an invasion is detected and calculate the distance between the center of the vehicle that invaded our lane and his waypoint;
+    \item The vehicle performs a deceleration and moves sideways, moving at the distance calculated before, to avoid the invasion; 
+    \item The target speed is reduced to ensure safe driving during this manoeuver;
+    \item Once the expansion disappears, the vehicle returns to its normal driving position by restoring the lateral offset and resuming the target speed. 
 \end{enumerate}
+These measures allow the vehicle to react appropriately and safely to lane-change situations.
 
-\subsection{Pedestrian}
-The management of vehicle behaviour in the presence of pedestrians was partly carried out, 
-although there was not enough time for full development of the solution (more on this in section x.xx). 
+\subsection{Pedestrian avoidance behaviors}
+The management of vehicle behavior in the presence of pedestrians was partly carried out, 
+although there was not enough time for full development of the solution. 
+We check if a pedestrian is on our lane and, if so, appropriate actions are taken to avoid a collision. 
+The distance between the vehicle and the pedestrian is calculated taking into account the size of the 
+respective bounding boxes.  
+\begin{itemize}
+    \item If the distance is less than the vehicle's braking distance, an emergency brake is executed to avoid an imminent collision;
+    \item If the distance is less than 15 metres, an emergency brake is also executed. 
+\end{itemize}
+These measures allow the vehicle to react quickly and effectively to the presence of pedestrians on the road, 
+ensuring safety for both vehicle driver and pedestrians.
 
-
-\subsection{Traffic negotiation}
-gestione degli incroci
-
-
-
-
-\section*{Road Event Management}
-In this section we will explain how we handled certain situations that occurred in the routes, 
-in order to show the level of attention achieved by our system. The following subsections are 
-correlated with demonstration videos to prove the effective functioning of the system.
-\subsection*{Overtake}
-\subsection*{Junction}
-\subsection*{Lane invasion}
-
-
-
-
-
-
-
-\section{Analisi qualitativa dei risultati}
+\section{Qualitative analysis of results}
 scrivere dove siamo arrivati mostrando i video (minuti) e fare il confronto tra prima e dopo l'ottimizzazione
 \subsection{Control loss}
 testo con video
@@ -358,32 +390,32 @@ testo con video
 testo con video
 
 \section{Future Improvements and Errors}
-dire cosa manca, gli errori e i possibili sviliuppi futuri
----erroei dovuto al simulatore
----non abbiamo gestito quando è bagnato a terra
----spawna pedoni troppo vicini
 
-
-
-First of all, it should be emphasised how much time was available for the development of the project: it allowed the system to 
+First of all, it should be emphasized how much time was available for the development of the project: it allowed the system to 
 be developed up to the point described above; any further developments, on the other hand, could have been entangled with the 
 spending of additional working hours. 
 The presence of errors can be traced back to a choice based on the priority of the error: certain features were chosen over 
 others in order to find solutions to the most serious problems.
-
+\subsection{Errors or missing feature}
 \textbf{Pedestrians hit by ego-vehicle}: this is one of the most serious problems not resolved in the system; what 
-    happens is that the pedestrian appears when the ego-vehicle is too close to the pedestrian spawn point: the vehicle's behaviour 
-    is correct because it performs a stop manoeuvre, but the small distance to the pedestrian makes braking impossible. 
-    In particular, this event occurs twice and the calculated distances between the ego vehicle and the pedestrian are 11 and 
-    11.8 metres respectively, so distances are too small.
+    happens is that the pedestrian appears when the ego-vehicle is too close to the pedestrian spawn point: the vehicle's behavior 
+    is correct because it performs a stop manoeuver, but the small distance to the pedestrian makes braking impossible. 
+    In particular, this event occurs twice and the calculated distances between the ego vehicle and the pedestrian, at the time of spawning, 
+    are 11 and 11.8 metres respectively, so distances are too small.
 
-\textbf{Lack of ABS and traction control implementation}: Within our system, there is no braking aid and this generates the 
+\textbf{Lack of ABS and traction control implementation}\label{ABS}: Within our system, there is no braking aid and this generates the 
 problem where the vehicle fails to stop properly, because it brakes in wet conditions. 
 Within route1, the system correctly detects the stop signal and proceeds to stop, but vehicle skidding occurs.
 In weather conditions that make the asphalt slippery this turns out to be a serious problem and, for this reason, it is one 
 of the most needed possible future improvements.
+\textbf{Lack of control at traffic lights}
+With regard to vehicle handling at traffic lights, our system manages the correct behaviour depending on the colour of the 
+traffic light. A vulnerability here is the fact that we do not check left and right when we pass the traffic light. The problem, 
+if everyone follows the rules of the road, should not be there; which is not the case if, on the other hand, a vehicle commits 
+an offence by going through a red light and thus encroaching on a piece of road that was the ego-vehicle's right at the time.
+However, it does not seem to be a major problem.
 
-\subsection{Simulator errors}
+\subsection{Errors caused by the simulator}
 Among the errors we find:
 \begin{enumerate}
     \item \textbf{Pedestrians hit by other vehicle} — There is a possibility, in the route4, that a vehicle (not the ego-vehicle) 
@@ -399,6 +431,18 @@ Among the errors we find:
     \item \textbf{Fails to yield} - On certain occasions, a vehicle approaching from the right on the main road fails to yield 
     and collides with the ego-vehicle, correctly entering the intersection. VIDEO MINUTO
 \end{enumerate}
+
+\subsection{Possible improvements and advantages that could they bring}
+Implementing other features in our system would be a huge benefit for our autonomous driving system. 
+In particular, we thought about the benefits that they could bring:
+\begin{itemize}
+    \item ABS braking system: Adding an ABS braking system would allow me to handle emergency braking more effectively. Avoiding wheel lock-up during sudden braking would ensure greater vehicle stability and optimal traction control. This would mean greater safety for passengers and a reduction in the risk of accidents due to loss of control in critical braking situations;
+    \item Advanced traction control: With traction control, optimal traction could be maintained on slippery or low-grip roads. The system would constantly monitor wheel grip and adjust acceleration according to road conditions. This would allow me to move with greater safety and stability, reducing the risk of skidding or loss of control;
+    \item Pedestrian tracking and prediction system: Being able to track and predict the behaviour of pedestrians would be a huge advantage for our ability to safely interact with the road environment. Thanks to advanced sensors and recognition algorithms, I could identify pedestrians along the road, monitor their movements and predict their intentions. This would allow me to take preventive measures to avoid potential collisions and interact safely with pedestrians, ensuring their safety and our reliability as an autonomous vehicle.
+\end{itemize}
+Ultimately, the implementation of these improvements would greatly enhance the safety and ability to adapt to 
+road conditions and surroundings. It would allow us to offer a safer, more reliable and comfortable autonomous 
+driving experience for both passengers on board and road users.
 
 \printbibliography
 
