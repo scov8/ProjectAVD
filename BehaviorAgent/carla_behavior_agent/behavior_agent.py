@@ -438,11 +438,6 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug) # run the local planner
 
         return control
-    
-    def destroy(self):
-        print("DESTROY")
-        if self._agent:
-            self._agent.reset()
 
     def run_step(self, debug=True):  # il debug era false
         """
@@ -468,14 +463,6 @@ class BehaviorAgent(BasicAgent):
 
         ego_vehicle_loc = self._vehicle.get_location()
         ego_vehicle_wp = self._map.get_waypoint(ego_vehicle_loc)
-
-        vehicle_list = self._world.get_actors().filter("*vehicle*")
-        for actor in vehicle_list:
-            if not('role_name' in actor.attributes and actor.attributes['role_name'] == 'hero'):
-                try:
-                    actor.destroy()
-                except:
-                    pass
 
         # 1: Red lights and stops behavior
         if self.traffic_light_manager():
