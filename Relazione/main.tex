@@ -55,7 +55,7 @@ We conducted the software testing on a Dell machine equipped with an NVIDIA Quad
 The system was powered by an Intel 8th generation i9 processor, delivering exceptional processing power. Furthermore, it was equipped with a 
 substantial 16GB of RAM, ensuring smooth and efficient operation throughout the testing phase.
 
-\subsubsection{How we optimized the performance?}
+\subsubsection{How we optimised the performance?}
 In order to optimize performance and enhance the execution speed, we opted to remove all unnecessary sensors from the machine, 
 as they were not utilized during the testing process. Leveraging our comprehensive global knowledge of the surrounding environment, 
 we were able to confidently eliminate these redundant components. 
@@ -78,6 +78,21 @@ agents are initialized at a starting point and directed to a destination point w
 Routes are defined in a variety of situations, including urban areas, residential neighborhoods and rural environments. 
 The classification evaluates AD agents in different weather conditions, including daytime scenes, sunset, rain, fog and night.
 
+\subsection{Baseline provided}
+The baseline provided by the CARLA team is a simple agent that drives at a constant speed, follows the lane and stops at the traffic lights.
+The agent is not able to handle the following situations:
+\begin{itemize}
+    \item overtakes of other vehicles;
+    \item overtakes of obstacles;
+    \item stops at stop signs;
+    \item manage intersections;
+    \item manage lane invasion;
+    \item stop when a vehicle is parked or slow moving in roadside;
+\end{itemize}
+
+You can see a video of the baseline agent at the following link: \url{https://youtu.be/BLABLABLA}.
+
+FARE VIDEO
 \section{Operational Design Domain}
 First of all, considering the fact that the data used by the ego-vehicle are directly provided by CARLA simulator and they are not took by any kind of sensor, we have 
 that the our ODD has reached the following operational domains:
@@ -98,7 +113,7 @@ that the our ODD has reached the following operational domains:
 
 \subsection{Traffic Scenario}
 Agents will experience multiple instances of traffic scenarios selected from the NHTSA pre-crash typology \cite{NHTSA}. 
-
+\newpage
 \subsubsection{Control loss}
 The ego-vehicle loses control due to bad conditions on the road and it must recover, coming back to its original lane.
 \begin{figure}[h]
@@ -113,7 +128,7 @@ The ego-vehicle is performing an unprotected left turn at an intersection, yield
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{img/TR08.png}
-    \caption{Right turn at an intersection with crossing traffic} \label{Scenario_trafficNegtiation}
+    \caption{Unprotected left turn at intersection with oncoming traffic} \label{leftTurn}
 \end{figure}
 
 \textbf{Right turn at an intersection with crossing traffic} 
@@ -121,7 +136,7 @@ The ego-vehicle is performing a right or left turn at an intersection, yielding 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{img/TR09.png}
-    \caption{Right turn at an intersection with crossing traffic} \label{Scenario_trafficNegtiation}
+    \caption{Right turn at an intersection with crossing traffic} \label{rightTurn}
 \end{figure}
 
 \subsubsection{Obstacle avoidance}
@@ -195,16 +210,15 @@ While performing a maneuver, the ego-vehicle encounters a stopped vehicle in the
 \end{figure}
 
 \section{Vehicle configuration}
-
-\subsection{Control system}
-
+The vehicle used for the project is the default vehicle provided by CARLA. 
+This vehicle has automatic transmission and is not provided of sensors because we have not used them as we have full knowledge of the environment.
 \section{Evaluation and metrics}
 The driving proficiency of an agent can be characterized by multiple metrics. For the assigned leaderboard, we have a number of metrics that help 
 to understand different aspects of driving. Although all routes have the same type of metrics, the respective values are calculated separately. 
 The specific metrics are as follows:
 \begin{itemize}
-  \item \textbf{Driving score}: Product between the route completion and the infraction penalty, $R_i P_i$. Main metric of the leaderboard, 
-  serving as the product between the route completion and the infractions penalty. Here Ri is the percentage of completion of the \textit{i-th} route, and \textit{Pi}, 
+  \item \textbf{Driving score}: Main metric of the leaderboard, serving as the product between the route completion and the infractions penalty, $R_i * P_i$.
+  Here Ri is the percentage of completion of the \textit{i-th} route, and \textit{Pi}, 
   the infraction penalty of the \textit{i-th} route.
   \item \textbf{Route completion}: Percentage of the route completed by the agent. The route completion is calculated as the percentage of the route
   \item \textbf{Infraction penalty}: Productory of the infractions committed, 

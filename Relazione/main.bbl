@@ -19,28 +19,30 @@
 
 \refsection{0}
   \datalist[entry]{none/global//global/global}
-    \entry{vggface}{online}{}
+    \entry{NHTSA}{online}{}
       \name{author}{1}{}{%
-        {{hash=7966f44f8e167935b99442c396a8bced}{%
-           family={{Cao, Q., Shen, L., Xie, W., Parkhi, O.M., Zisserman, A.}},
-           familyi={C\bibinitperiod}}}%
+        {{hash=82d8ace8a8a08d01af01f381c5f0d935}{%
+           family={{U.S. Department of Transportation, National Highway Traffic Safety Administration}},
+           familyi={U\bibinitperiod}}}%
       }
-      \strng{namehash}{7966f44f8e167935b99442c396a8bced}
-      \strng{fullhash}{7966f44f8e167935b99442c396a8bced}
-      \strng{bibnamehash}{7966f44f8e167935b99442c396a8bced}
-      \strng{authorbibnamehash}{7966f44f8e167935b99442c396a8bced}
-      \strng{authornamehash}{7966f44f8e167935b99442c396a8bced}
-      \strng{authorfullhash}{7966f44f8e167935b99442c396a8bced}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \strng{namehash}{82d8ace8a8a08d01af01f381c5f0d935}
+      \strng{fullhash}{82d8ace8a8a08d01af01f381c5f0d935}
+      \strng{bibnamehash}{82d8ace8a8a08d01af01f381c5f0d935}
+      \strng{authorbibnamehash}{82d8ace8a8a08d01af01f381c5f0d935}
+      \strng{authornamehash}{82d8ace8a8a08d01af01f381c5f0d935}
+      \strng{authorfullhash}{82d8ace8a8a08d01af01f381c5f0d935}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{{IEEE International Conference on Automatic Face \& Gesture Recognition}}
-      \field{title}{{VGGFace2: a dataset for recognising faces across pose and age.}}
-      \field{year}{2018}
-      \true{nocite}
-      \field{pages}{67\bibrangedash 74}
-      \range{pages}{8}
+      \field{title}{{NHTSA pre-crash typology}}
+      \field{year}{2007}
+      \verb{urlraw}
+      \verb https://rosap.ntl.bts.gov/view/dot/6281/dot_6281_DS1.pdf?
+      \endverb
+      \verb{url}
+      \verb https://rosap.ntl.bts.gov/view/dot/6281/dot_6281_DS1.pdf?
+      \endverb
     \endentry
   \enddatalist
 \endrefsection
