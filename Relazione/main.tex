@@ -87,12 +87,11 @@ The agent is not able to handle the following situations:
     \item stops at stop signs;
     \item manage intersections;
     \item manage lane invasion;
-    \item stop when a vehicle is parked or slow moving in roadside;
+    \item stop when a vehicle is parked or slow moving in roadside.
 \end{itemize}
 
-You can see a video of the baseline agent at the following link: \url{https://youtu.be/BLABLABLA}.
+You can see a video of the baseline agent at the following link: \url{https://youtu.be/MVdoyX8uouc}.
 
-FARE VIDEO
 \section{Operational Design Domain}
 First of all, considering the fact that the data used by the ego-vehicle are directly provided by CARLA simulator and they are not took by any kind of sensor, we have 
 that the our ODD has reached the following operational domains:
@@ -108,12 +107,12 @@ that the our ODD has reached the following operational domains:
     \item the vehicle is capable of handling junctions;
     \item the vehicle is able to avoid collisions with obstacles that can be find through the path (e.g. road cones, traffic sign, construction obstacle, etc.);
     \item the vehicle is able to correctly pass the traffic light;
-    \item the vehicle is able to elude vehicles that invade its lane;
+    \item the vehicle is able to elude vehicles that invade its lane.
 \end{itemize}
 
 \subsection{Traffic Scenario}
 Agents will experience multiple instances of traffic scenarios selected from the NHTSA pre-crash typology \cite{NHTSA}. 
-\newpage
+
 \subsubsection{Control loss}
 The ego-vehicle loses control due to bad conditions on the road and it must recover, coming back to its original lane.
 \begin{figure}[h]
@@ -235,8 +234,8 @@ The global driving score is the main metric on which you will be classified with
 The CARLA leaderboard offers individual metrics for a series of infractions. Each of these has a penalty coefficient that will be applied everytime it happens. 
 The infractions are the following:
 \begin{itemize}
-    \item \textbf{Collisions with pedestrians} - $a_{\small{i}}^{\small{ped.}} = 0.60$
-    \item \textbf{Collisions with vehicles} - $a_{\small{i}}^{\small{veh.}} = 0.50$
+    \item \textbf{Collisions with pedestrians} - $a_{\small{i}}^{\small{ped.}} = 0.50$
+    \item \textbf{Collisions with vehicles} - $a_{\small{i}}^{\small{veh.}} = 0.60$
     \item \textbf{Collisions with static elements} - $a_{\small{i}}^{\small{statEl.}} = 0.65$
     \item \textbf{Running a red light } - $a_{\small{i}}^{\small{light.}} = 0.70$
     \item \textbf{Stop sign} - $a_{\small{i}}^{\small{stop.}} = 0.80$
@@ -374,16 +373,18 @@ ensuring safety for both vehicle driver and pedestrians.
 
 \section{Qualitative analysis of results}
 \subsection{Video}
-We did six video:
+We did six video, please note that in our videos (except for the baseline video), for the route0 and route1 we set the sun altitude to 15 degrees,
+so you can understand better the behavior of our agent.
+
 \begin{itemize}
-    \item \textbf{Baseline agent}: In this video we show the behavior of the baseline agent in all the routes. \url{https://youtu.be/BLABLABLA}
+    \item \textbf{Baseline agent}: In this video we show the behavior of the baseline agent in all the routes. \url{https://youtu.be/MVdoyX8uouc}
     \item \textbf{Full video}: In this one we show the behavior of our agent in all the routes. \url{https://youtu.be/RBGWd_so80U}
     \item \textbf{Overtakes}: In this video we show all the overtakes. \url{https://youtu.be/vDg-9poUQ9k}
     \item \textbf{Vehicle invading lane on bend}: In this video we show all the lane invasions. \url{https://youtu.be/KME91FAB5ko}
     \item \textbf{Traffic negotiation}: In this video we show all the traffic negotiation. \url{https://youtu.be/d2ESc0bXmmg}
     \item \textbf{Simulator errors} In this video we show all the errors caused by the simulator. \url{https://youtu.be/0O9b3UihDAw}
 \end{itemize}
-scrivere dove siamo arrivati mostrando i video (minuti) e fare il confronto tra prima e dopo l'ottimizzazione
+
 \subsection{Control loss}
 Since neither the traction control system nor ABS has been implemented, impacts may occur due to wet or dirty road conditions, 
 resulting in loss of vehicle control. Nevertheless, if the braking distance exceeds a certain threshold, impacts will not occur as 
@@ -467,13 +468,13 @@ Among the errors we find:
     \item \textbf{Pedestrian hit by other vehicle} — There is a possibility, in the route4, that a vehicle (not the ego-vehicle) 
     may collide with a pedestrian, causing the pedestrian to bounce and land on the ego-vehicle. This problem seems to be due to 
     an internal error in the simulator, so it was decided not to try to develop a solution, as the ego-vehicle cannot be blamed 
-    in this case. (\href{https://youtu.be/0O9b3UihDAw?t=11}{Click here to see the video})
+    in this case. (\href{https://youtu.be/0O9b3UihDAw?t=11}{Click here to see it in the video})
     \item \textbf{Vehicle getting stuck at the junction} - A vehicle occasionally gets stuck in the center of an intersection, 
     preventing any other vehicles from moving and subsequently causing a disruption in traffic flow.
     The behaviour of the ego vehicle in this case is correct, as it remains stationary and no attempt is made to overtake the 
-    stationary vehicle as it is in a junction. (\href{https://youtu.be/0O9b3UihDAw?t=19}{Click here to see the video})
+    stationary vehicle as it is in a junction. (\href{https://youtu.be/0O9b3UihDAw?t=19}{Click here to see it in the video})
     \item \textbf{Collision with stop sign} - On certain occasions, when a vehicle accelerates from a stop, it may inadvertently 
-    mount the sidewalk and collide with a roadside sign. (\href{https://youtu.be/0O9b3UihDAw?t=40}{Click here to see the video})
+    mount the sidewalk and collide with a roadside sign. (\href{https://youtu.be/0O9b3UihDAw?t=40}{Click here to see it in the video})
 \end{enumerate}
 
 \subsection{Possible improvements and advantages that could they bring}

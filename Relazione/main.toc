@@ -8,38 +8,38 @@
 \contentsline {subsection}{\numberline {1.3}Baseline provided}{5}{subsection.1.3}%
 \contentsline {section}{\numberline {2}Operational Design Domain}{5}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Traffic Scenario}{6}{subsection.2.1}%
-\contentsline {subsubsection}{\numberline {2.1.1}Control loss}{7}{subsubsection.2.1.1}%
-\contentsline {subsubsection}{\numberline {2.1.2}Traffic negotiation}{7}{subsubsection.2.1.2}%
-\contentsline {subsubsection}{\numberline {2.1.3}Obstacle avoidance}{8}{subsubsection.2.1.3}%
-\contentsline {subsubsection}{\numberline {2.1.4}Braking and lane changing}{9}{subsubsection.2.1.4}%
+\contentsline {subsubsection}{\numberline {2.1.1}Control loss}{6}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}Traffic negotiation}{6}{subsubsection.2.1.2}%
+\contentsline {subsubsection}{\numberline {2.1.3}Obstacle avoidance}{7}{subsubsection.2.1.3}%
+\contentsline {subsubsection}{\numberline {2.1.4}Braking and lane changing}{8}{subsubsection.2.1.4}%
 \contentsline {section}{\numberline {3}Vehicle configuration}{10}{section.3}%
 \contentsline {section}{\numberline {4}Evaluation and metrics}{10}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Infractions and shutdown events}{11}{subsection.4.1}%
-\contentsline {section}{\numberline {5}Project development and phases }{12}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Controllers}{12}{subsection.5.1}%
+\contentsline {subsection}{\numberline {4.1}Infractions and shutdown events}{10}{subsection.4.1}%
+\contentsline {section}{\numberline {5}Project development and phases }{11}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Controllers}{11}{subsection.5.1}%
 \contentsline {subsubsection}{\numberline {5.1.1}PID Controller}{12}{subsubsection.5.1.1}%
 \contentsline {subsubsection}{\numberline {5.1.2}Stanley Controller}{12}{subsubsection.5.1.2}%
 \contentsline {subsection}{\numberline {5.2}Obstacle avoidance and overtake}{12}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Stop sign and Traffic negotiation}{14}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.3}Stop sign and Traffic negotiation}{13}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4}Other vehicles invading the ego lane}{14}{subsection.5.4}%
-\contentsline {subsection}{\numberline {5.5}Pedestrian avoidance behaviors}{15}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.5}Pedestrian avoidance behaviors}{14}{subsection.5.5}%
 \contentsline {section}{\numberline {6}Qualitative analysis of results}{15}{section.6}%
 \contentsline {subsection}{\numberline {6.1}Video}{15}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Control loss}{16}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3}Traffic negotiation}{16}{subsection.6.3}%
-\contentsline {subsubsection}{\numberline {6.3.1}Right turn at an intersection with crossing traffic}{16}{subsubsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.2}Control loss}{15}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Traffic negotiation}{15}{subsection.6.3}%
+\contentsline {subsubsection}{\numberline {6.3.1}Right turn at an intersection with crossing traffic}{15}{subsubsection.6.3.1}%
 \contentsline {subsubsection}{\numberline {6.3.2}Unprotected left turn at intersection with oncoming traffic}{16}{subsubsection.6.3.2}%
 \contentsline {subsection}{\numberline {6.4}Obstacle avoidance}{16}{subsection.6.4}%
 \contentsline {subsubsection}{\numberline {6.4.1}Obstacle in lane}{16}{subsubsection.6.4.1}%
-\contentsline {subsubsection}{\numberline {6.4.2}Slow moving hazard at lane edge}{17}{subsubsection.6.4.2}%
-\contentsline {subsubsection}{\numberline {6.4.3}Vehicle invading lane on bend}{17}{subsubsection.6.4.3}%
-\contentsline {subsection}{\numberline {6.5}Braking and lane changing}{17}{subsection.6.5}%
-\contentsline {subsubsection}{\numberline {6.5.1}Longitudinal control after leading vehicle’s brake}{17}{subsubsection.6.5.1}%
+\contentsline {subsubsection}{\numberline {6.4.2}Slow moving hazard at lane edge}{16}{subsubsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.3}Vehicle invading lane on bend}{16}{subsubsection.6.4.3}%
+\contentsline {subsection}{\numberline {6.5}Braking and lane changing}{16}{subsection.6.5}%
+\contentsline {subsubsection}{\numberline {6.5.1}Longitudinal control after leading vehicle’s brake}{16}{subsubsection.6.5.1}%
 \contentsline {subsubsection}{\numberline {6.5.2}Obstacle avoidance without prior action}{17}{subsubsection.6.5.2}%
 \contentsline {subsubsection}{\numberline {6.5.3}Pedestrian emerging from behind parked vehicle}{17}{subsubsection.6.5.3}%
-\contentsline {subsubsection}{\numberline {6.5.4}Obstacle avoidance with prior action - pedestrian or bicycle}{18}{subsubsection.6.5.4}%
-\contentsline {subsubsection}{\numberline {6.5.5}Obstacle avoidance with prior action - vehicle}{18}{subsubsection.6.5.5}%
-\contentsline {section}{\numberline {7}Future Improvements and Errors}{18}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Errors or missing feature}{18}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Errors caused by the simulator}{19}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3}Possible improvements and advantages that could they bring}{19}{subsection.7.3}%
+\contentsline {subsubsection}{\numberline {6.5.4}Obstacle avoidance with prior action - pedestrian or bicycle}{17}{subsubsection.6.5.4}%
+\contentsline {subsubsection}{\numberline {6.5.5}Obstacle avoidance with prior action - vehicle}{17}{subsubsection.6.5.5}%
+\contentsline {section}{\numberline {7}Future Improvements and Errors}{17}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Errors or missing feature}{17}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Errors caused by the simulator}{18}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Possible improvements and advantages that could they bring}{18}{subsection.7.3}%
