@@ -461,20 +461,19 @@ an offense by going through a red light and thus encroaching on a piece of road 
 However, it does not seem to be a major problem.
 
 \subsection{Errors caused by the simulator}\label{simErr}
+We did a video of all the errors caused by the simulator, which is available for viewing \href{https://youtu.be/0O9b3UihDAw}{here}.
 Among the errors we find:
 \begin{enumerate}
-    \item \textbf{Pedestrians hit by other vehicle} — There is a possibility, in the route4, that a vehicle (not the ego-vehicle) 
+    \item \textbf{Pedestrian hit by other vehicle} — There is a possibility, in the route4, that a vehicle (not the ego-vehicle) 
     may collide with a pedestrian, causing the pedestrian to bounce and land on the ego-vehicle. This problem seems to be due to 
     an internal error in the simulator, so it was decided not to try to develop a solution, as the ego-vehicle cannot be blamed 
-    in this case. VIDEO MINUTO
+    in this case. (\href{https://youtu.be/0O9b3UihDAw?t=11}{Click here to see the video})
     \item \textbf{Vehicle getting stuck at the junction} - A vehicle occasionally gets stuck in the center of an intersection, 
     preventing any other vehicles from moving and subsequently causing a disruption in traffic flow.
     The behaviour of the ego vehicle in this case is correct, as it remains stationary and no attempt is made to overtake the 
-    stationary vehicle as it is in a junction. VIDEO MINUTO
+    stationary vehicle as it is in a junction. (\href{https://youtu.be/0O9b3UihDAw?t=19}{Click here to see the video})
     \item \textbf{Collision with stop sign} - On certain occasions, when a vehicle accelerates from a stop, it may inadvertently 
-    mount the sidewalk and collide with a roadside sign. VIDEO MINUTO
-    \item \textbf{Fails to yield} - On certain occasions, a vehicle approaching from the right on the main road fails to yield 
-    and collides with the ego-vehicle, correctly entering the intersection. VIDEO MINUTO
+    mount the sidewalk and collide with a roadside sign. (\href{https://youtu.be/0O9b3UihDAw?t=40}{Click here to see the video})
 \end{enumerate}
 
 \subsection{Possible improvements and advantages that could they bring}
