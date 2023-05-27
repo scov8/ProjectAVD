@@ -281,7 +281,7 @@ within such a system; its difficulty was such that it required constant developm
 the course of the entire project. The solution found is optimal, with no errors in the management of the 
 various events.
 
-\subsubsection*{Previous checks}
+\subsubsection*{Previous checks}\label{checkover}
 We do different checks for the overtake of a vehicle and an obstacle.
 
 If we have to overtake a vehicle, we check whether it is possible to overtake it in the following way:
@@ -373,34 +373,44 @@ These measures allow the vehicle to react quickly and effectively to the presenc
 ensuring safety for both vehicle driver and pedestrians.
 
 \section{Qualitative analysis of results}
+\subsection{Video}
+We did six video:
+\begin{itemize}
+    \item \textbf{Baseline agent}: In this video we show the behavior of the baseline agent in all the routes. \url{https://youtu.be/BLABLABLA}
+    \item \textbf{Full video}: In this one we show the behavior of our agent in all the routes. \url{https://youtu.be/RBGWd_so80U}
+    \item \textbf{Overtakes}: In this video we show all the overtakes. \url{https://youtu.be/vDg-9poUQ9k}
+    \item \textbf{Vehicle invading lane on bend}: In this video we show all the lane invasions. \url{https://youtu.be/KME91FAB5ko}
+    \item \textbf{Traffic negotiation}: In this video we show all the traffic negotiation. \url{https://youtu.be/d2ESc0bXmmg}
+    \item \textbf{Simulator errors} In this video we show all the errors caused by the simulator. \url{https://youtu.be/0O9b3UihDAw}
+\end{itemize}
 scrivere dove siamo arrivati mostrando i video (minuti) e fare il confronto tra prima e dopo l'ottimizzazione
 \subsection{Control loss}
 Since neither the traction control system nor ABS has been implemented, impacts may occur due to wet or dirty road conditions, 
 resulting in loss of vehicle control. Nevertheless, if the braking distance exceeds a certain threshold, impacts will not occur as 
-indicated in the minute 10:35 of the \href{https://www.youtube.com/watch?v=RBGWd_so80U}{main video}. Due to the lack of control, we are unable to stop promptly at a stop sign and we are unable to avoid a rear-end collision from minute 11:22 of the \href{https://www.youtube.com/watch?v=RBGWd_so80U}{main video}.
+indicated in the minute 10:35 of the \href{https://youtu.be/RBGWd_so80U?t=635}{main video}. Due to the lack of control, we are unable to stop promptly at a stop sign and we are unable to avoid a rear-end collision from minute 11:22 of the \href{https://youtu.be/RBGWd_so80U?t=682}{main video}.
 
 \subsection{Traffic negotiation}
 The baseline agent is unable to handle any of the traffic negotiation scenarios, our system, on the other hand, is able to handle the following scenarios.
 \subsubsection{Right turn at an intersection with crossing traffic}
-As shown in the video, starting from minute XX, it can be seen that the system demonstrates good robustness in handling intersections with stop signs. However, 
+As shown in the video dedicated to traffic negotiation scenario, starting from minute \href{https://youtu.be/d2ESc0bXmmg?t=140}{2:20}, it can be seen that the system demonstrates good robustness in handling intersections with stop signs. However, 
 with regard to intersections regulated by traffic lights, our control is limited to checking the status of the traffic light, whether it is green or red, and 
 consequently, in the case of a red signal, an emergency brake is executed. In the event that the traffic light is green, the system continues without any 
 further control. This represents a potential vulnerability of our system.
 \subsubsection{Unprotected left turn at intersection with oncoming traffic}
-Starting from minute XX of the video, which only illustrates the management of crossings, it is possible to observe the behaviour manifested by the system in 
+Starting from minute \href{https://youtu.be/d2ESc0bXmmg?t=9}{0:09} of the video, which only illustrates the management of crossings, it is possible to observe the behaviour manifested by the system in 
 this specific situation. In this context, all the observations previously made apply.
 
 \subsection{Obstacle avoidance}
 The baseline agent is unable to handle any of the obstacle avoidance scenarios, our system, on the other hand, is able to handle the following scenarios.
 \subsubsection{Obstacle in lane}
-All overtaking obstacles can be observed in minute XX of the overtaking video. There are two different types of obstacles: those of a static nature and 
+All overtaking obstacles can be observed in minute \href{https://youtu.be/vDg-9poUQ9k?t=110}{1:50} of the overtaking video. There are two different types of obstacles: those of a static nature and 
 those of vehicles parked at the side of the road. The former include signs of roadworks, cones, etc. The system appears to be robust in both situations 
-as all the necessary checks are carried out, as described in detail in section YY.
+as all the necessary checks are carried out, as described in detail in section \ref{checkover}.
 \subsubsection{Slow moving hazard at lane edge}
-All overtaking of slow vehicles can be observed from minute XX of the overtaking video. The system demonstrates robustness as all necessary checks are 
-carried out, as described in detail in section YY.
+All overtaking of slow vehicles can be observed from minute \href{https://youtu.be/vDg-9poUQ9k?t=10}{0:10} of the overtaking video. The system demonstrates robustness as all necessary checks are 
+carried out, as described in detail in section \ref{checkover}.
 \subsubsection{Vehicle invading lane on bend}
-We have made a video specifically dedicated to this issue, which is available for viewing here. This case is handled more efficiently than in other situations, 
+We have made a video specifically dedicated to this issue, which is available for viewing \href{https://youtu.be/KME91FAB5ko}{here}. This case is handled more efficiently than in other situations, 
 as the system is able to accurately calculate the distance invaded by the vehicle moving into the lane, and is able to induce the vehicle to brake and steer in 
 order to avoid a collision.
 
@@ -409,20 +419,21 @@ Our system in this scenarios is almost similar to the baseline agent, a particul
 \subsubsection{Longitudinal control after leading vehicle’s brake}
 The system demonstrates a high capacity to handle emergency braking generated by vehicles ahead of the autonomous vehicle, ensuring an adequate response in 
 dry asphalt conditions. However, it is important to emphasize that if there is moisture on the road, please refer to the specific section on loss control. 
-In order to provide a clear example of how the system works in this specific situation, please refer to the full video available at minute XX.
+In order to provide a clear example of how the system works in this specific situation, please refer to the full video available at minute \href{https://youtu.be/RBGWd_so80U?t=333}{5:33} (you can see that the longitudinal control after leading vehicle's brakes works well also after an overtake).
 \subsubsection{Obstacle avoidance without prior action}
-On the only occasion when this occurred, the system responded appropriately (at minute XX of the full video), except that the vehicle traveling in the adjacent 
-lane unintentionally ran over the pedestrian in our direction.
+On the only occasion when this occurred, the system responded appropriately (at minute \href{https://youtu.be/RBGWd_so80U?t=1435}{23:55} of the full video), 
+but there is a problem in the simulator that causes the vehicle to collide with the obstacle, please refer to section \ref{simErr}.
 \subsubsection{Pedestrian emerging from behind parked vehicle}
 This is the main source of errors in our system, as we have not yet implemented pedestrian tracking and prediction systems. Therefore, the system cannot detect 
 the presence of pedestrians behind a parked vehicle, but can only activate the brakes if pedestrians are already on the road. An example of such behavior can 
-be seen in the case where the pedestrian is not hit in minute XX of the full video. Similarly, an example of misbehavior can be seen at minute XX of the full video.
+be seen in the case where the pedestrian is not hit in minute \href{https://youtu.be/RBGWd_so80U?t=1324}{22:04} of the full video. Similarly, an example of misbehavior can be seen at 
+minute \href{https://youtu.be/RBGWd_so80U?t=210}{3:30} of the full video.
 \subsubsection{Obstacle avoidance with prior action - pedestrian or bicycle}
 In the present context, the system shows an adequate response in that no accident involving pedestrians or cyclists is detected after a bend. This observation can 
-be verified, for example, in minute XX of the full video.
+be verified, for example, in minute \href{https://youtu.be/RBGWd_so80U?t=1425}{23:45}  of the full video.
 \subsubsection{Obstacle avoidance with prior action - vehicle}
 In the same context as above, it can be seen that the system proves capable of providing an adequate response, successfully avoiding any vehicular collisions that might 
-occur following a curve. This situation can be clearly observed in the full video in minute XX, as an illustrative case in point.
+occur following a curve. This situation can be clearly observed in the full video in minute \href{https://youtu.be/RBGWd_so80U?t=24}{0:24}, as an illustrative case in point.
 
 \section{Future Improvements and Errors}
 First of all, it should be emphasized how much time was available for the development of the project: it allowed the system to 
@@ -449,7 +460,7 @@ if everyone follows the rules of the road, should not be there; which is not the
 an offense by going through a red light and thus encroaching on a piece of road that was the ego-vehicle's right at the time.
 However, it does not seem to be a major problem.
 
-\subsection{Errors caused by the simulator}
+\subsection{Errors caused by the simulator}\label{simErr}
 Among the errors we find:
 \begin{enumerate}
     \item \textbf{Pedestrians hit by other vehicle} — There is a possibility, in the route4, that a vehicle (not the ego-vehicle) 
