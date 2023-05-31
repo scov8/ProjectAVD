@@ -134,7 +134,6 @@ class BehaviorAgent(BasicAgent):
             vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(vehicle_list, distance, up_angle_th=90) # check for vehicles in the other lane
             # If a vehicle is detected in the other lane, we return True, otherwise we return False.
             if vehicle_state:
-                print("OTHER LANE OCCUPATA DA: ", str(vehicle), "CON DISTANZA: ", dist(vehicle, self._vehicle))
                 return True
             return False
         else:
@@ -143,15 +142,12 @@ class BehaviorAgent(BasicAgent):
 
             # If a vehicle is detected in the other lane on ahead and behind
             if vehicle_state_ahead and vehicle_state_behind:
-                print(f"OTHER LANE OCCUPATA AHEAD: {vehicle_ahead} e BEHIND: {vehicle_behind} distanti {dist(vehicle_ahead, vehicle_behind)}")
                 return dist(vehicle_ahead, vehicle_behind) <= self._vehicle.bounding_box.extent.x * 2 + 5
             # If a vehicle is detected in the other lane on ahead return True
             elif vehicle_state_ahead:
-                print("OTHER LANE OCCUPATA AHEAD DA: " + str(vehicle_ahead))
                 return True
             # If a vehicle is detected in the other lane behind return True
             elif vehicle_state_behind:
-                print(f"VEICOLO BEHIND {vehicle_behind} è lontano {distance_behind}")
                 return distance_behind - 3 < self._vehicle.bounding_box.extent.x * 2.5
             return False
 
@@ -168,7 +164,6 @@ class BehaviorAgent(BasicAgent):
 
         vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(vehicle_list, distance, up_angle_th=90) # check for vehicles in the other lane
         if vehicle_state: # if a vehicle is detected in the other lane, we return True and the distance between the ego vehicle and the vehicle in the other lane
-            print("OTHER LANE OCCUPATA DA: " + str(vehicle))
             return True, vehicle
         return False, None
 
@@ -180,7 +175,6 @@ class BehaviorAgent(BasicAgent):
         """
         vel = vehicle.get_velocity().length()       # get the velocity of the vehicle
         acc = vehicle.get_acceleration().length()   # get the acceleration of the vehicle
-        print("VELOCITA VEICOLO: ", vel, "ACCELERAZIONE: ", acc)
         return acc <= 1.0 and vel < 3 # if the acceleration is low and the velocity is low, we return True, otherwise we return False
     
     def _iam_stuck(self, waypoint):
@@ -215,13 +209,9 @@ class BehaviorAgent(BasicAgent):
         i=0             # initialize the index of the list of vehicles in front of the ego vehicle
         # create a list of vehicles that are in maximum 15 meters from each other
         for i in range (len(vehicle_list)-1):
-            print("i: ", i, "len: ", len(vehicle_list))
             v1_location = vehicle_list[i].get_transform().location      # get the location of the first vehicle
             v2_location = vehicle_list[i+1].get_transform().location    # get the location of the second vehicle
             v_distance = math.sqrt((v2_location.x - v1_location.x)**2 + (v2_location.y - v1_location.y)**2) # distance between the first vehicle and the second vehicle
-            #print("VEICOLO: ", v, "DISTANZA: ", v.get_location().distance(self._vehicle.get_location()))
-            print("VEICOLO: ", vehicle_list[i], "DISTANZA: ", v_distance)
-            print("i: ", i, "len: ", len(vehicle_list))
             # if the distance between the first vehicle and the second vehicle is less than 15 meters, we add the first vehicle to the list of vehicles in front of the ego vehicle
             if v_distance < 15:
                 v_list.append(vehicle_list[i])  # add the first vehicle to the list of vehicles in front of the ego vehicle
@@ -234,13 +224,10 @@ class BehaviorAgent(BasicAgent):
         v_list.append(vehicle_list[i])# add the last vehicle to the list of vehicles in front of the ego vehicle
         # return True, the number of vehicles in front of the ego vehicle, the total distance between the ego vehicle and the last vehicle in front of it, and the maximum distance between two vehicles in front of the ego vehicle
         if len(v_list) == 1 or len(v_list) == 0:
-            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 1, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
             return True, 1, 65, 8
         elif len(v_list) == 2:
-            print("I AM STUCK - VEICOLI DAVANTI A ME: ", 2, "DISTANZA TOTALE: ",65, "DISTANZA MASSIMA: ", 8)
             return True, 2, 65, 8
         else:
-            print("I AM STUCK - VEICOLI DAVANTI A ME: ", len(v_list), "DISTANZA TOTALE: ",distance*3, "DISTANZA MASSIMA: ", d_max+1)
             return True, len(v_list), max(80, distance*3), d_max+1
     
     def traffic_light_manager(self):
@@ -265,7 +252,6 @@ class BehaviorAgent(BasicAgent):
         stops_list = self._world.get_actors().filter('*stop*') if not self._stops_list else self._stops_list # get all the stop signs in the world
         def dist(v): return v.get_location().distance(waypoint.transform.location) # distance between the waypoint of the stop sign and the ego vehicle
         stops_list = [v for v in stops_list if dist(v) < 20] # filter stop signs within 15 meters from the ego vehicle
-        print(str(len(stops_list)) + '\n' if len(stops_list) > 0 else '', end='')
         if len(stops_list) > 1: # if there are more than one stop signs, we sort them by distance
             stops_list.sort(key=dist)
         
@@ -348,7 +334,6 @@ class BehaviorAgent(BasicAgent):
 
             if not vehicle_state and self._direction == RoadOption.LANEFOLLOW and not waypoint.is_junction and self._speed > 10 and self._behavior.tailgate_counter == 0: # if there is no vehicle in the current lane and the ego vehicle is not in a junction and the ego vehicle is moving at a speed larger than 10 and the tailgate counter is 0
                 self._tailgating(waypoint, vehicle_list)
-        print("vehicle_state: ", vehicle_state, "vehicle: ", vehicle, "distance: ", distance)
 
         return vehicle_state, vehicle, distance # return True if there is a vehicle nearby, False if not, the nearby vehicle, and the distance to the nearby vehicle
 
@@ -377,7 +362,6 @@ class BehaviorAgent(BasicAgent):
         else:
             walker_state, walker, distance = self._vehicle_obstacle_detected(walker_list, max(self._behavior.min_proximity_threshold, self._speed_limit), up_angle_th=60)  # check if there is a walker in the current lane
 
-        print("walker_state: ", walker_state, "walker: ", walker, "distance: ", distance)
         return walker_state, walker, distance
 
     def obstacle_avoid_manager(self, waypoint):
@@ -405,7 +389,6 @@ class BehaviorAgent(BasicAgent):
         else:
             obstacle_state, obstacle, distance = self._vehicle_obstacle_detected(obstacle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), up_angle_th=40)  # check if there is a obstacle in the current lane
 
-        print("obstacle_state", obstacle_state, "obstacle", obstacle, "distance", distance)
         return obstacle_state, obstacle, distance # return True if there is a obstacle nearby, False if not, the nearby obstacle, and the distance to the nearby obstacle
 
     def car_following_manager(self, vehicle, distance, debug=False):
@@ -421,7 +404,6 @@ class BehaviorAgent(BasicAgent):
         delta_v = max(1, (self._speed - vehicle_speed) / 3.6) # difference between our speed and the speed of the vehicle in front of us
         ttc = distance / delta_v if delta_v != 0 else distance / np.nextafter(0., 1.) # time to collision
 
-        print("VEICOLO DAVANTI. Distance: ", distance, "Velocità ego: ",self._speed, "Velocità veicolo davanti: ", vehicle_speed)
         if self._behavior.safety_time * 0.3 > ttc > 0.0: # if the time to collision is less than the safety time
             target_speed = min([positive(vehicle_speed - self._behavior.speed_decrease), self._behavior.max_speed, self._speed_limit - self._behavior.speed_lim_dist]) # decrease the speed
             self._local_planner.set_speed(target_speed) # set the speed
@@ -489,7 +471,6 @@ class BehaviorAgent(BasicAgent):
             invasion_state, offset_invasion = self._lane_invasion(vehicle_invasion)
             if invasion_state:
                 # if the lane invasion is true we do a trajectory shift to avoid the vehicle in our lane and we decrease the speed
-                #print('LANE INVASION: TRUE, SO DO EMERGENCY STOP')
                 self._local_planner.set_lat_offset(-(offset_invasion+0.8)) # set the lateral offset
                 self._shrinkage = True
                 target_speed = min([self._behavior.max_speed, self._speed_limit]) - (self._behavior.speed_decrease * 2) # decrease the speed
@@ -498,7 +479,6 @@ class BehaviorAgent(BasicAgent):
                 return control
         elif self._shrinkage:
             # the normal behavior is restored
-            #print('LANE INVASION: FALSE')
             self._local_planner.set_lat_offset(0.0)
             self._shrinkage = False
 
@@ -734,11 +714,5 @@ class BehaviorAgent(BasicAgent):
             if relative_direction <= 90 and intersection_distance < closest_distance: 
                 closest_intersection = intersection_location # update the closest intersection
                 closest_distance = intersection_distance # update the closest distance
-
-        # CANCELLAREEEEE!!!!!!
-        if closest_intersection is not None:
-            print('Closest intersection:', closest_intersection, 'Distance:', closest_distance)
-        else:
-            print('No intersections found.')
-
+                
         return closest_distance

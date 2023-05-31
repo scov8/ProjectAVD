@@ -136,13 +136,10 @@ class BasicAgent(object):
             print(vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
 
         for vehicle in vehicle_list:
-            print('--------------- for ----------------')
             ve_wpt = self._map.get_waypoint(vehicle.get_location())
             if junction is not None and ve_wpt.get_junction().id == junction.id:
                 _print_vehicle_info(vehicle)
                 _print_vehicle_info(self._vehicle)
-                # print('||||| vehicle_type:', vehicle.type_id, ' ||||| data: transform', vehicle.get_transform(), ' forward', vehicle.get_forward_vector(), ' right', vehicle.get_right_vector())
-                # print('||||| ego:', self._vehicle.type_id, ' ||||| data: transform', self._vehicle.get_transform(), ' forward', self._vehicle.get_forward_vector(), ' right', self._vehicle.get_right_vector())
 
         
         if check_lane != 'left' or check_lane != 'right':
@@ -402,7 +399,6 @@ class BasicAgent(object):
 
         #if the last stop sign is not none, check if it is still affecting the vehicle
         if self._last_stop_sign is not None:
-            print('-------- last_stop_sign if --------------')
             l_vehicle_state, l_vehicle, l_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='left')     #check if there is a vehicle in the left lane
             r_vehicle_state, r_vehicle, r_distance = self._vehicle_in_junction(ego_vehicle_waypoint, check_lane='right')    #check if there is a vehicle in the right lane
 
@@ -753,7 +749,6 @@ class BasicAgent(object):
 
         if len(self._near_vehicle_list) > 0:
             self._near_vehicle_list = sorted(self._near_vehicle_list, key=lambda t: t[2])
-            print(self._near_vehicle_list[0][1].type_id)
             if check_overtake_list and self._near_vehicle_list[0][1].type_id not in self._overtake_list:
                 return (False, None, -1)
             return self._near_vehicle_list[0]
@@ -770,10 +765,6 @@ class BasicAgent(object):
         Use the different distances to fine-tune the maneuver.
         If the lane change is impossible, the returned path will be empty.
         """
-
-        print("DISTANCE SAME LANE:  ", distance_same_lane)
-        print("DISTANCE OTHER LANE: ", distance_other_lane)
-        print("DISTANCE LANE CHANGE:", lane_change_distance)
 
         plan = []
         plan.append((waypoint, RoadOption.LANEFOLLOW))  # start position
