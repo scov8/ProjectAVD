@@ -51,7 +51,7 @@ class BehaviorAgent(BasicAgent):
         # Vehicle information
         self._speed = 0             # speed of the ego vehicle
         self._steer = 0             # steering wheel angle of the ego vehicle
-        self._speed_limit = 0       # speed limit of the road the ego vehicle
+        self._speed_limit = 0       # speed limit of the road the ego vehicle is in
         self._direction = None      # direction the ego vehicle is following
         self._vehicle_heading = None        # heading of the ego vehicle
         self._incoming_direction = None     # direction of the incoming waypoint
@@ -66,7 +66,7 @@ class BehaviorAgent(BasicAgent):
         self._destination_waypoint = None # final destination waypoint
         self._shrinkage = False           # shrinkage flag
         self._waypoints_queue_copy = None # copy of the waypoints queue
-        self._d_max = 8                   # maximum distance to check for overtaking
+        self._d_max = 8                   # maximum distance to check for overtaking ending
         self._distance_to_over = 75       # distance to overtake
         self._distance_to_overtake_obj = 80    # distance to overtake
         self._n_vehicle = 0                 # number of vehicles in front of the ego vehicle
@@ -100,7 +100,7 @@ class BehaviorAgent(BasicAgent):
         self._look_ahead_steps = int((self._speed_limit) / 10) # set the look ahead steps based on the speed limit of the road the ego vehicle is in
 
         self._incoming_waypoint, self._incoming_direction = self._local_planner.get_incoming_waypoint_and_direction(steps=self._look_ahead_steps) # get the incoming waypoint and direction
-        # if the incoming direction is None, we set it to LANEFOLLOW
+       
         if self._incoming_direction is None:
             self._incoming_direction = RoadOption.LANEFOLLOW
 
@@ -116,7 +116,7 @@ class BehaviorAgent(BasicAgent):
         """
         This method returns True if the other lane is occupied by a vehicle.
             :param distance: distance to look ahead for other vehicles
-            :param check_behind: if True check also for vehicles behind the ego vehicle, otherwise check for vehicles ahead of the ego vehicle
+            :param check_behind: if True check also the back of the ahead vehicle
             :return True if the other lane is occupied by a vehicle, False otherwise
         """
 
@@ -129,7 +129,7 @@ class BehaviorAgent(BasicAgent):
         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x # return distance between two vehicles
         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < distance and v.id != self._vehicle.id] # filter vehicles within distance and not the ego vehicle
 
-        # If the flag check_behind is False, we check the ahead vehicle
+        # If the flag check_behind is False, we check only the front of the ahead vehicle
         if check_behind is False:
             vehicle_state, vehicle, distance = self._vehicle_detected_other_lane(vehicle_list, distance, up_angle_th=90) # check for vehicles in the other lane
             # If a vehicle is detected in the other lane, we return True, otherwise we return False.
@@ -137,8 +137,8 @@ class BehaviorAgent(BasicAgent):
                 return True
             return False
         else:
-            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True)      # check for vehicles in the other lane ahead of the ego vehicle
-            vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)  # check for vehicles in the other lane behind of the ego vehicle
+            vehicle_state_ahead, vehicle_ahead, distance_ahead = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True)      # check for vehicles in the other lane, check the front of the ahead vehicle
+            vehicle_state_behind, vehicle_behind, distance_behind = self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 3), low_angle_th=90, up_angle_th=135)  # check for vehicles in the other lane, check the back of the ahead vehicle
 
             # If a vehicle is detected in the other lane on ahead and behind
             if vehicle_state_ahead and vehicle_state_behind:
@@ -246,21 +246,21 @@ class BehaviorAgent(BasicAgent):
         """
         This method is in charge of behaviors for stop signs.
             :param waypoint: the waypoint of the stop sign
-            :return affected: True and the stop sign if the ego vehicle is affected by a stop sign, otherwise return False and 0
+            :return affected: True  if the ego vehicle is affected by a stop sign, otherwise return False
+            :return stop_sign: the stop sign that affects the ego vehicle
         """
 
         stops_list = self._world.get_actors().filter('*stop*') if not self._stops_list else self._stops_list # get all the stop signs in the world
         def dist(v): return v.get_location().distance(waypoint.transform.location) # distance between the waypoint of the stop sign and the ego vehicle
-        stops_list = [v for v in stops_list if dist(v) < 20] # filter stop signs within 15 meters from the ego vehicle
+        stops_list = [v for v in stops_list if dist(v) < 20] # filter stop signs within 20 meters from the ego vehicle
         if len(stops_list) > 1: # if there are more than one stop signs, we sort them by distance
             stops_list.sort(key=dist)
         
-        return self._affected_by_stop_sign(self._vehicle, stops_list)[0] # return True if the ego vehicle is affected by a stop sign, otherwise return False
+        return self._affected_by_stop_sign(self._vehicle, stops_list)[0] 
 
     def _tailgating(self, waypoint, vehicle_list):
         """
         This method is in charge of tailgating behaviors.
-            :param location: current location of the agent
             :param waypoint: current waypoint of the agent
             :param vehicle_list: list of all the nearby vehicles
         """
@@ -307,7 +307,6 @@ class BehaviorAgent(BasicAgent):
         free_space_on_one_side = lane_width / 2 - other_extent # free space on one side of the lane
 
         if other_offset > free_space_on_one_side: # if the distance between the waypoint of the other vehicle and effective location of the other vehicle is larger than the free space on one side of the lane
-            print('other_offset is larger thant free space on one side')
             return True, other_offset - free_space_on_one_side # return True and the distance between the waypoint of the other vehicle and effective location of the other vehicle minus the free space on one side of the lane
         return False, 0
 
@@ -367,7 +366,7 @@ class BehaviorAgent(BasicAgent):
     def obstacle_avoid_manager(self, waypoint):
         """
         This module is in charge of warning in case of a collision
-        with any pedestrian.
+        with any obstacle.
             :param waypoint: current waypoint of the agent
             :return obstacle_state: True if there is a object nearby, False if not
             :return obstacle: nearby obstacle
@@ -421,7 +420,7 @@ class BehaviorAgent(BasicAgent):
 
         return control
 
-    def run_step(self, debug=True):  # il debug era false
+    def run_step(self, debug=True):  # Debug was set to False
         """
         Execute one step of navigation.
             :param debug: boolean for debugging
@@ -451,9 +450,8 @@ class BehaviorAgent(BasicAgent):
         
         # 1.1: Stop Signs
         if self.stop_signs_manager(ego_vehicle_wp) and not get_speed(self._vehicle) < 1.0:
-                # if the ego vehicle is affected by a stop sign
+                # if the ego vehicle is affected by a stop sign and the speed of the ego vehicle is low
                 self._stay_at_stop_counter=15
-                #return self.emergency_stop()
         elif self._incoming_waypoint.is_junction and (self._incoming_direction in [RoadOption.LEFT, RoadOption.RIGHT]): 
             # if the ego vehicle is in a junction and the incoming direction is left or right
             target_speed = min([self._behavior.max_speed, self._speed_limit-5]) # decrease the speed, setting the target speed to the minimum between the maximum speed and the speed limit minus 5
@@ -461,14 +459,14 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug) # run the local planner
         
         if self._stay_at_stop_counter > 0: 
-            #when the counter is still active, the vehicle will not move
+            # when the counter is still active, the vehicle will not move
             return self.emergency_stop()
         
         # 2.0: Lane Invasion of other vehicles
-        vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30) # check if there is a vehicle in our lane
+        vehicle_state_invasion, vehicle_invasion = self._other_lane_occupied_lane_invasion(distance=30) # check if there is a vehicle in the other lane that is not in his expected waypoint 
         if vehicle_state_invasion and not self._overtaking_vehicle and not self._overtaking_obj:
-            # if there is a vehicle in our lane and we are not overtaking another vehicle or an object we can manage the lane invasion
-            invasion_state, offset_invasion = self._lane_invasion(vehicle_invasion)
+            # if there is a possible lane invasion and we are not overtaking another vehicle or an object we can manage the lane invasion
+            invasion_state, offset_invasion = self._lane_invasion(vehicle_invasion) # check if there is a lane invasion and get the offset
             if invasion_state:
                 # if the lane invasion is true we do a trajectory shift to avoid the vehicle in our lane and we decrease the speed
                 self._local_planner.set_lat_offset(-(offset_invasion+0.8)) # set the lateral offset
@@ -478,12 +476,12 @@ class BehaviorAgent(BasicAgent):
                 control = self._local_planner.run_step(debug=debug)
                 return control
         elif self._shrinkage:
-            # the normal behavior is restored
+            # the normal behavior is restored after the end of lane invasion
             self._local_planner.set_lat_offset(0.0)
             self._shrinkage = False
 
         # 2.1: Pedestrian avoidance behaviors
-        walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp)
+        walker_state, walker, w_distance = self.pedestrian_avoid_manager(ego_vehicle_wp) # check if there is a walker in front of us
 
         if walker_state:
             # Distance is computed from the center of the two cars, we use bounding boxes to calculate the actual distance
@@ -495,19 +493,18 @@ class BehaviorAgent(BasicAgent):
                 return self.emergency_stop()
 
         # 2.2: Obstacle avoidance behaviors
-        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp) # check if there is an obstacle in our lane
+        obstacle_state, obstacle, distance = self.obstacle_avoid_manager(ego_vehicle_wp) # check if there is an obstacle in front of us
 
         if obstacle_state: 
-            # if there is an obstacle in our lane
+            # if there is an obstacle
             distance = distance - max(obstacle.bounding_box.extent.y, obstacle.bounding_box.extent.x) - max(self._vehicle.bounding_box.extent.y, self._vehicle.bounding_box.extent.x) # compute the distance between the ego vehicle and the obstacle
 
-            # Emergency brake if the car is very close.
             if self._speed < 0.01: 
                 # if the speed of the ego vehicle is less than 0.01
                 if ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken: 
                     # check the type of the left lane marking (if it is broken or solid broken)
                     if not self._overtaking_obj and self._direction == RoadOption.LANEFOLLOW: 
-                        # if we are not overtaking another vehicle or an object and the direction is lanefollow
+                        # if we are not overtaking another vehicle or an object and the direction is LANEFOLLOW
                         if not self._other_lane_occupied(distance=self._distance_to_overtake_obj): 
                             # check if there is a vehicle in the left lane
                             self._waypoints_queue_copy = self._local_planner._waypoints_queue.copy() # copy the waypoints queue
@@ -534,7 +531,7 @@ class BehaviorAgent(BasicAgent):
                 self._distance_to_overtake_obj -= 0.3
                 
 
-        # 2.x.x: overtake behavior
+        # 2.3: overtake manager
         if self._ending_overtake: 
             # if we are ending the overtaking phase
             if not self._local_planner.has_incoming_waypoint(): 
@@ -585,7 +582,7 @@ class BehaviorAgent(BasicAgent):
             control = self._local_planner.run_step(debug=debug) # run the local planner
             return control
 
-        # 2.3: Car following behaviors
+        # 2.4: Car management
         vehicle_state, vehicle, distance = self.collision_and_car_avoid_manager(ego_vehicle_wp) # check if there is a vehicle in our lane
 
         if vehicle_state: 
@@ -595,10 +592,10 @@ class BehaviorAgent(BasicAgent):
             if (ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.Broken or ego_vehicle_wp.left_lane_marking.type == carla.LaneMarkingType.SolidBroken) and self._behavior.overtake_counter == 0 and distance < 6: 
                 # check the type of the left lane marking (if it is broken or solid broken) and if the overtaking counter is 0 and the distance is less than 6
                 if not self._overtaking_vehicle and self._direction == RoadOption.LANEFOLLOW:
-                    # if we are not overtaking another vehicle and the direction is lanefollow
+                    # if we are not overtaking another vehicle and the direction is LANEFOLLOW
                     if self._is_slow(vehicle): 
                         # if the vehicle in front of us is slow
-                        stuck, self._n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp) # check if we are stuck
+                        stuck, self._n_vehicle, self._distance_to_over, self._d_max  = self._iam_stuck(ego_vehicle_wp) # count vehicles in front of us and calculate the distance to overtake
                         vehicle_list = self._world.get_actors().filter("*vehicle*") # get all the vehicles in the world
                         def dist(v, w): return v.get_location().distance(w.get_location()) - v.bounding_box.extent.x - w.bounding_box.extent.x # distance between the two vehicles
                         vehicle_list = [v for v in vehicle_list if dist(v, self._vehicle) < 30 and v.id != self._vehicle.id] # get all the vehicles in the world that are within 30 meters from the ego vehicle and are not the ego vehicle
@@ -631,7 +628,7 @@ class BehaviorAgent(BasicAgent):
             self._local_planner.set_speed(target_speed)
             control = self._local_planner.run_step(debug=debug)
 
-        # 3.1: Normal behavior - controllo se la velocità è troppo alta mentre sto sterzando
+        # 3.1: Decrease speed during turns
         elif self._speed > 45 and self._steer > 90 or self.closest_intersection() < 30:
             # if the speed is too high while steering or we are in the proximity of an intersection we decelerate
             return self.decelerate()
@@ -649,7 +646,7 @@ class BehaviorAgent(BasicAgent):
         """
         Overwrites the throttle a brake values of a control to perform an emergency stop.
         The steering is kept the same to avoid going out of the lane when stopping during turns
-            :param speed (carl.VehicleControl): control to be modified
+            :return control: carla.VehicleControl
         """
         control = carla.VehicleControl()
         control.throttle = 0.0
