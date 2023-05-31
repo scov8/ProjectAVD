@@ -69,7 +69,7 @@ class BasicAgent(object):
         self._max_brake = 0.5
         self._offset = 0
         self._near_vehicle_list = []
-        self._overtake_list = ["vehicle.dodge.charger_police_2020", "vehicle.diamondback.century", "vehicle.ford.crown", "vehicle.mercedes.coupe_2020","vehicle.gazelle.omafiets"] # Blacklist of vehicles to overtake
+        self._overtake_list = ["vehicle.dodge.charger_police_2020", "vehicle.diamondback.century", "vehicle.ford.crown", "vehicle.mercedes.coupe_2020","vehicle.gazelle.omafiets"] # List of vehicles to overtake that are on right lane
         self._junction_counter = 0
 
         # Change parameters according to the dictionary
@@ -117,6 +117,16 @@ class BasicAgent(object):
         self._stops_map = {}
 
     def _vehicle_in_junction(self, waypoint, vehicle_list=None, check_lane='left'):
+        '''
+        Method to check if there is a vehicle in the junction, in the left or right lane.
+            :param waypoint (carla.Waypoint): waypoint of the vehicle
+            :param vehicle_list (list of carla.Vehicle): list contatining vehicle objects.
+            :param check_lane (string): lane to check, 'left' or 'right'
+            :return (bool) True if there is a vehicle in front of the agent blocking its path,
+                False otherwise.
+            :return (carla.Vehicle) the vehicle that is blocking the agent
+            :return (float) the distance between the agent and the vehicle
+        '''
         if not waypoint.is_junction:
             return (False, None, -1)
 
@@ -323,7 +333,6 @@ class BasicAgent(object):
         if self._ignore_traffic_lights:
             return (False, None)
 
-        #
         if not lights_list:
             lights_list = self._world.get_actors().filter("*traffic_light*")
 
@@ -641,7 +650,7 @@ class BasicAgent(object):
         if len(self._near_vehicle_list) > 0:
             self._near_vehicle_list = sorted(self._near_vehicle_list, key=lambda t: t[2])
             return self._near_vehicle_list[0]
-        # this else if are used to check for vehicles of the blacklist in the second lane so the right lane of the agent
+        # these else if are used to check for vehicles of the list in the second lane, so the right lane of the agent
         elif check_rear and not check_second_lane:
             return self._vehicle_detected_other_lane(vehicle_list, max(self._behavior.min_proximity_threshold, self._speed_limit / 2), up_angle_th=90, check_rear=True, check_second_lane=True)
         elif not check_second_lane:
