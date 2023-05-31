@@ -49,42 +49,54 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {5.5}Pedestrian avoidance behaviors}{14}{subsection.5.5}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {6}Qualitative analysis of results}{15}{section.6}%
+\contentsline {section}{\numberline {6}Simulation Results}{15}{section.6}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {6.1}Video}{15}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.1}Route 0}{16}{subsection.6.1}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {6.2}Control loss}{15}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.2}Route 1}{17}{subsection.6.2}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {6.3}Traffic negotiation}{15}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.3}Route 2}{18}{subsection.6.3}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.3.1}Right turn at an intersection with crossing traffic}{15}{subsubsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.4}Route 3}{19}{subsection.6.4}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.3.2}Unprotected left turn at intersection with oncoming traffic}{16}{subsubsection.6.3.2}%
+\contentsline {subsection}{\numberline {6.5}Route 4}{20}{subsection.6.5}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {6.4}Obstacle avoidance}{16}{subsection.6.4}%
+\contentsline {section}{\numberline {7}Qualitative analysis of results}{21}{section.7}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.4.1}Obstacle in lane}{16}{subsubsection.6.4.1}%
+\contentsline {subsection}{\numberline {7.1}Video}{21}{subsection.7.1}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.4.2}Slow moving hazard at lane edge}{16}{subsubsection.6.4.2}%
+\contentsline {subsection}{\numberline {7.2}Control loss}{21}{subsection.7.2}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.4.3}Vehicle invading lane on bend}{16}{subsubsection.6.4.3}%
+\contentsline {subsection}{\numberline {7.3}Traffic negotiation}{21}{subsection.7.3}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {6.5}Braking and lane changing}{16}{subsection.6.5}%
+\contentsline {subsubsection}{\numberline {7.3.1}Right turn at an intersection with crossing traffic}{21}{subsubsection.7.3.1}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.5.1}Longitudinal control after leading vehicle’s brake}{16}{subsubsection.6.5.1}%
+\contentsline {subsubsection}{\numberline {7.3.2}Unprotected left turn at intersection with oncoming traffic}{22}{subsubsection.7.3.2}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.5.2}Obstacle avoidance without prior action}{17}{subsubsection.6.5.2}%
+\contentsline {subsection}{\numberline {7.4}Obstacle avoidance}{22}{subsection.7.4}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.5.3}Pedestrian emerging from behind parked vehicle}{17}{subsubsection.6.5.3}%
+\contentsline {subsubsection}{\numberline {7.4.1}Obstacle in lane}{22}{subsubsection.7.4.1}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.5.4}Obstacle avoidance with prior action - pedestrian or bicycle}{17}{subsubsection.6.5.4}%
+\contentsline {subsubsection}{\numberline {7.4.2}Slow moving hazard at lane edge}{22}{subsubsection.7.4.2}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {6.5.5}Obstacle avoidance with prior action - vehicle}{17}{subsubsection.6.5.5}%
+\contentsline {subsubsection}{\numberline {7.4.3}Vehicle invading lane on bend}{22}{subsubsection.7.4.3}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {7}Future Improvements and Errors}{17}{section.7}%
+\contentsline {subsection}{\numberline {7.5}Braking and lane changing}{22}{subsection.7.5}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {7.1}Errors or missing feature}{17}{subsection.7.1}%
+\contentsline {subsubsection}{\numberline {7.5.1}Longitudinal control after leading vehicle’s brake}{22}{subsubsection.7.5.1}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {7.2}Errors caused by the simulator}{18}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.5.2}Obstacle avoidance without prior action}{23}{subsubsection.7.5.2}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {7.3}Possible improvements and advantages that could they bring}{19}{subsection.7.3}%
+\contentsline {subsubsection}{\numberline {7.5.3}Pedestrian emerging from behind parked vehicle}{23}{subsubsection.7.5.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {7.5.4}Obstacle avoidance with prior action - pedestrian or bicycle}{23}{subsubsection.7.5.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {7.5.5}Obstacle avoidance with prior action - vehicle}{23}{subsubsection.7.5.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {8}Future Improvements and Errors}{23}{section.8}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {8.1}Errors or missing feature}{23}{subsection.8.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {8.2}Errors caused by the simulator}{24}{subsection.8.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {8.3}Possible improvements and advantages that could they bring}{25}{subsection.8.3}%

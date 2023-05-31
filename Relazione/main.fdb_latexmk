@@ -1,17 +1,17 @@
 # Fdb version 3
-["biber main"] 0 "main.bcf" "main.bbl" "main" 1685194095
-  "main.bcf" 1685194064 106053 c49ad187d757a62ae2ff82a5685f255d "pdflatex"
+["biber main"] 0 "main.bcf" "main.bbl" "main" 1685519655
+  "main.bcf" 1685519655 106053 c49ad187d757a62ae2ff82a5685f255d "pdflatex"
   (generated)
-  "main.blg"
   "main.bbl"
-["makeindex main.idx"] 1685191419 "main.idx" "main.ind" "main" 1685194095
-  "main.idx" 1685194062 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.blg"
+["makeindex main.idx"] 1685191419 "main.idx" "main.ind" "main" 1685519655
+  "main.idx" 1685519653 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   (generated)
-  "main.ind"
   "main.ilg"
-["pdflatex"] 1685194061 "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.tex" "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.pdf" "main" 1685194095
-  "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.aux" 1685194064 13861 f6dc06cbaa899d24174a6b0e8a254d8b ""
-  "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.tex" 1685194094 34707 5964dffe97a81208fb83d9c9c493a583 ""
+  "main.ind"
+["pdflatex"] 1685519652 "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.tex" "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.pdf" "main" 1685519655
+  "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.aux" 1685519655 14864 2435dc1d08bb641a1a1e66589e85bec6 ""
+  "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.tex" 1685519652 42247 3e9ec4778cfd004d264e97d634f2775c ""
   "/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -167,21 +167,21 @@
   "img/TR17.png" 1684767881 130995 3487ebe99e0a988416ac4457f0767eb4 ""
   "img/TR19a.png" 1684767881 146006 d12273f0bd025fd25d8f8ded6027bc75 ""
   "img/TR22.png" 1684767881 131475 e4ae3fd10e3803608d8eaed15eb12622 ""
-  "main.aux" 1685194064 13861 f6dc06cbaa899d24174a6b0e8a254d8b "pdflatex"
+  "main.aux" 1685519655 14864 2435dc1d08bb641a1a1e66589e85bec6 "pdflatex"
   "main.bbl" 1685188826 1607 6c64045df6db147bfeb01ed18b8bbdb2 "biber main"
   "main.ind" 1685191419 0 d41d8cd98f00b204e9800998ecf8427e "makeindex main.idx"
-  "main.out" 1685194064 8926 0716533996dfb28fcfa50addef6af9d4 "pdflatex"
-  "main.run.xml" 1685194064 2301 f06af3099c978185a0ac5347b2a69dfa "pdflatex"
-  "main.tex" 1685194094 34707 5964dffe97a81208fb83d9c9c493a583 ""
-  "main.toc" 1685194064 5909 47a1bb1615fbf2245d9fe7e7431fea76 "pdflatex"
+  "main.out" 1685519655 9543 bae217e36d1e68286adc60ef49f32855 "pdflatex"
+  "main.run.xml" 1685519655 2301 f06af3099c978185a0ac5347b2a69dfa "pdflatex"
+  "main.tex" 1685519652 42247 3e9ec4778cfd004d264e97d634f2775c ""
+  "main.toc" 1685519655 6564 a5a5564f90092728d3a46612a4c7d2c1 "pdflatex"
   (generated)
-  "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.pdf"
-  "main.run.xml"
-  "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.log"
-  "main.toc"
   "main.out"
+  "main.log"
   "main.bcf"
   "main.idx"
+  "main.run.xml"
+  "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.pdf"
+  "/Users/francescotortora/Documents/GitHub/ProjectAVD/Relazione/main.log"
   "main.aux"
-  "main.log"
   "main.pdf"
+  "main.toc"

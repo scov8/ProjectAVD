@@ -375,6 +375,253 @@ respective bounding boxes.
 These measures allow the vehicle to react quickly and effectively to the presence of pedestrians on the road,
 ensuring safety for both vehicle driver and pedestrians.
 
+\section{Simulation Results}
+Our simulation has reached the following global results that could resume the vehicle statistic through the different routes.
+You can see also the results of the baseline on the Google Drive folder.
+\begin{verbatim}
+    {
+        "global_record": {
+            "index": -1,
+            "route_id": -1,
+            "status": "Completed",
+            "infractions": {
+                "collisions_layout": 0.096,
+                "collisions_pedestrian": 0.383,
+                "collisions_vehicle": 0.096,
+                "red_light": 0.0,
+                "stop_infraction": 0.096,
+                "outside_route_lanes": 0.01,
+                "min_speed_infractions": 0.575,
+                "yield_emergency_vehicles_infractions": 0.0,
+                "scenario_timeouts": 0.0,
+                "route_dev": 0.0,
+                "vehicle_blocked": 0.0,
+                "route_timeout": 0.0
+            },
+            "scores_mean": {
+                "score_composed": 56.983979,
+                "score_route": 100.0,
+                "score_penalty": 0.569839
+            },
+            "scores_std_dev": {
+                "score_composed": 40.725,
+                "score_route": 0.0,
+                "score_penalty": 0.407
+            },
+            "meta": {
+                "exceptions": []
+            }
+        },
+        "progress": [
+            5,
+            5
+        ]
+    }
+\end{verbatim}
+Instead, below we have detailed the routes taken individually.
+\clearpage
+\subsection{Route 0}
+\begin{verbatim}
+    {
+        "index": 0,
+        "route_id": "RouteScenario_0_rep0",
+        "status": "Completed",
+        "num_infractions": 4,
+        "infractions": {
+            "collisions_layout": [],
+            "collisions_pedestrian": [
+                "Agent collided against object with type=walker.pedestrian.0049
+                and id=31467 at (x=-3886.007, y=3776.67, z=346.962)",
+                "Agent collided against object with type=walker.pedestrian.0044
+                and id=31490 at (x=-3356.573, y=4073.047, z=364.677)"
+            ],
+            "collisions_vehicle": [],
+            "red_light": [],
+            "stop_infraction": [],
+            "outside_route_lanes": [],
+            "min_speed_infractions": [
+                "Average speed is 87.97% of the surrounding traffic's one",
+                "Average speed is 87.97% of the surrounding traffic's one"
+            ],
+            "yield_emergency_vehicles_infractions": [],
+            "scenario_timeouts": [],
+            "route_dev": [],
+            "vehicle_blocked": [],
+            "route_timeout": []
+        },
+        "scores": {
+            "score_route": 100,
+            "score_penalty": 0.232280,
+            "score_composed": 23.228062
+        },
+        "meta": {
+            "route_length": 4210.947,
+            "duration_game": 484.05,
+            "duration_system": 930.988
+        }
+    }
+\end{verbatim}
+\clearpage
+\subsection{Route 1}
+\begin{verbatim}
+    {
+    "index": 1,
+    "route_id": "RouteScenario_1_rep0",
+    "status": "Completed",
+    "num_infractions": 7,
+    "infractions": {
+        "collisions_layout": [],
+        "collisions_pedestrian": [],
+        "collisions_vehicle": [
+            "Agent collided against object with type=vehicle.chevrolet.impala
+            and id=35521 at (x=-3087.486, y=619.79, z=320.53)"
+        ],
+        "red_light": [],
+        "stop_infraction": [
+            "Agent ran a stop with id=31917 at (x=-3084.022, y=615.53, z=320.273)"
+        ],
+        "outside_route_lanes": [
+            "Agent went outside its route lanes for about 5.066 meters
+            (0.16% of the completed route)"
+        ],
+        "min_speed_infractions": [
+            "Average speed is 90.9% of the surrounding traffic's one",
+            "Average speed is 94.6% of the surrounding traffic's one",
+            "Average speed is 98.81% of the surrounding traffic's one",
+            "Average speed is 98.81% of the surrounding traffic's one"
+        ],
+        "yield_emergency_vehicles_infractions": [],
+        "scenario_timeouts": [],
+        "route_dev": [],
+        "vehicle_blocked": [],
+        "route_timeout": []
+    },
+    "scores": {
+        "score_route": 100,
+        "score_penalty": 0.455329,
+        "score_composed": 45.532881
+    },
+    "meta": {
+        "route_length": 3206.913,
+        "duration_game": 434.15,
+        "duration_system": 821.393
+    }
+}
+\end{verbatim}
+\clearpage
+\subsection{Route 2}
+\begin{verbatim}
+    {
+    "index": 2,
+    "route_id": "RouteScenario_2_rep0",
+    "status": "Perfect",
+    "num_infractions": 0,
+    "infractions": {
+        "collisions_layout": [],
+        "collisions_pedestrian": [],
+        "collisions_vehicle": [],
+        "red_light": [],
+        "stop_infraction": [],
+        "outside_route_lanes": [],
+        "min_speed_infractions": [],
+        "yield_emergency_vehicles_infractions": [],
+        "scenario_timeouts": [],
+        "route_dev": [],
+        "vehicle_blocked": [],
+        "route_timeout": []
+    },
+    "scores": {
+        "score_route": 100,
+        "score_penalty": 1.0,
+        "score_composed": 100.0
+    },
+    "meta": {
+        "route_length": 884.393,
+        "duration_game": 232.45,
+        "duration_system": 365.14
+    }
+}
+\end{verbatim}
+\clearpage
+\subsection{Route 3}
+\begin{verbatim}
+    {
+    "index": 3,
+    "route_id": "RouteScenario_3_rep0",
+    "status": "Perfect",
+    "num_infractions": 0,
+    "infractions": {
+        "collisions_layout": [],
+        "collisions_pedestrian": [],
+        "collisions_vehicle": [],
+        "red_light": [],
+        "stop_infraction": [],
+        "outside_route_lanes": [],
+        "min_speed_infractions": [],
+        "yield_emergency_vehicles_infractions": [],
+        "scenario_timeouts": [],
+        "route_dev": [],
+        "vehicle_blocked": [],
+        "route_timeout": []
+    },
+    "scores": {
+        "score_route": 100,
+        "score_penalty": 1.0,
+        "score_composed": 100.0
+    },
+    "meta": {
+        "route_length": 1231.288,
+        "duration_game": 376.75,
+        "duration_system": 627.647
+    }
+}
+\end{verbatim}
+\clearpage
+\subsection{Route 4}
+\begin{verbatim}
+    {
+    "index": 4,
+    "route_id": "RouteScenario_4_rep0",
+    "status": "Completed",
+    "num_infractions": 4,
+    "infractions": {
+        "collisions_layout": [
+            "Agent collided against object with type=traffic.stop and id=44393
+            at (x=3610.803, y=2521.817, z=363.886)"
+        ],
+        "collisions_pedestrian": [
+            "Agent collided against object with type=walker.pedestrian.0049
+            and id=47477 at (x=3591.484, y=2405.555, z=361.443)",
+            "Agent collided against object with type=walker.pedestrian.0049
+            and id=47477 at (x=3591.484, y=2405.555, z=361.443)"
+        ],
+        "collisions_vehicle": [],
+        "red_light": [],
+        "stop_infraction": [],
+        "outside_route_lanes": [
+            "Agent went outside its route lanes for about 5.0 meters
+            (0.56% of the completed route)"
+        ],
+        "min_speed_infractions": [],
+        "yield_emergency_vehicles_infractions": [],
+        "scenario_timeouts": [],
+        "route_dev": [],
+        "vehicle_blocked": [],
+        "route_timeout": []
+    },
+    "scores": {
+        "score_route": 100,
+        "score_penalty": 0.161589,
+        "score_composed": 16.158952
+    },
+    "meta": {
+        "route_length": 900.445,
+        "duration_game": 268.7,
+        "duration_system": 401.493
+    }
+}
+\end{verbatim}
+
 \section{Qualitative analysis of results}
 \subsection{Video}
 We did six video, please note that in our videos (except for the baseline video), for the route0 and route1 we set the sun altitude to 15 degrees,
